@@ -8,7 +8,10 @@ code), **authorization** by policy (three-scope guardrails, intersection),
 the platform holds no business entity). The seven restrictions are this
 separation made checkable.
 This file pins down **names, signatures and rules**. Implementers do not invent
-abstractions beyond it. Divergence = bug.
+abstractions beyond it. Divergence = bug. The pattern's technology-independent
+rules are extracted in [`SPECIFICATION.md`](SPECIFICATION.md) (draft): where
+both state the same rule, the specification carries the pattern-level wording
+and this file adds the binding to this implementation.
 
 Python: 3.14 (venv in `.venv`). Style: **synchronous** code (async→sync bridges
 live inside the connectors). No pydantic in `core` (pure stdlib: `dataclasses`,
@@ -61,7 +64,7 @@ default is right and makes it checkable, so agent wiring doesn't undo it. It
 is load-bearing where the default does not exist: greenfield platforms and
 MCP-era connections.
 
-## Architectural guarantees (given the seven restrictions; each with its evidence)
+## Architectural guarantees (given the seven restrictions + the output-contract guard; each with its evidence)
 
 - **Deterministic execution order** — the model selects and generates, never
   sequences; model-call count per execution is **bounded** and known per plan

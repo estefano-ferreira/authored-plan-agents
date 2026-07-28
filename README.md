@@ -1,5 +1,5 @@
 # Authored-Plan Agents
-### An architectural pattern for AI-driven business process automation — LLM agents with separated execution, policy, and domain authority. Reference implementation & measurement study.
+### An architectural pattern for AI-driven business process automation — LLM agents with separated execution, policy, and domain authority. Specification + reference implementation & measurement study.
 
 > **In a hurry?** [`WHY.md`](WHY.md) is the five-minute version: the problem,
 > the three authorities, and whether your case applies.
@@ -70,9 +70,12 @@ amortize. The five-minute version of this scoping is in [`WHY.md`](WHY.md).
 
 ## Architectural guarantees
 
-Given the seven restrictions hold (each enforced by a test that also *commits
-its violation* in a strict-xfail probe), the architecture guarantees — each
-with the evidence that measured it:
+Given the seven restrictions **plus the output-contract guard on the write
+path** (the mechanism integrity-matrix cell B measures — see
+[`SPECIFICATION.md`](SPECIFICATION.md) § 5.1 for why it is named separately
+from the numbered set), each restriction enforced by a test that also
+*commits its violation* in a strict-xfail probe, the architecture
+guarantees — each with the evidence that measured it:
 
 | Guarantee | Evidence |
 |---|---|
@@ -89,10 +92,12 @@ restrictions — verified in-process and at the container boundary. They are
 and **not** a guarantee of content quality inside a valid schema (that residue
 is what the output-contract guard bounds, and the matrix measures).
 
-This repository is an academic study in three artifacts: a minimal end-to-end
-platform that implements the pattern, a test suite that enforces its
-restrictions (rather than documenting them), and three cycles of real-model
-measurement that refined the pattern against its own evidence.
+This repository is an academic study in three artifacts — a minimal
+end-to-end platform that implements the pattern, a test suite that enforces
+its restrictions (rather than documenting them), and three cycles of
+real-model measurement that refined the pattern against its own evidence —
+plus a draft [`SPECIFICATION.md`](SPECIFICATION.md) extracted from them, so
+the pattern can be implemented in any stack without reading this code.
 
 ## Key results (measured, not claimed)
 
@@ -218,6 +223,7 @@ test, not by convention.
 
 | Document | What it is |
 |---|---|
+| [`SPECIFICATION.md`](SPECIFICATION.md) | **The pattern, independent of this implementation** (draft) — scope, terminology, the seven constraints with their enforcement moments, guarantees, conformance status, security considerations. What any implementation in any stack must satisfy |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | The reasoning per component: why each exists, what would break without it, which authority it protects — and the components deliberately left out. No contracts repeated |
 | [`DESIGN.md`](DESIGN.md) | Source of truth: contracts, signatures, rules, phase-by-phase decisions |
 | [`NOTES.md`](NOTES.md) | **The study's core artifact** — where the structure resisted, where it had to bend, and every measurement, under one criterion: *observed, not speculated* |

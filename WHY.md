@@ -64,4 +64,4 @@ scope, and these are its edges.
 
 ---
 
-**Details, evidence and implementation → [README](README.md).**
+**Details, evidence, specification and implementation → [README](README.md).**
