@@ -1,5 +1,8 @@
 # Authored-Plan Agents
-### An architectural pattern for LLM agent platforms with separated execution, policy, and domain authority — reference implementation & measurement study
+### An architectural pattern for AI-driven business process automation — LLM agents with separated execution, policy, and domain authority. Reference implementation & measurement study.
+
+> **In a hurry?** [`WHY.md`](WHY.md) is the five-minute version: the problem,
+> the three authorities, and whether your case applies.
 
 ## The incident this pattern prevents
 
@@ -45,6 +48,25 @@ The pattern separates the three decisions and gives each to the party that can:
 > reviewed in a pull request. The authored plan is one of the three
 > authorities (sequence), not the whole thesis: swap YAML for BPMN or JSON and
 > the pattern stands — the essence is the separation, not the plan's format.
+
+**How that differs from what you already know:**
+
+| Approach | Who authors the sequence | Where business validity is decided |
+|---|---|---|
+| ReAct-style agents | model, per step at runtime | inside the loop |
+| Plan-and-Execute / ReWOO / LLMCompiler | model, generated per run | inside the plan |
+| Action-Selector ([arXiv 2506.08837](https://arxiv.org/abs/2506.08837)) | human, fixed action set | not addressed (security-motivated) |
+| Workflow engines / BPMN | human | inside the engine |
+| **Authored-Plan Agents** | **human, versioned, reviewed** | **outside the platform, by the system that owns the invariant** |
+
+**When to use it — and when not.** Use it when agents write business state
+whose invariants matter and the flows are known enough to review. Skip it
+when: there is **no business state to protect** (FAQ bots, assistants,
+summarization, simple copilots); when **every write path already runs through
+server-side validation nothing in the agent wiring can bypass** — there the
+pattern names why your default is right but adds no mechanism; and for
+**prototypes or single-domain tools**, where the per-agent ceremony doesn't
+amortize. The five-minute version of this scoping is in [`WHY.md`](WHY.md).
 
 ## Architectural guarantees
 
@@ -199,6 +221,7 @@ test, not by convention.
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | The reasoning per component: why each exists, what would break without it, which authority it protects — and the components deliberately left out. No contracts repeated |
 | [`DESIGN.md`](DESIGN.md) | Source of truth: contracts, signatures, rules, phase-by-phase decisions |
 | [`NOTES.md`](NOTES.md) | **The study's core artifact** — where the structure resisted, where it had to bend, and every measurement, under one criterion: *observed, not speculated* |
+| [`RELATED_WORK.md`](RELATED_WORK.md) | Deep comparison with prior art and an honest contribution hierarchy — which elements have named precedents, which do not, and the epistemic status of the search itself |
 
 ## Honest limitations
 
