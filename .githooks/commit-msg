@@ -1,0 +1,17 @@
+#!/bin/sh
+# Guardrail: block commit MESSAGES carrying internal AI-tooling attribution.
+# Co-author trailers, session links and assistant addresses are internal control
+# metadata and must not appear in the published history.
+# Install path: git config core.hooksPath .githooks
+
+MSG_FILE="$1"
+BLOCK='Co-Authored-By:.*(Claude|Anthropic)|Claude-Session|Generated with.*Claude|claude\.ai/code|noreply@anthropic\.com'
+
+hits=$(grep -iE "$BLOCK" "$MSG_FILE")
+if [ -n "$hits" ]; then
+    echo "BLOCKED (commit-msg): internal AI-tooling attribution is not allowed in commit messages:" >&2
+    echo "$hits" | sed 's/^/  /' >&2
+    echo "Remove the trailer(s)/link(s) and commit again." >&2
+    exit 1
+fi
+exit 0

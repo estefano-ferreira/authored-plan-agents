@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software or the study's measurements, please cite it as below."
+title: "Authored-Plan Agents: Reference Implementation and Measurement Study of an Architectural Pattern for LLM Agent Platforms"
+type: software
+license: MIT
+authors:
+  - family-names: "Senhor Ferreira"
+    given-names: "Estefano"
+    email: "estefano.senhor@gmail.com"
+date-released: "2026-07-27"
+version: "0.1.0"
+keywords:
+  - LLM agents
+  - agent orchestration
+  - architectural patterns
+  - saga compensation
+  - structured output
+  - false success
+abstract: >
+  Reference implementation of an architectural pattern for LLM agent platforms
+  in which non-determinism is confined to selection and generation, never to
+  sequence. Includes a restriction-enforcing test suite and three cycles of
+  real-model measurement: false success over real persistence (100% silent
+  corruption -> 0 with decoding-level structured output plus an architectural
+  contract guard), compensation over persisted state including failure of the
+  compensation itself, and selection accuracy at catalog scale (ambiguity as a
+  ~75% floor rather than a catalog-size slope; 100% out-of-catalog refusal).

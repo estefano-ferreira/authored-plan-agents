@@ -1,0 +1,157 @@
+{
+  "A": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "completed": 10
+      },
+      "tokens_in_total": 3893,
+      "tokens_out_total": 1376,
+      "cost_usd_total": 0.00303725,
+      "latency_ms_mean": 14104.85345000634,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 2,
+        "max_latency_ms": 63934.002200025134
+      },
+      "repairs_total": 10,
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0
+      }
+    },
+    "erp": {
+      "db_path": "var/erp/matrix-A.sqlite",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 10,
+      "rows_valid_summary": 0,
+      "rows_garbage": 10
+    }
+  },
+  "B": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "failed_clean": 10
+      },
+      "tokens_in_total": 4545,
+      "tokens_out_total": 2636,
+      "cost_usd_total": 0.00509025,
+      "latency_ms_mean": 11523.856529977638,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 2,
+        "max_latency_ms": 50260.212299996056
+      },
+      "repairs_total": 0,
+      "output_contract": {
+        "contract_violations": 10,
+        "contract_retries": 10,
+        "contract_failures": 10
+      }
+    },
+    "erp": {
+      "db_path": "var/erp/matrix-B.sqlite",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 0,
+      "rows_valid_summary": 0,
+      "rows_garbage": 0
+    }
+  },
+  "C": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "completed": 10
+      },
+      "tokens_in_total": 3893,
+      "tokens_out_total": 995,
+      "cost_usd_total": 0.00246575,
+      "latency_ms_mean": 24783.158249990083,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 3,
+        "max_latency_ms": 111493.76230000053
+      },
+      "repairs_total": 0,
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0
+      }
+    },
+    "erp": {
+      "db_path": "var/erp/matrix-C.sqlite",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 10,
+      "rows_valid_summary": 10,
+      "rows_garbage": 0
+    }
+  },
+  "D": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "completed": 10
+      },
+      "tokens_in_total": 3893,
+      "tokens_out_total": 993,
+      "cost_usd_total": 0.00246275,
+      "latency_ms_mean": 10640.575150004588,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 1,
+        "max_latency_ms": 48574.085199972615
+      },
+      "repairs_total": 0,
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0
+      }
+    },
+    "erp": {
+      "db_path": "var/erp/matrix-D.sqlite",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 10,
+      "rows_valid_summary": 10,
+      "rows_garbage": 0
+    }
+  },
+  "control": {
+    "aggregate": {
+      "n": 3,
+      "status_counts": {
+        "completed": 3
+      },
+      "tokens_in_total": 618,
+      "tokens_out_total": 12,
+      "cost_usd_total": 0.0001725,
+      "latency_ms_mean": 16686.258966607664,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 1,
+        "max_latency_ms": 47169.57269993145
+      },
+      "repairs_total": 0,
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0
+      }
+    },
+    "erp": {
+      "db_path": "var/erp/matrix-control.sqlite",
+      "exists": true,
+      "table": "appointments",
+      "rows_created": 3,
+      "rows_valid_summary": null,
+      "rows_garbage": null
+    }
+  }
+}

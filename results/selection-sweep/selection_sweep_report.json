@@ -1,0 +1,172 @@
+{
+  "generated_at": "2026-07-28T20:23:25.056798+00:00",
+  "source_jsonl": "results/selection-sweep/selection_sweep.jsonl",
+  "n_records": 240,
+  "models_present": [
+    "gemini-3.1-flash-lite"
+  ],
+  "by_model": {
+    "gemini-3.1-flash-lite": {
+      "by_catalog_size": {
+        "2": {
+          "overall": {
+            "n": 10,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 4,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 6,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 116,
+          "avg_output_tokens": 2,
+          "avg_latency_ms": 668.6300199944526
+        },
+        "5": {
+          "overall": {
+            "n": 18,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 10,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 2,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 6,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 214.33333333333334,
+          "avg_output_tokens": 2.7777777777777777,
+          "avg_latency_ms": 2812.460683324995
+        },
+        "10": {
+          "overall": {
+            "n": 34,
+            "accuracy": 0.9411764705882353,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 20,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 8,
+              "accuracy": 0.75,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 6,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 371.94117647058823,
+          "avg_output_tokens": 2.8823529411764706,
+          "avg_latency_ms": 3904.1835970710963
+        },
+        "20": {
+          "overall": {
+            "n": 68,
+            "accuracy": 0.9117647058823529,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 40,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 22,
+              "accuracy": 0.7272727272727273,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 6,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 717.2352941176471,
+          "avg_output_tokens": 3.911764705882353,
+          "avg_latency_ms": 3455.0855220655008
+        },
+        "40": {
+          "overall": {
+            "n": 110,
+            "accuracy": 0.9090909090909091,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 80,
+              "accuracy": 0.95,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 24,
+              "accuracy": 0.75,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 6,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 1395.7454545454545,
+          "avg_output_tokens": 4.2272727272727275,
+          "avg_latency_ms": 3643.9452609121377
+        }
+      },
+      "accuracy_curve": [
+        {
+          "catalog_size": 2,
+          "n": 10,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 5,
+          "n": 18,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 10,
+          "n": 34,
+          "accuracy": 0.9411764705882353
+        },
+        {
+          "catalog_size": 20,
+          "n": 68,
+          "accuracy": 0.9117647058823529
+        },
+        {
+          "catalog_size": 40,
+          "n": 110,
+          "accuracy": 0.9090909090909091
+        }
+      ],
+      "n_records": 240
+    }
+  }
+}

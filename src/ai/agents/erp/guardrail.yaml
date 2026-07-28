@@ -1,0 +1,7 @@
+id: erp-agent-guardrail
+scope: agent
+allow_tool_types: [SYSTEM_OF_RECORD]
+allow_targets: ["rest:erp", "model:*"]
+limits:
+  max_model_calls_per_step: 1
+  max_tool_calls_per_step: 3

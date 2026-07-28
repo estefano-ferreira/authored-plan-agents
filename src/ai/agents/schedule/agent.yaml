@@ -1,0 +1,13 @@
+id: schedule-agent
+version: 1.0.0
+owner: scheduling
+business_context: scheduling
+goal: Book and reschedule customer appointments, confirming via WhatsApp.
+instructions: |
+  You act on behalf of the scheduling area. Check availability and policy
+  before creating or changing an appointment, and always confirm to the customer
+  through the informed channel. Never invent time slots or policies: consult the tools.
+capabilities: [book, reschedule]
+memory_policy:
+  session: {last_n_turns: 10, ttl_seconds: 1800}
+  knowledge: {enabled: true, top_k: 3}

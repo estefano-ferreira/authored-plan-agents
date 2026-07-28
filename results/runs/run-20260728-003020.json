@@ -1,0 +1,380 @@
+{
+  "metadata": {
+    "provider": "local",
+    "model": "local-deterministic",
+    "repeat": 2,
+    "timestamp": "2026-07-28T03:30:20.114640+00:00",
+    "fault_injection": false
+  },
+  "per_execution": [
+    {
+      "index": 0,
+      "repeat_round": 1,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-1 at slot 2026-09-01T10:00",
+      "execution_id": "80611023-a53a-447b-b7f9-b7e5ec38f029",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-1"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 55.13320001773536,
+      "latency_ms_per_step": {
+        "booking": 54.34259993489832
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 1,
+      "repeat_round": 1,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-1 received from the customer",
+      "execution_id": "2d5e2843-f2b2-4ea4-b73a-6251bed25d09",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-1",
+        "reply_id": "reply-354b0ef5"
+      },
+      "tokens_in": 419,
+      "tokens_out": 67,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 18.825799925252795,
+      "latency_ms_per_step": {
+        "acknowledge": 7.4841000605374575,
+        "register": 10.76799992006272
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 2,
+      "repeat_round": 2,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-2 at slot 2026-09-01T11:00",
+      "execution_id": "163f3b5f-13d9-45a8-9e78-47908d6a7d1d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-2"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 18.74939992558211,
+      "latency_ms_per_step": {
+        "booking": 18.24600005056709
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 3,
+      "repeat_round": 2,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-2 received from the customer",
+      "execution_id": "42cf3f7d-fe87-4250-9d69-06ea83bd3aa3",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-2",
+        "reply_id": "reply-9ca31c79"
+      },
+      "tokens_in": 419,
+      "tokens_out": 67,
+      "cache_read_tokens": 147,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 18.07379990350455,
+      "latency_ms_per_step": {
+        "acknowledge": 7.049400010146201,
+        "register": 10.55179990362376
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    }
+  ],
+  "aggregate": {
+    "schedule-appointment": {
+      "n": 2,
+      "completed": 2,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 217,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 6,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 36.94129997165874,
+        "stdev": 25.727231770497298
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 2
+        },
+        "capability": {
+          "book": 2
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "inbound-email-to-erp": {
+      "n": 2,
+      "completed": 2,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 419,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 67,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 18.449799914378673,
+        "stdev": 0.5317443148306151
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "inbound-email-to-erp": 2
+        },
+        "capability": {
+          "read-and-reply": 2,
+          "register-request": 2
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "overall": {
+      "n": 4,
+      "completed": 4,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 318,
+        "stdev": 116.62475437630441
+      },
+      "tokens_out": {
+        "mean": 36.5,
+        "stdev": 35.21836642056717
+      },
+      "model_calls": {
+        "mean": 3,
+        "stdev": 1.1547005383792515
+      },
+      "latency_ms_total": {
+        "mean": 27.695549943018705,
+        "stdev": 18.294888001457572
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 2,
+          "inbound-email-to-erp": 2
+        },
+        "capability": {
+          "book": 2,
+          "read-and-reply": 2,
+          "register-request": 2
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    }
+  }
+}

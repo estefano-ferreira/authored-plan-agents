@@ -1,0 +1,31 @@
+id: inbound-email-to-erp
+version: 1.0.0
+description: Read a customer email, reply and register the request in the ERP.
+triggers: ["email recebido", "received email", "inbound email", "solicitação por email", "email request"]
+entry_scopes: ["gmail:read", "gmail:send", "erp:write"]
+steps:
+  - id: acknowledge
+    agent: correspondence-agent
+    intent: "read inbound email and send acknowledgement reply"
+    input: {email_id: "{{ request.email_id }}"}
+    effect: true
+    compensate:
+      agent: correspondence-agent
+      intent: "send correction about failed processing"
+      input: {email_id: "{{ request.email_id }}", mode: "correction"}
+  - id: register
+    agent: erp-agent
+    intent: "register customer request record"
+    depends_on: [acknowledge]
+    input:
+      customer_email: "{{ steps.acknowledge.result.sender }}"
+      summary: "{{ steps.acknowledge.result.summary }}"
+      request_type: "{{ steps.acknowledge.result.request_type }}"
+    effect: true
+    compensate:
+      agent: erp-agent
+      intent: "cancel request record"
+      input: {record_id: "{{ steps.register.result.record_id }}"}
+output:
+  record_id: "{{ steps.register.result.record_id }}"
+  reply_id: "{{ steps.acknowledge.result.reply_id }}"

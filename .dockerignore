@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+_legacy_sketch/
+.claude/
+.githooks/
+var/
+results/
+tests/
+.git/

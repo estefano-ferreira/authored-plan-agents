@@ -1,0 +1,52 @@
+#!/bin/sh
+# Guardrail: block any commit that stages credentials or internal tooling state.
+# Layer 1: refuse .env files and .claude/ paths outright.
+# Layer 2: scan every staged added line for credential-shaped content and
+#          internal-tooling references that must not be published.
+# Install path: git config core.hooksPath .githooks
+
+fail=0
+
+# --- Layer 1a: .env files must never be staged (only .env.example is allowed) ---
+staged_env=$(git diff --cached --name-only | grep -E '(^|/)\.env(\..+)?$' | grep -v -E '\.env\.example$')
+if [ -n "$staged_env" ]; then
+    echo "BLOCKED (pre-commit): .env file(s) staged — credentials are never committed:" >&2
+    echo "$staged_env" | sed 's/^/  - /' >&2
+    fail=1
+fi
+
+# --- Layer 1b: internal tooling state (.claude/) must never be staged ---
+staged_internal=$(git diff --cached --name-only | grep -E '(^|/)\.claude(/|$)')
+if [ -n "$staged_internal" ]; then
+    echo "BLOCKED (pre-commit): internal tooling path(s) staged — .claude/ is never committed:" >&2
+    echo "$staged_internal" | sed 's/^/  - /' >&2
+    fail=1
+fi
+
+# --- Layer 2: scan staged added lines ---
+# Credential patterns: Google API keys (legacy AIza... and current AQ.... formats),
+# Anthropic, OpenAI, LangSmith, GitHub tokens, AWS key ids, private key blocks, and
+# any known credential env var assigned a non-trivial value.
+PATTERNS='AIza[0-9A-Za-z_-]{30,}|AQ\.[A-Za-z0-9_-]{35,}|sk-ant-[A-Za-z0-9_-]{10,}|sk-proj-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{32,}|lsv2_[A-Za-z0-9_]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|BEGIN[ A-Z]* PRIVATE KEY|(GOOGLE_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|LANGSMITH_API_KEY|WHATSAPP_TOKEN|GMAIL_CREDENTIALS_PATH)[[:space:]]*[=:][[:space:]]*["'"'"']?[A-Za-z0-9_/.-]{8,}'
+# Internal-tooling references that must not appear in published content:
+# AI-assistant co-author trailers, session links, and assistant noreply addresses.
+INTERNAL='Co-Authored-By:[^\n]*(Claude|Anthropic)|Claude-Session|claude\.ai/code|noreply@anthropic\.com'
+
+added=$(git diff --cached --unified=0 -- . ':(exclude).githooks/*' | grep -E '^\+' | grep -v -E '^\+\+\+')
+
+hits=$(echo "$added" | grep -E "$PATTERNS")
+if [ -n "$hits" ]; then
+    echo "BLOCKED (pre-commit): staged content matches credential patterns:" >&2
+    echo "$hits" | head -10 | sed 's/^/  /' >&2
+    echo "Remove the secret from the staged changes (use environment variables / .env, which is gitignored)." >&2
+    fail=1
+fi
+
+internal_hits=$(echo "$added" | grep -E "$INTERNAL")
+if [ -n "$internal_hits" ]; then
+    echo "BLOCKED (pre-commit): staged content contains internal-tooling references (co-author trailers / session links):" >&2
+    echo "$internal_hits" | head -10 | sed 's/^/  /' >&2
+    fail=1
+fi
+
+exit $fail

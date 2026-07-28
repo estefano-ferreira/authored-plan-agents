@@ -1,0 +1,275 @@
+{
+  "metadata": {
+    "provider": "local",
+    "model": "local-deterministic",
+    "repeat": 1,
+    "timestamp": "2026-07-28T03:19:01.084207+00:00",
+    "fault_injection": false
+  },
+  "per_execution": [
+    {
+      "index": 0,
+      "repeat_round": 1,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-1 at slot 2026-09-01T10:00",
+      "execution_id": "fe3b5c91-4965-4bea-bafc-07ea72dd69f4",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-1"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 33.19139999803156,
+      "latency_ms_per_step": {
+        "booking": 32.396500115282834
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 1,
+      "repeat_round": 1,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-1 received from the customer",
+      "execution_id": "3b2c74bf-e49c-44d4-9186-8b670a58de9a",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-1",
+        "reply_id": "reply-354b0ef5"
+      },
+      "tokens_in": 419,
+      "tokens_out": 67,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 41.52329999487847,
+      "latency_ms_per_step": {
+        "acknowledge": 8.051899960264564,
+        "register": 32.74200006853789
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    }
+  ],
+  "aggregate": {
+    "schedule-appointment": {
+      "n": 1,
+      "completed": 1,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 217,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 6,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 33.19139999803156,
+        "stdev": 0.0
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 1
+        },
+        "capability": {
+          "book": 1
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "inbound-email-to-erp": {
+      "n": 1,
+      "completed": 1,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 419,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 67,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 41.52329999487847,
+        "stdev": 0.0
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "inbound-email-to-erp": 1
+        },
+        "capability": {
+          "read-and-reply": 1,
+          "register-request": 1
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "overall": {
+      "n": 2,
+      "completed": 2,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 318,
+        "stdev": 142.8355697996826
+      },
+      "tokens_out": {
+        "mean": 36.5,
+        "stdev": 43.1335136523794
+      },
+      "model_calls": {
+        "mean": 3,
+        "stdev": 1.4142135623730951
+      },
+      "latency_ms_total": {
+        "mean": 37.357349996455014,
+        "stdev": 5.891542987938627
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 1,
+          "inbound-email-to-erp": 1
+        },
+        "capability": {
+          "book": 1,
+          "read-and-reply": 1,
+          "register-request": 1
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    }
+  }
+}

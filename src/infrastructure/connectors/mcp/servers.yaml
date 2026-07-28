@@ -1,0 +1,16 @@
+# MCP servers used by the platform (stdio). If the credential referenced in
+# `env` is not defined in the environment, or the command does not exist/the connection fails,
+# McpConnector automatically falls back to a deterministic stub per server.
+
+gmail:
+  command: npx
+  args: ["-y", "@modelcontextprotocol/server-gmail"]
+  # names of env vars that must be set (values come from the environment, never from this file)
+  env:
+    - GMAIL_CREDENTIALS_PATH   # path to the OAuth credentials file
+
+whatsapp:
+  command: npx
+  args: ["-y", "@modelcontextprotocol/server-whatsapp"]
+  env:
+    - WHATSAPP_TOKEN           # WhatsApp Business API access token

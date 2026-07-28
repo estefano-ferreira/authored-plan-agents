@@ -1,0 +1,14 @@
+id: schedule-appointment
+version: 1.0.0
+description: Book an appointment and confirm to the customer.
+triggers: ["agendar", "marcar horário", "schedule", "book"]
+entry_scopes: ["scheduling:write", "whatsapp:send"]
+steps:
+  - id: booking
+    agent: schedule-agent
+    intent: "book an appointment"
+    input: {customer_id: "{{ request.customer_id }}", slot: "{{ request.slot }}"}
+    effect: true
+    compensate: null          # irreversible — must be the last one with an effect (it is the only one)
+output:
+  appointment_id: "{{ steps.booking.result.appointment_id }}"

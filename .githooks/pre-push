@@ -1,0 +1,54 @@
+#!/bin/sh
+# Guardrail: block any push whose outgoing commits contain credentials or
+# internal AI-tooling metadata (in files, paths, or commit messages).
+# Second line of defense after pre-commit/commit-msg (covers commits made with
+# --no-verify or created before the hooks were installed).
+# stdin: "<local_ref> <local_sha> <remote_ref> <remote_sha>" per ref being pushed.
+
+PATTERNS='AIza[0-9A-Za-z_-]{30,}|AQ\.[A-Za-z0-9_-]{35,}|sk-ant-[A-Za-z0-9_-]{10,}|sk-proj-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{32,}|lsv2_[A-Za-z0-9_]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|BEGIN[ A-Z]* PRIVATE KEY|(GOOGLE_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|LANGSMITH_API_KEY|WHATSAPP_TOKEN|GMAIL_CREDENTIALS_PATH)[[:space:]]*[=:][[:space:]]*["'"'"']?[A-Za-z0-9_/.-]{8,}'
+INTERNAL='Co-Authored-By:.*(Claude|Anthropic)|Claude-Session|Generated with.*Claude|claude\.ai/code|noreply@anthropic\.com'
+ZERO=0000000000000000000000000000000000000000
+
+fail=0
+while read local_ref local_sha remote_ref remote_sha; do
+    [ "$local_sha" = "$ZERO" ] && continue   # branch deletion — nothing to scan
+    if [ "$remote_sha" = "$ZERO" ]; then
+        range="$local_sha"                    # new branch: scan everything reachable
+    else
+        range="$remote_sha..$local_sha"       # update: scan only outgoing commits
+    fi
+
+    # Forbidden paths committed in the outgoing range? (.env files, .claude/)
+    bad_paths=$(git rev-list "$range" | while read c; do git diff-tree --no-commit-id --name-only -r "$c"; done | grep -E '(^|/)\.env(\..+)?$|(^|/)\.claude(/|$)' | grep -v -E '\.env\.example$' | sort -u)
+    if [ -n "$bad_paths" ]; then
+        echo "BLOCKED (pre-push): outgoing commits contain forbidden path(s) (.env / .claude):" >&2
+        echo "$bad_paths" | sed 's/^/  - /' >&2
+        fail=1
+    fi
+
+    # Credential-shaped or internal-tooling content added anywhere in the range?
+    added=$(git log -p --unified=0 "$range" -- . ':(exclude).githooks/*' | grep -E '^\+' | grep -v -E '^\+\+\+')
+    hits=$(echo "$added" | grep -E "$PATTERNS")
+    if [ -n "$hits" ]; then
+        echo "BLOCKED (pre-push): outgoing commits contain credential-shaped content:" >&2
+        echo "$hits" | head -10 | sed 's/^/  /' >&2
+        fail=1
+    fi
+    internal_hits=$(echo "$added" | grep -E "$INTERNAL")
+    if [ -n "$internal_hits" ]; then
+        echo "BLOCKED (pre-push): outgoing commits contain internal-tooling references:" >&2
+        echo "$internal_hits" | head -10 | sed 's/^/  /' >&2
+        fail=1
+    fi
+
+    # AI-tooling attribution in outgoing commit MESSAGES?
+    msg_hits=$(git log --format=%B "$range" | grep -iE "$INTERNAL")
+    if [ -n "$msg_hits" ]; then
+        echo "BLOCKED (pre-push): outgoing commit message(s) carry internal AI-tooling attribution:" >&2
+        echo "$msg_hits" | head -10 | sed 's/^/  /' >&2
+        echo "Rewrite the offending commit message(s) (git rebase / git commit --amend) before pushing." >&2
+        fail=1
+    fi
+done
+
+exit $fail

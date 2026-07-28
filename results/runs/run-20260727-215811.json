@@ -1,0 +1,1219 @@
+{
+  "metadata": {
+    "provider": "gemini",
+    "model": "gemini-3.1-flash-lite",
+    "repeat": 10,
+    "timestamp": "2026-07-28T00:58:11.762624+00:00"
+  },
+  "per_execution": [
+    {
+      "index": 0,
+      "repeat_round": 1,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-1 at slot 2026-09-01T10:00",
+      "execution_id": "e34ce76f-c2b2-4654-ae3f-a4dfbd5ff21b",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-1"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1772.1434000413865,
+      "latency_ms_per_step": {
+        "booking": 701.2963999295607
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 1,
+      "repeat_round": 1,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-1 received from the customer",
+      "execution_id": "1f8b10b5-d33b-4451-bf75-edcff8d67a76",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-1",
+        "reply_id": "reply-0cce6d8d"
+      },
+      "tokens_in": 389,
+      "tokens_out": 107,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00025775000000000006,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001705
+      },
+      "latency_ms_total": 2917.924099951051,
+      "latency_ms_per_step": {
+        "acknowledge": 1785.284300101921,
+        "register": 459.76630004588515
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 2,
+      "repeat_round": 2,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-2 at slot 2026-09-01T11:00",
+      "execution_id": "86f9f0ac-c442-4387-9c49-c079dd5ab11f",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-2"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1435.1521999342367,
+      "latency_ms_per_step": {
+        "booking": 591.8442999245599
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 3,
+      "repeat_round": 2,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-2 received from the customer",
+      "execution_id": "d7325000-458e-4569-9af2-1eb10a1d6c0e",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-2",
+        "reply_id": "reply-1f540769"
+      },
+      "tokens_in": 389,
+      "tokens_out": 97,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024275,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001555
+      },
+      "latency_ms_total": 2859.959200024605,
+      "latency_ms_per_step": {
+        "acknowledge": 1529.7110999235883,
+        "register": 592.2725000418723
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 4,
+      "repeat_round": 3,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-3 at slot 2026-09-01T12:00",
+      "execution_id": "ec41f98b-065f-4e61-8b66-8540594ee034",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-3"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1311.340200016275,
+      "latency_ms_per_step": {
+        "booking": 608.3953999914229
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 5,
+      "repeat_round": 3,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-3 received from the customer",
+      "execution_id": "200f2b55-3397-417d-bf88-c471e497583b",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-3",
+        "reply_id": "reply-0229226b"
+      },
+      "tokens_in": 389,
+      "tokens_out": 99,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024575000000000004,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001585
+      },
+      "latency_ms_total": 40335.06280009169,
+      "latency_ms_per_step": {
+        "acknowledge": 39033.51480001584,
+        "register": 556.37140001636
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 6,
+      "repeat_round": 4,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-4 at slot 2026-09-01T13:00",
+      "execution_id": "c5f9353a-4f08-4545-b832-b9d57da8fb1e",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-4"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1270.8319999510422,
+      "latency_ms_per_step": {
+        "booking": 547.9766000062227
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 7,
+      "repeat_round": 4,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-4 received from the customer",
+      "execution_id": "21fdaef5-020d-43da-aaab-47ee1f37714d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-4",
+        "reply_id": "reply-eefb2a87"
+      },
+      "tokens_in": 389,
+      "tokens_out": 96,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024125,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.000154
+      },
+      "latency_ms_total": 2953.939500031993,
+      "latency_ms_per_step": {
+        "acknowledge": 1671.9506999943405,
+        "register": 473.2629000209272
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 8,
+      "repeat_round": 5,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-5 at slot 2026-09-01T14:00",
+      "execution_id": "75a76b7a-e8ad-4f94-9ecd-8b9e11ef4e4d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-5"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1355.105399969034,
+      "latency_ms_per_step": {
+        "booking": 527.125500026159
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 9,
+      "repeat_round": 5,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-5 received from the customer",
+      "execution_id": "9ae97e50-0609-4a22-8c36-94f015d2bce2",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-5",
+        "reply_id": "reply-479f3410"
+      },
+      "tokens_in": 389,
+      "tokens_out": 93,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00023675,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001495
+      },
+      "latency_ms_total": 3150.083899963647,
+      "latency_ms_per_step": {
+        "acknowledge": 1661.0920000821352,
+        "register": 699.7380999382585
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 10,
+      "repeat_round": 6,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-6 at slot 2026-09-01T15:00",
+      "execution_id": "7b7ab771-72cb-4247-833d-37a54e88ffd9",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-6"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 49170.27110001072,
+      "latency_ms_per_step": {
+        "booking": 48669.92180002853
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 11,
+      "repeat_round": 6,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-6 received from the customer",
+      "execution_id": "db9c0e88-7174-4188-b43f-b6717d201b01",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-6",
+        "reply_id": "reply-765a7406"
+      },
+      "tokens_in": 389,
+      "tokens_out": 97,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024275,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001555
+      },
+      "latency_ms_total": 2977.6996999280527,
+      "latency_ms_per_step": {
+        "acknowledge": 1631.080299965106,
+        "register": 601.8053999869153
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 12,
+      "repeat_round": 7,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-7 at slot 2026-09-01T16:00",
+      "execution_id": "f30353ab-98b5-4127-a2c2-0e6fd37ef4f7",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-7"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1327.605600003153,
+      "latency_ms_per_step": {
+        "booking": 743.7842000508681
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 13,
+      "repeat_round": 7,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-7 received from the customer",
+      "execution_id": "7004d923-302d-465a-88ff-9aa02c55eb56",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-7",
+        "reply_id": "reply-a95f9d42"
+      },
+      "tokens_in": 389,
+      "tokens_out": 101,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024875000000000006,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.0001615
+      },
+      "latency_ms_total": 2856.1354000121355,
+      "latency_ms_per_step": {
+        "acknowledge": 1732.613499974832,
+        "register": 586.1969999969006
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 14,
+      "repeat_round": 8,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-8 at slot 2026-09-01T17:00",
+      "execution_id": "fc66aae3-c86c-448e-b5fb-886f6fd41f00",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-8"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1488.7274999637157,
+      "latency_ms_per_step": {
+        "booking": 690.6818000134081
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 15,
+      "repeat_round": 8,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-8 received from the customer",
+      "execution_id": "4c7e3f33-0806-4fce-990c-79cd27f5c247",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-8",
+        "reply_id": "reply-c52724d3"
+      },
+      "tokens_in": 389,
+      "tokens_out": 108,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00025925000000000004,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.000172
+      },
+      "latency_ms_total": 2907.8862000023946,
+      "latency_ms_per_step": {
+        "acknowledge": 1740.8932999242097,
+        "register": 542.7782000042498
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 16,
+      "repeat_round": 9,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-9 at slot 2026-09-01T18:00",
+      "execution_id": "9bbeae18-0500-46f2-b42d-f2c6f8c0161d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-9"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 48564.93219989352,
+      "latency_ms_per_step": {
+        "booking": 47789.64410000481
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 17,
+      "repeat_round": 9,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-9 received from the customer",
+      "execution_id": "0b32fb57-acdd-4a58-9de6-ba873f337dce",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-9",
+        "reply_id": "reply-9bbab35f"
+      },
+      "tokens_in": 389,
+      "tokens_out": 100,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024725,
+      "cost_usd_by_purpose": {
+        "selection": 8.725e-05,
+        "generation": 0.00016
+      },
+      "latency_ms_total": 2984.197000041604,
+      "latency_ms_per_step": {
+        "acknowledge": 1798.94550004974,
+        "register": 645.1914000790566
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 18,
+      "repeat_round": 10,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-10 at slot 2026-09-01T19:00",
+      "execution_id": "e0781706-ba81-459e-94a3-118980500182",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-10"
+      },
+      "tokens_in": 207,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.775e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.775e-05
+      },
+      "latency_ms_total": 1359.6241000341251,
+      "latency_ms_per_step": {
+        "booking": 690.2172999689355
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 19,
+      "repeat_round": 10,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-10 received from the customer",
+      "execution_id": "b8691de4-b46e-41d6-ad7c-a0b272b1dd00",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "record_id": "record-10",
+        "reply_id": "reply-a7038786"
+      },
+      "tokens_in": 392,
+      "tokens_out": 101,
+      "cache_read_tokens": 0,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 3,
+        "generation": 1
+      },
+      "cost_usd": 0.00024950000000000005,
+      "cost_usd_by_purpose": {
+        "selection": 8.75e-05,
+        "generation": 0.000162
+      },
+      "latency_ms_total": 2795.6523000029847,
+      "latency_ms_per_step": {
+        "acknowledge": 1672.0593998907134,
+        "register": 541.7826999910176
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        },
+        {
+          "order": 1,
+          "chosen": "register-request",
+          "options": [
+            "register-request",
+            "cancel-request"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    }
+  ],
+  "aggregate": {
+    "schedule-appointment": {
+      "n": 10,
+      "completed": 10,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 206.1,
+        "stdev": 0.31622776601683794
+      },
+      "tokens_out": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 10905.573369981721,
+        "stdev": 20008.752001852008
+      },
+      "cost_usd": {
+        "mean": 5.7525e-05,
+        "stdev": 7.905694150420927e-08
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10
+        },
+        "capability": {
+          "book": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.00057525,
+        "generation_usd": 0.0,
+        "selection_fraction": 1.0
+      }
+    },
+    "inbound-email-to-erp": {
+      "n": 10,
+      "completed": 10,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 389.3,
+        "stdev": 0.9486832980505138
+      },
+      "tokens_out": {
+        "mean": 99.9,
+        "stdev": 4.701063709417263
+      },
+      "model_calls": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 6673.854010005016,
+        "stdev": 11827.733712856445
+      },
+      "cost_usd": {
+        "mean": 0.00024717500000000003,
+        "stdev": 7.07504416947345e-06
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "read-and-reply": 10,
+          "register-request": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.00087275,
+        "generation_usd": 0.001599,
+        "selection_fraction": 0.3530899160513806
+      }
+    },
+    "overall": {
+      "n": 20,
+      "completed": 20,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 297.7,
+        "stdev": 93.98213716054322
+      },
+      "tokens_out": {
+        "mean": 51.95,
+        "stdev": 49.30194295306594
+      },
+      "model_calls": {
+        "mean": 3,
+        "stdev": 1.0259783520851542
+      },
+      "latency_ms_total": {
+        "mean": 8789.713689993368,
+        "stdev": 16143.67436293421
+      },
+      "cost_usd": {
+        "mean": 0.00015235000000000002,
+        "stdev": 9.741019480850852e-05
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10,
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "book": 10,
+          "read-and-reply": 10,
+          "register-request": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.001448,
+        "generation_usd": 0.001599,
+        "selection_fraction": 0.47522152937315393
+      }
+    }
+  }
+}

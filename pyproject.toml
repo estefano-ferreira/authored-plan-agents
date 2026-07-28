@@ -1,0 +1,34 @@
+[project]
+name = "agent-platform-reference"
+version = "0.1.0"
+description = "Reference implementation and measurement study of an architectural pattern for LLM agent platforms."
+authors = [{ name = "Estefano Senhor Ferreira", email = "estefano.senhor@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "pyyaml",
+    "fastapi",
+    "httpx",
+    "uvicorn",
+    "mcp",
+    "anthropic",
+    "openai",
+    "google-genai",
+    "langsmith",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]",
+    "pgvector",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]

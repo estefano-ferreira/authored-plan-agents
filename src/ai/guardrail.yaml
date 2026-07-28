@@ -1,0 +1,7 @@
+id: platform-guardrail
+scope: platform
+allow_tool_types: [READ_ONLY, SYSTEM_OF_RECORD, IRREVERSIBLE]
+allow_targets: ["rest:erp", "rest:scheduling", "mcp:gmail", "mcp:whatsapp", "model:*"]
+limits:
+  max_model_calls_per_step: 3
+  max_tool_calls_per_step: 10

@@ -1,0 +1,27 @@
+# Credentials — never versioned (pre-commit hook enforces this as a second layer)
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Runtime state (Docker volumes / local SQLite / rolling audit) — NOT study evidence.
+# Measurement evidence lives in results/ and IS tracked: the study lost its baseline
+# raw results file to a cleanup step precisely because results/ was ignored early on.
+var/
+
+# Pre-study scribbles kept locally for provenance, excluded from publication
+_legacy_sketch/
+
+# Internal working notes — not publication material
+# TODO.md: session continuation checklist
+# RELATED_WORK.md: competitive-window analysis and naming-search record (kept
+# locally; the scholarly neighbors it names are cited inline in the public docs)
+TODO.md
+RELATED_WORK.md
+
+# Local tooling state — never published (pre-commit hook blocks it as a second layer)
+.claude/

@@ -1,0 +1,1117 @@
+{
+  "metadata": {
+    "provider": "gemini",
+    "model": "gemini-3.1-flash-lite",
+    "repeat": 10,
+    "timestamp": "2026-07-28T00:54:29.826585+00:00"
+  },
+  "per_execution": [
+    {
+      "index": 0,
+      "repeat_round": 1,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-1 at slot 2026-09-01T10:00",
+      "execution_id": "3eb9c618-e798-4627-b432-b395d78316fa",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-1"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1697.435099980794,
+      "latency_ms_per_step": {
+        "booking": 684.5488999970257
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 1,
+      "repeat_round": 1,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-1 received from the customer",
+      "execution_id": "94a527d3-674b-4c56-b8fa-f6f676edb374",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1536.0094000352547,
+      "latency_ms_per_step": {
+        "acknowledge": 984.1102999635041
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 2,
+      "repeat_round": 2,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-2 at slot 2026-09-01T11:00",
+      "execution_id": "d4191981-45f7-4f27-adcc-56a392ea7d3c",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-2"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1657.3414999293163,
+      "latency_ms_per_step": {
+        "booking": 666.6569000808522
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 3,
+      "repeat_round": 2,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-2 received from the customer",
+      "execution_id": "9c7b1eba-b66f-44c8-b008-4830560fbb47",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1642.6131000043824,
+      "latency_ms_per_step": {
+        "acknowledge": 884.4282999634743
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 4,
+      "repeat_round": 3,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-3 at slot 2026-09-01T12:00",
+      "execution_id": "d2a390aa-8c77-4180-a373-58a5227c0093",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-3"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1301.4279999770224,
+      "latency_ms_per_step": {
+        "booking": 495.8152000326663
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 5,
+      "repeat_round": 3,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-3 received from the customer",
+      "execution_id": "4b406078-ca9f-4256-bea4-5c5e420962f1",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1628.7809999193996,
+      "latency_ms_per_step": {
+        "acknowledge": 887.5065000029281
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 6,
+      "repeat_round": 4,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-4 at slot 2026-09-01T13:00",
+      "execution_id": "939fd77e-a434-4cf3-b3d3-674c830ed2b6",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-4"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1564.2566001042724,
+      "latency_ms_per_step": {
+        "booking": 518.8898999476805
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 7,
+      "repeat_round": 4,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-4 received from the customer",
+      "execution_id": "beb1d341-4cbb-405f-beec-5af7a21b103a",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 80119.50750008691,
+      "latency_ms_per_step": {
+        "acknowledge": 79307.15820007026
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 8,
+      "repeat_round": 5,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-5 at slot 2026-09-01T14:00",
+      "execution_id": "590f22b6-1814-4c1f-b088-166d1afdcf49",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-5"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1742.7487999666482,
+      "latency_ms_per_step": {
+        "booking": 638.747000019066
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 9,
+      "repeat_round": 5,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-5 received from the customer",
+      "execution_id": "74662c11-54af-4c15-99b0-12492c96c012",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1484.3994000693783,
+      "latency_ms_per_step": {
+        "acknowledge": 918.1340000359342
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 10,
+      "repeat_round": 6,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-6 at slot 2026-09-01T15:00",
+      "execution_id": "090b15cf-0e5a-408d-9fb0-8fbb00cd7e13",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-6"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1541.2232000380754,
+      "latency_ms_per_step": {
+        "booking": 577.3199000395834
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 11,
+      "repeat_round": 6,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-6 received from the customer",
+      "execution_id": "137754ed-47f8-464b-9a48-20921d92f811",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1642.6589000038803,
+      "latency_ms_per_step": {
+        "acknowledge": 875.3783999709412
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 12,
+      "repeat_round": 7,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-7 at slot 2026-09-01T16:00",
+      "execution_id": "0694bbf7-9f7a-4fdc-a5ab-adf1081b4d8c",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-7"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1752.9923999682069,
+      "latency_ms_per_step": {
+        "booking": 630.3713000379503
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 13,
+      "repeat_round": 7,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-7 received from the customer",
+      "execution_id": "c41c5d56-1fcd-4b6a-ad15-c955472423ab",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1571.6717999894172,
+      "latency_ms_per_step": {
+        "acknowledge": 878.655800013803
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 14,
+      "repeat_round": 8,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-8 at slot 2026-09-01T17:00",
+      "execution_id": "326375cf-5712-48f9-a0e4-f0af9c9fab2c",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-8"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 1980.6423999834806,
+      "latency_ms_per_step": {
+        "booking": 681.4912999980152
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 15,
+      "repeat_round": 8,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-8 received from the customer",
+      "execution_id": "17c2de01-779f-48da-b463-2c36c459e3d5",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1546.4359000325203,
+      "latency_ms_per_step": {
+        "acknowledge": 885.955199948512
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 16,
+      "repeat_round": 9,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-9 at slot 2026-09-01T18:00",
+      "execution_id": "2d91c794-94ec-49a7-8c93-45425cf2c131",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-9"
+      },
+      "tokens_in": 206,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.75e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.75e-05
+      },
+      "latency_ms_total": 45844.463699962944,
+      "latency_ms_per_step": {
+        "booking": 44807.2753000306
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 17,
+      "repeat_round": 9,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-9 received from the customer",
+      "execution_id": "ed2bc954-7095-428f-a603-15bf173b25fb",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 182,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.500000000000001e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.5e-05
+      },
+      "latency_ms_total": 1734.7591000143439,
+      "latency_ms_per_step": {
+        "acknowledge": 903.5735999932513
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 18,
+      "repeat_round": 10,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-10 at slot 2026-09-01T19:00",
+      "execution_id": "6b861ada-3418-4888-b098-7b72e2fd380f",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-10"
+      },
+      "tokens_in": 207,
+      "tokens_out": 4,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 5.775e-05,
+      "cost_usd_by_purpose": {
+        "selection": 5.775e-05
+      },
+      "latency_ms_total": 1563.2884000660852,
+      "latency_ms_per_step": {
+        "booking": 629.591399920173
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 19,
+      "repeat_round": 10,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-10 received from the customer",
+      "execution_id": "7cc209ad-9942-459b-8338-71035b6361de",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.BadRequest', 'fieldViolations': [{'field': 'generation_config.response_schema', 'description': 'Invalid JSON payload received. Unknown name \"additional_properties\" at \\'generation_config.response_schema\\': Cannot find field.'}]}]}}",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 183,
+      "tokens_out": 13,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 6.525e-05,
+      "cost_usd_by_purpose": {
+        "selection": 6.525e-05
+      },
+      "latency_ms_total": 1618.4866999974474,
+      "latency_ms_per_step": {
+        "acknowledge": 880.5238000350073
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "gemini-3.1-flash-lite"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    }
+  ],
+  "aggregate": {
+    "schedule-appointment": {
+      "n": 10,
+      "completed": 10,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 206.1,
+        "stdev": 0.31622776601683794
+      },
+      "tokens_out": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 6064.5820099976845,
+        "stdev": 13978.333720115785
+      },
+      "cost_usd": {
+        "mean": 5.7525e-05,
+        "stdev": 7.905694150420927e-08
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10
+        },
+        "capability": {
+          "book": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.00057525,
+        "generation_usd": 0.0,
+        "selection_fraction": 1.0
+      }
+    },
+    "inbound-email-to-erp": {
+      "n": 10,
+      "completed": 0,
+      "success_rate": 0.0,
+      "tokens_in": {
+        "mean": 182.1,
+        "stdev": 0.31622776601683794
+      },
+      "tokens_out": {
+        "mean": 13,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 9452.532280015294,
+        "stdev": 24829.94276997433
+      },
+      "cost_usd": {
+        "mean": 6.502500000000001e-05,
+        "stdev": 7.905694150420712e-08
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "read-and-reply": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.00065025,
+        "generation_usd": 0.0,
+        "selection_fraction": 1.0
+      }
+    },
+    "overall": {
+      "n": 20,
+      "completed": 10,
+      "success_rate": 0.5,
+      "tokens_in": {
+        "mean": 194.1,
+        "stdev": 12.315587042870767
+      },
+      "tokens_out": {
+        "mean": 8.5,
+        "stdev": 4.616902584383193
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 7758.557145006489,
+        "stdev": 19687.920260003273
+      },
+      "cost_usd": {
+        "mean": 6.1275e-05,
+        "stdev": 3.848188227150404e-06
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10,
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "book": 10,
+          "read-and-reply": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0012255,
+        "generation_usd": 0.0,
+        "selection_fraction": 1.0
+      }
+    }
+  }
+}

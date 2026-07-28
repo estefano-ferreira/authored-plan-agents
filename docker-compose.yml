@@ -1,0 +1,55 @@
+services:
+  # Platform's Postgres: sessions, knowledge (pgvector) and the audit trail. Owned by "aici" only.
+  postgres-platform:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_USER=platform
+      - POSTGRES_PASSWORD=platform
+      - POSTGRES_DB=platform
+    volumes:
+      - platform-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform -d platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Real internal business system (SQLAlchemy + SQLite). Reachable ONLY over HTTP -- its own
+  # storage volume is never shared with the "aici" service.
+  erp:
+    build:
+      context: .
+      dockerfile: erp_service/Dockerfile
+    volumes:
+      - ./var/erp-data:/data
+    ports:
+      # Published for convenience (manual calls from the host); the platform reaches this
+      # service through the internal network at ERP_BASE_URL=http://erp:8123, not via this
+      # published port.
+      - "8123:8123"
+
+  # The platform (agent orchestration). ISOLATION RULE: this service receives no env/volume/
+  # credential that reaches the ERP's storage -- no ERP_DATABASE_URL, no ./var/erp-data volume.
+  # The only way it can reach the business system is ERP_BASE_URL (HTTP).
+  aici:
+    build: .
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.6-flash}
+      - AI_PROVIDER=${AI_PROVIDER:-gemini}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY:-}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-agent-platform-reference}
+      - PLATFORM_DATABASE_URL=postgresql+psycopg://platform:platform@postgres-platform:5432/platform
+      - ERP_BASE_URL=http://erp:8123
+    volumes:
+      - ./var:/app/var
+      - ./results:/app/results
+    depends_on:
+      postgres-platform:
+        condition: service_healthy
+      erp:
+        condition: service_started
+    command: ["--repeat", "10"]
+
+volumes:
+  platform-pgdata:

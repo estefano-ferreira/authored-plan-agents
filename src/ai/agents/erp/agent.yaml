@@ -1,0 +1,13 @@
+id: erp-agent
+version: 1.0.0
+owner: back-office
+business_context: back-office
+goal: Register and cancel customer requests in the ERP, respecting the system's invariants.
+instructions: |
+  You act on behalf of the back-office. Register or cancel requests in the ERP
+  exactly as received, without changing the request type or customer data.
+  The ERP is the authority on business invariants; respect any rejection.
+capabilities: [register-request, cancel-request]
+memory_policy:
+  session: {last_n_turns: 10, ttl_seconds: 1800}
+  knowledge: {enabled: false, top_k: 3}

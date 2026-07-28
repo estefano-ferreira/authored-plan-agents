@@ -1,0 +1,1228 @@
+{
+  "metadata": {
+    "provider": "local",
+    "model": "local-deterministic",
+    "repeat": 10,
+    "timestamp": "2026-07-28T03:16:48.951493+00:00",
+    "fault_injection": true
+  },
+  "per_execution": [
+    {
+      "index": 0,
+      "repeat_round": 1,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-1 at slot 2026-09-01T10:00",
+      "execution_id": "a791c367-ab54-40ab-a1b3-a230956bc14d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-1"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 0,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 35.803499980829656,
+      "latency_ms_per_step": {
+        "booking": 34.95260002091527
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 1,
+      "repeat_round": 1,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-1 received from the customer",
+      "execution_id": "318a1f2a-9194-47f9-8e95-3e5b22d9750e",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 69,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 6.701800040900707,
+      "latency_ms_per_step": {
+        "acknowledge": 5.879499949514866
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 2,
+      "repeat_round": 2,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-2 at slot 2026-09-01T11:00",
+      "execution_id": "41950a1a-062d-4f07-988b-f8d7acedfd2e",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-2"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 23.58720009215176,
+      "latency_ms_per_step": {
+        "booking": 23.18979997653514
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 3,
+      "repeat_round": 2,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-2 received from the customer",
+      "execution_id": "d784b425-9d73-4589-b065-214879f02b24",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.667499965056777,
+      "latency_ms_per_step": {
+        "acknowledge": 5.100200069136918
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 4,
+      "repeat_round": 3,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-3 at slot 2026-09-01T12:00",
+      "execution_id": "28bd28f8-2888-4180-89b9-f8ff94aa76ac",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-3"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 18.941700109280646,
+      "latency_ms_per_step": {
+        "booking": 18.55119992978871
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 5,
+      "repeat_round": 3,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-3 received from the customer",
+      "execution_id": "58a8314e-a336-48d4-aa8f-9ce2ebd0602e",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.352300009690225,
+      "latency_ms_per_step": {
+        "acknowledge": 4.93819999974221
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 6,
+      "repeat_round": 4,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-4 at slot 2026-09-01T13:00",
+      "execution_id": "0ce9544e-cb1b-4376-a5a5-5340b88e5f1d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-4"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 22.606899961829185,
+      "latency_ms_per_step": {
+        "booking": 22.086499957367778
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 7,
+      "repeat_round": 4,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-4 received from the customer",
+      "execution_id": "19c2cdc0-9b9c-403e-a276-39e9fba5590b",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 6.108099943958223,
+      "latency_ms_per_step": {
+        "acknowledge": 5.6600000243633986
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 8,
+      "repeat_round": 5,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-5 at slot 2026-09-01T14:00",
+      "execution_id": "31223826-c38b-42dd-8406-3e3d7a00d05d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-5"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 42.11779998149723,
+      "latency_ms_per_step": {
+        "booking": 41.66099999565631
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 9,
+      "repeat_round": 5,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-5 received from the customer",
+      "execution_id": "0c417f45-df70-4f4f-85be-8d946bf4577c",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.941100069321692,
+      "latency_ms_per_step": {
+        "acknowledge": 5.257299984805286
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 10,
+      "repeat_round": 6,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-6 at slot 2026-09-01T15:00",
+      "execution_id": "80ae2f9d-e2a8-4c1e-b7c4-a00113139078",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-6"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 20.11559996753931,
+      "latency_ms_per_step": {
+        "booking": 19.74100002553314
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 11,
+      "repeat_round": 6,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-6 received from the customer",
+      "execution_id": "66ef57ec-cc17-4642-bb78-2b4a2f1a9908",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.7873999467119575,
+      "latency_ms_per_step": {
+        "acknowledge": 5.364299984648824
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 12,
+      "repeat_round": 7,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-7 at slot 2026-09-01T16:00",
+      "execution_id": "d1bf4658-ee3f-4d03-98e4-d23d845879e0",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-7"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 20.647500059567392,
+      "latency_ms_per_step": {
+        "booking": 20.26390004903078
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 13,
+      "repeat_round": 7,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-7 received from the customer",
+      "execution_id": "b7b2fe26-fa98-42eb-9a13-abce305809ad",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.709700053557754,
+      "latency_ms_per_step": {
+        "acknowledge": 5.384800024330616
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 14,
+      "repeat_round": 8,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-8 at slot 2026-09-01T17:00",
+      "execution_id": "d0096c64-cf39-4ac9-914b-652e3ef6a00f",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-8"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 19.40909994300455,
+      "latency_ms_per_step": {
+        "booking": 19.03969992417842
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 15,
+      "repeat_round": 8,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-8 received from the customer",
+      "execution_id": "a62734cb-7cd1-44c0-92a8-222b8fa57a79",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.840400001034141,
+      "latency_ms_per_step": {
+        "acknowledge": 5.495999939739704
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 16,
+      "repeat_round": 9,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-9 at slot 2026-09-01T18:00",
+      "execution_id": "ab1023bb-a086-4118-8fa0-594ce6cf7ec9",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-9"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 18.780099926516414,
+      "latency_ms_per_step": {
+        "booking": 18.436299986205995
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 17,
+      "repeat_round": 9,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-9 received from the customer",
+      "execution_id": "b78b67d5-3d19-401c-a13c-802905905541",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 177,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 5.296000046655536,
+      "latency_ms_per_step": {
+        "acknowledge": 4.844500101171434
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    },
+    {
+      "index": 18,
+      "repeat_round": 10,
+      "request_label": "schedule-appointment",
+      "intent": "book an appointment for customer customer-10 at slot 2026-09-01T19:00",
+      "execution_id": "cab6f0fb-891c-439b-a9c5-9803838aaa0d",
+      "status": "completed",
+      "rejection": null,
+      "output": {
+        "appointment_id": "appointment-10"
+      },
+      "tokens_in": 217,
+      "tokens_out": 6,
+      "cache_read_tokens": 45,
+      "model_calls": 2,
+      "model_calls_by_purpose": {
+        "selection": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0
+      },
+      "latency_ms_total": 19.842399982735515,
+      "latency_ms_per_step": {
+        "booking": 19.45949997752905
+      },
+      "selection_violations": 0,
+      "generation_violations": 0,
+      "violation_details": [],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "schedule-appointment",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "book",
+          "options": [
+            "book",
+            "reschedule"
+          ]
+        }
+      ],
+      "contract_violations": 0,
+      "contract_retries": 0,
+      "contract_failures": 0
+    },
+    {
+      "index": 19,
+      "repeat_round": 10,
+      "request_label": "inbound-email-to-erp",
+      "intent": "process inbound email email-10 received from the customer",
+      "execution_id": "55e6b3c8-fc06-4165-b934-f503b7211704",
+      "status": "compensated",
+      "rejection": {
+        "code": "invariant_violated",
+        "reason": "output contract violated after 2 attempt(s): '```json\\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\\\"Hello, I need support with my request 123.\\\\\". We will follo'",
+        "scope": ""
+      },
+      "output": {},
+      "tokens_in": 479,
+      "tokens_out": 118,
+      "cache_read_tokens": 108,
+      "model_calls": 4,
+      "model_calls_by_purpose": {
+        "selection": 2,
+        "generation": 2
+      },
+      "cost_usd": 0.0,
+      "cost_usd_by_purpose": {
+        "selection": 0.0,
+        "generation": 0.0
+      },
+      "latency_ms_total": 7.084100041538477,
+      "latency_ms_per_step": {
+        "acknowledge": 6.732400041073561
+      },
+      "selection_violations": 0,
+      "generation_violations": 2,
+      "violation_details": [
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        },
+        {
+          "purpose": "generation",
+          "content": "```json\n{\"request_type\": \"cancellation\", \"summary\": \"Hello, I need support with my request 123.\", \"reply_body\": \"We received your message: \\\"Hello, I need support with my request 123.\\\". We will follo"
+        }
+      ],
+      "models_seen": [
+        "local-deterministic"
+      ],
+      "resolved_plan": "inbound-email-to-erp",
+      "capability_selections": [
+        {
+          "order": 0,
+          "chosen": "read-and-reply",
+          "options": [
+            "read-and-reply"
+          ]
+        }
+      ],
+      "contract_violations": 1,
+      "contract_retries": 1,
+      "contract_failures": 1
+    }
+  ],
+  "aggregate": {
+    "schedule-appointment": {
+      "n": 10,
+      "completed": 10,
+      "success_rate": 1.0,
+      "tokens_in": {
+        "mean": 217,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 6,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 2,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 24.185180000495166,
+        "stdev": 8.075126957259206
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10
+        },
+        "capability": {
+          "book": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 0,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0,
+        "executions_with_contract_retry": 0,
+        "executions_with_contract_failure": 0
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "inbound-email-to-erp": {
+      "n": 10,
+      "completed": 0,
+      "success_rate": 0.0,
+      "tokens_in": {
+        "mean": 479,
+        "stdev": 0.0
+      },
+      "tokens_out": {
+        "mean": 118,
+        "stdev": 0.0
+      },
+      "model_calls": {
+        "mean": 4,
+        "stdev": 0.0
+      },
+      "latency_ms_total": {
+        "mean": 5.948840011842549,
+        "stdev": 0.5614871166556841
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "read-and-reply": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 20,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 10,
+        "contract_retries": 10,
+        "contract_failures": 10,
+        "executions_with_contract_retry": 10,
+        "executions_with_contract_failure": 10
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    },
+    "overall": {
+      "n": 20,
+      "completed": 10,
+      "success_rate": 0.5,
+      "tokens_in": {
+        "mean": 348,
+        "stdev": 134.4031641231552
+      },
+      "tokens_out": {
+        "mean": 62,
+        "stdev": 57.45478771676863
+      },
+      "model_calls": {
+        "mean": 3,
+        "stdev": 1.0259783520851542
+      },
+      "latency_ms_total": {
+        "mean": 15.067010006168857,
+        "stdev": 10.888252890956126
+      },
+      "cost_usd": {
+        "mean": 0.0,
+        "stdev": 0.0
+      },
+      "selection_distribution": {
+        "resolved_plan": {
+          "schedule-appointment": 10,
+          "inbound-email-to-erp": 10
+        },
+        "capability": {
+          "book": 10,
+          "read-and-reply": 10
+        }
+      },
+      "violations": {
+        "selection_violations": 0,
+        "generation_violations": 20,
+        "executions_failed_with_selection_violation": 0,
+        "executions_fallback_absorbed_generation_violation": 0
+      },
+      "output_contract": {
+        "contract_violations": 10,
+        "contract_retries": 10,
+        "contract_failures": 10,
+        "executions_with_contract_retry": 10,
+        "executions_with_contract_failure": 10
+      },
+      "cost_split": {
+        "selection_usd": 0.0,
+        "generation_usd": 0.0,
+        "selection_fraction": 0.0
+      }
+    }
+  }
+}
