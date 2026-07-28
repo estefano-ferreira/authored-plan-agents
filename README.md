@@ -101,17 +101,6 @@ reference implementation exercises the **decision** moment (pre-tool policy on
 types, targets and limits); see `ARCHITECTURE.md` for what exists here versus
 what the pattern admits.*
 
-```mermaid
-flowchart LR
-    CH[Channel] --> O[Orchestrator<br/><i>single entry point</i>]
-    O -- "plan (versioned YAML)<br/>declares agent order,<br/>handoff, compensation" --> R[Agent Runtime]
-    R -- "capability (code)<br/>declares tool order" --> T[Tools]
-    T -- "SYSTEM_OF_RECORD<br/>(HTTP only)" --> ERP[(System of record<br/>validates invariants<br/>by DB constraint)]
-    T -- "READ_ONLY / IRREVERSIBLE" --> EXT[MCP / external]
-    LLM((LLM)) -. "plan selection" .-> O
-    LLM -. "capability selection<br/>+ generation" .-> R
-```
-
 **Concepts.** A *Plan* is a human-authored, versioned YAML sequence of agent
 invocations (never referencing capabilities or tools). An *Agent* is
 declarative data anchored to a business context with a named owner. A
