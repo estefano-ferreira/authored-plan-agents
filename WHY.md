@@ -64,4 +64,5 @@ scope, and these are its edges.
 
 ---
 
-**Details, evidence, specification and implementation → [README](README.md).**
+**Want to implement it in your stack? → [`SPECIFICATION.md`](SPECIFICATION.md).
+Details, evidence and the reference implementation → [`README.md`](README.md).**

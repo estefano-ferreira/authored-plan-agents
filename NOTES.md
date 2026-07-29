@@ -722,7 +722,44 @@ tokens grow linearly with the catalog (~35 tokens/plan entry; 12× from N=2 to
 N=40), motivating catalog scoping/prefiltering before the selection call in
 large deployments.
 
-## Terminology correction (2026-07-28)
+## Cross-model selection spot-check (2026-07-28, post-publication)
+
+The README's honest-limitations list called the cross-model check "pending".
+This is it — smaller than planned, for a reason that is itself a finding.
+
+**The free-tier model landscape had shifted under the plan.** The TODO's
+queued candidates aged out between planning and execution: `gemini-2.5-flash`
+and `gemini-2.5-flash-lite` are closed to new accounts (404), and
+`gemini-2.0-flash` has a free-tier request limit of **zero**. The available
+current-generation alternatives — `gemini-3.6-flash` (thinking regime) and
+`gemini-3-flash-preview` — both carry a **20-requests/day** free-tier cap
+(`GenerateRequestsPerDayPerProjectPerModel-FreeTier`, `quotaValue: 20`),
+discovered by hitting it. The preview model additionally threw 503
+capacity errors requiring a retry wrapper. Model availability is an
+experimental variable, not an infrastructure constant — the same lesson the
+integrity matrix taught about daily quotas, now on the axis of model access.
+
+**What fit under the caps** (2 reps planned, rep 1 partially recorded before
+each cap; data in `results/selection-sweep/selection_sweep.jsonl`, per-model
+blocks in the report):
+
+| model | n | correct | format violations | coverage |
+|---|---|---|---|---|
+| gemini-3.6-flash (thinking) | 24 | **24/24** | 0 | N=2, N=5 complete; N=10 clear 10/10 |
+| gemini-3-flash-preview | 18 | **18/18** | 0 | N=2, N=5 complete; N=10 clear 4/4 |
+
+Per-kind, both models: clear intents 100%, out-of-catalog refusal 100%
+(6/6 each — restriction 7 transfers), ambiguous 1/1 each (barely sampled).
+
+**Honest reading.** At N≤10, two additional model families — one of them a
+thinking model — reproduce the measured model's selection profile exactly:
+42/42 with zero format violations, on the byte-identical prompt. This
+upgrades "single model family" to "spot-checked across three, unanimous in
+the covered range". It does **not** extend the floor-not-slope ambiguity
+claim or the N=20..40 range beyond the original model: those remain
+single-family results. Full 240-point curves on a second model would need a
+paid tier (~$0.06 at list price) or ~6 days of 20-per-day accumulation —
+documented as the cost, not done.
 
 The tool-type triad was renamed twice in one day — `AUTHORITATIVE` →
 `CUSTODIAL` (morning) → `SYSTEM_OF_RECORD` (final), plus `REFERENCE` →

@@ -1,11 +1,101 @@
 {
-  "generated_at": "2026-07-28T20:23:25.056798+00:00",
+  "generated_at": "2026-07-29T00:45:17.912228+00:00",
   "source_jsonl": "results/selection-sweep/selection_sweep.jsonl",
-  "n_records": 240,
+  "n_records": 282,
   "models_present": [
-    "gemini-3.1-flash-lite"
+    "gemini-3-flash-preview",
+    "gemini-3.1-flash-lite",
+    "gemini-3.6-flash"
   ],
   "by_model": {
+    "gemini-3-flash-preview": {
+      "by_catalog_size": {
+        "2": {
+          "overall": {
+            "n": 5,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 2,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 116,
+          "avg_output_tokens": 124,
+          "avg_latency_ms": 6503.0285799643025
+        },
+        "5": {
+          "overall": {
+            "n": 9,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 5,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 1,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 214.33333333333334,
+          "avg_output_tokens": 187,
+          "avg_latency_ms": 6774.962866691769
+        },
+        "10": {
+          "overall": {
+            "n": 4,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 4,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 375.25,
+          "avg_output_tokens": 312.25,
+          "avg_latency_ms": 34543.686400022125
+        }
+      },
+      "accuracy_curve": [
+        {
+          "catalog_size": 2,
+          "n": 5,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 5,
+          "n": 9,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 10,
+          "n": 4,
+          "accuracy": 1.0
+        }
+      ],
+      "n_records": 18
+    },
     "gemini-3.1-flash-lite": {
       "by_catalog_size": {
         "2": {
@@ -167,6 +257,94 @@
         }
       ],
       "n_records": 240
+    },
+    "gemini-3.6-flash": {
+      "by_catalog_size": {
+        "2": {
+          "overall": {
+            "n": 5,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 2,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 116,
+          "avg_output_tokens": 108.4,
+          "avg_latency_ms": 1367.4745600204915
+        },
+        "5": {
+          "overall": {
+            "n": 9,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 5,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 1,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 214.33333333333334,
+          "avg_output_tokens": 158,
+          "avg_latency_ms": 16405.949377791127
+        },
+        "10": {
+          "overall": {
+            "n": 10,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 10,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 371.9,
+          "avg_output_tokens": 112.2,
+          "avg_latency_ms": 6464.9650499923155
+        }
+      },
+      "accuracy_curve": [
+        {
+          "catalog_size": 2,
+          "n": 5,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 5,
+          "n": 9,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 10,
+          "n": 10,
+          "accuracy": 1.0
+        }
+      ],
+      "n_records": 24
     }
   }
 }

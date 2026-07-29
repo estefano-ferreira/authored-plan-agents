@@ -234,8 +234,14 @@ test, not by convention.
 The study records its own failures as findings — read `NOTES.md` for the full
 list. Highlights: ambiguous intents misroute at a steady ~25% (the pattern
 should clarify-or-refuse on detected ambiguity rather than choose silently —
-proposed amendment, unmeasured); all real-model data is from one model family
-(`gemini-3.1-flash-lite`; cross-model spot-check pending); the selection sweep
+proposed amendment, unmeasured); the full measurement curves are from one
+model family (`gemini-3.1-flash-lite`) — a cross-model spot-check exists
+(42/42 selections, zero format violations, across `gemini-3.6-flash` and
+`gemini-3-flash-preview` at N≤10 — predominantly clear intents and
+out-of-catalog detection; only 1 ambiguous point per model, both at N=5;
+free-tier daily caps of 20 requests/model bounded it — see NOTES §
+Cross-model selection spot-check) but the catalog-scale and ambiguity-floor
+claims remain single-family; the selection sweep
 uses authored synthetic catalogs, not production intents; "compensation" of an
 `IRREVERSIBLE` step is forward-correction by generation, not rollback; and
 restriction 4 is a real wall only at the container boundary — in-process it is
@@ -252,10 +258,13 @@ per-execution records; every aggregate from it survives in the NOTES tables
 
 ## Status & roadmap
 
-Working reference implementation; measurements current as of 2026-07-28.
-Next: cross-model selection sweep (30 min on a second free-tier model) and the
-ambiguity-detection experiment (can the selector *flag* ambiguity instead of
-choosing?).
+Working reference implementation; measurements current as of 2026-07-28,
+including the cross-model spot-check (which falsified its own "30 minutes on
+a second free-tier model" estimate: the viable candidates carry 20-request
+daily caps — see NOTES). Next: full selection curves on a second model
+(≈6 days of daily-cap accumulation, or one paid-tier run at ~$0.06 list
+price) and the ambiguity-detection experiment (can the selector *flag*
+ambiguity instead of choosing?).
 
 ## Citation
 
