@@ -21,6 +21,19 @@ business API and satisfied it. Testing doesn't catch it — the model is
 non-deterministic, so the failing output shape appears in production, not in
 your fixtures.
 
+**What does close it — and what this pattern is actually for.** Constrained
+decoding closes this channel when it is configured correctly: in the
+integrity matrix, with a real schema, both boundary policies produced
+byte-equivalent clean outcomes and the guard had literally nothing to do —
+its idle cost measured zero. The pattern's write-path claim is therefore
+deliberately narrow: it is **not the only way to close the channel; it is
+what keeps the channel closed when the simple mechanism silently breaks.**
+That case is measured, not hypothetical: a provider schema-dialect surprise
+disabled constrained decoding by configuration — the same class of surprise
+that had produced the 10/10 silent corruptions above — and the boundary
+guard turned it into 10/10 loud, unpersisted, typed failures, at the price
+of one extra model call per violation.
+
 ## The three authorities
 
 Each failure above is one party deciding something it cannot guarantee. The

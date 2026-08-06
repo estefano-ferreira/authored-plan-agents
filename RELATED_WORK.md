@@ -27,7 +27,7 @@ of a new architecture. See the weighted contribution hierarchy in the Verdict.
 | LangGraph / [OpenAI Agents SDK](https://github.com/openai/swarm) / Flowise | Popular, mature — and **antithetical**: model-decided routing and agent→agent handoffs are their central feature | This pattern prohibits what they sell |
 | Plan-and-Execute / ReWOO / [LLMCompiler](https://arxiv.org/pdf/2312.04511) | Share "plan before execute" | The plan is **LLM-generated per run**; here it is human-authored and versioned — opposite philosophies of plan origin |
 | [12-Factor Agents](https://github.com/humanlayer/12-factor-agents) | Philosophical kin ("own your control flow", "tools are structured outputs") | A checklist of engineering heuristics, not a composed reference architecture |
-| ["Design Patterns for Securing LLM Agents against Prompt Injections" (arXiv 2506.08837)](https://arxiv.org/abs/2506.08837) — ETH Zürich / Google DeepMind / IBM / Microsoft, 14 authors | **The closest articulation of the central rule, arrived at from a third motivation**: Action-Selector (the LLM cannot decide control flow) and Plan-Then-Execute (the plan is fixed before execution) as *provable* prompt-injection defenses | Their plan is **LLM-generated per run** and the frame is security; here the plan is human-authored/versioned and the frame is integrity + determinism. Three independent roads — determinism (Conductor), cost, security (this paper) — converge on the same rule, which strengthens the rule and dilutes any single-owner claim to it |
+| ["Design Patterns for Securing LLM Agents against Prompt Injections" (arXiv 2506.08837)](https://arxiv.org/abs/2506.08837) — ETH Zürich / Google DeepMind / IBM / Microsoft, 14 authors | **The closest articulation of the central rule, arrived at from a third motivation**: Action-Selector (the LLM cannot decide control flow) and Plan-Then-Execute (the plan is fixed before execution) as *provable* prompt-injection defenses | Their plan is **LLM-generated per run** and the frame is security; here the plan is human-authored/versioned and the frame is integrity + determinism. Three independent roads — determinism (Conductor), cost, security (this paper) — converge on the same rule, which makes the rule plausible and dilutes any single-owner claim to it; convergence is consilience, not evidence — the integrity matrix, not the number of parties agreeing, is what carries the rule here |
 | [Invariant Engineering (Eledath, abr/2026)](https://www.bassimeledath.com/blog/invariant-engineering) | The crispest practitioner articulation: "a prompt that says ask the five questions in order is a suggestion; a harness that only surfaces question 3 after 2 is an invariant" — the harness owns sequencing, not the LLM | Blog-level guidance, no platform composition, no measurement |
 
 ## 2. Restriction 2 (agent never calls agent) — already named
@@ -60,7 +60,17 @@ through a supervisor/workflow. This restriction is prior art, not a contribution
   invariant* (an external system of record, by constraint, vs. the platform),
   with "no business entity on the platform side" as a rule. The narrowed
   claim: the triad's reversibility half has named neighbors; its
-  guarantee-locus half does not. DDD's aggregate-as-invariant-guardian is
+  guarantee-locus half does not. **Delimitation (2026-08-06): that absence
+  claim is time- and method-bound** — keyword search at its date, over a
+  literature that does not index by this axis (every taxonomy found
+  classifies by consequence: reversibility, blast radius, privilege). The
+  method's false-negative rate is measured by example: an adjacent
+  authorization-axis result ([arXiv 2606.22916](https://arxiv.org/abs/2606.22916),
+  v1 of 2026-06-22 — server-side, payload-bound enforcement over declared
+  manifests; the guarantee-belongs-to-the-validator argument on the
+  authorization axis) existed during the July sweep and surfaced only in a
+  later external review round. Absence findings in this document mean "not
+  found by this search as of its date", never "does not exist". DDD's aggregate-as-invariant-guardian is
   decades old, and its application to LLM agents is emerging in 2026
   ([Thoughtworks](https://www.thoughtworks.com/insights/blog/generative-ai/your-agent-skill-not-anti-corruption-layer),
   [Value Iteration](https://www.valueiteration.com/insights/data-modeling-ai-agents-systems-of-record))
@@ -366,7 +376,10 @@ search). Neither string is taken verbatim anywhere
      writes enforced by the system of record and no business entity on the
      platform side — positioned exactly in the gap the MCP maintainers
      themselves declare open ("annotations are hints; real guarantees belong
-     to another layer"). Advani's dual-control observation (false success at
+     to another layer"). Its novelty half is a negative claim and carries
+     the § 3 delimitation (search- and time-bound as of 2026-08-06); its
+     mechanism half — the registration-time check itself — does not depend
+     on that claim. Advani's dual-control observation (false success at
      3% when an independent verifier holds state) is a structural analogy in
      the same direction — separate the actor from the verifier — not
      corroboration of this specific mechanism (see § 8).

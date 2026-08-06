@@ -41,7 +41,9 @@ consumes the enum names):
 
 `READ_ONLY` and `IRREVERSIBLE` are deliberately *borrowed*, consolidated
 vocabulary — they carry no novelty claim. The guarantee-locus axis is the one
-term the related-work pass found no counterpart for, and the claim attached to
+term the related-work pass found no counterpart for (a search- and time-bound
+finding, not an absolute — see RELATED_WORK § 3, delimitation of 2026-08-06),
+and the claim attached to
 it is narrow: **one semantic axis** (who validates the business invariant, as
 a first-class tool classification), not the triad as a whole and not the
 registration-time enforcement mechanism (arXiv 2606.26924, "A Deterministic

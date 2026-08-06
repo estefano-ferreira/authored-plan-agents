@@ -126,6 +126,13 @@ single-family scope and its cross-model spot-check are discussed in
 | **Compensation over persisted state** — incl. failure of the compensation itself | Orphaned row remains in the ERP's SQLite but is now fully traceable from the audit trail alone (`compensation` events carry the orphaned state) | [`NOTES.md`](NOTES.md) § Persistence and real boundary |
 | Cost per completed task (gemini-3.1-flash-lite) | $0.000058 (no-generation plan — 100% selection overhead) to $0.000247 (two-agent plan) | `results/runs/run-20260727-215811.json` |
 
+Read the matrix row narrowly, the way a reviewer will: with real constrained
+decoding the guard has nothing to do — cells C and D are byte-equivalent and
+its idle cost is zero. The pattern does not claim to be the only way to close
+this channel. It claims to keep the channel closed when the simpler mechanism
+silently breaks — the dialect-bug row is that case, measured — at one extra
+model call per violation: the price of knowing.
+
 All real-model measurements ran **inside free-tier quotas** (≈$0.075 at list
 price, summed from the tracked per-round costs; the 42-call cross-model
 spot-check is uncosted), which is itself a claim: the methodology is

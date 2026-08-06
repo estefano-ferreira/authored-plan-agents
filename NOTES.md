@@ -805,6 +805,13 @@ rationale, both collision searches, and rejected alternatives in
   classification), not the triad, and not the registration-time enforcement
   mechanism (arXiv 2606.26924 — the injected-violation conformance neighbor;
   an earlier draft mis-cited 2606.04017, which is about epistemic integrity).
+  *(Delimitation, 2026-08-06 review round: "no found counterpart" is bound to
+  a keyword search at its date, over a literature that indexes by consequence
+  (reversibility, blast radius), not by this axis. The method's
+  false-negative rate is measured by example — arXiv 2606.22916, an adjacent
+  authorization-axis paper with v1 of 2026-06-22, existed during this sweep
+  and surfaced only in a later external round. Absence findings are
+  search-bound, never absolute; full delimitation in RELATED_WORK § 3.)*
 
 Historical records in `results/` keep the original strings (`authoritative` —
 the intermediate `custodial` never reached persisted evidence) — they are
