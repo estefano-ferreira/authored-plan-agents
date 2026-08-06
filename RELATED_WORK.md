@@ -116,6 +116,31 @@ through a supervisor/workflow. This restriction is prior art, not a contribution
   must be the last effectful step", validated at plan load time.** SagaLLM
   validates at runtime/planning. **Candidate contribution (small but sharp).**
 
+## 5b. Durable-execution runtimes — the most populated neighborhood (added 2026-08-06)
+
+- The category this document previously did not map: Temporal, DBOS, Restate,
+  and LangGraph's checkpointers treat **durable execution** as a first-class
+  agent feature. Temporal's workflow/activity split is structurally this
+  pattern's separation between deterministic sequence and non-deterministic
+  model calls — workflows must be deterministic and cannot perform I/O; LLM
+  calls live in activities. The agent ecosystem has adopted it explicitly:
+  [Pydantic AI ships Temporal/DBOS/Prefect integrations](https://temporal.io/blog/build-durable-ai-agents-pydantic-ai-and-temporal),
+  Temporal ships a [LangGraph plugin](https://temporal.io/blog/temporal-langgraph-plugin-durable-execution)
+  and an [OpenAI Agents SDK integration](https://docs.temporal.io/ai-cookbook/openai-agents-sdk-python).
+- The first question a distributed-systems reviewer asks — *why not wrap a
+  LangGraph agent in a Temporal workflow?* — has a structural answer: durable
+  execution guarantees that the **execution** completes, replays, and
+  survives crashes. It says nothing about whether the persisted **content**
+  is business-true: a Temporal workflow persists garbage perfectly durably
+  and perfectly auditably. Integrity-matrix cell A is exactly that artifact —
+  a durable, fully-logged, wrong record. The validity authority is
+  **orthogonal to durable execution, not redundant with it**.
+- Consequence for the map: durable runtimes are candidate **hosts** for the
+  sequence authority (an authored plan could compile to a Temporal workflow;
+  the pattern's poster is format-agnostic on this), while the validity
+  decision still has nowhere to live inside them — it belongs to the system
+  of record. Their replay determinism is execution-level, not content-level.
+
 ## 6. Identity, audit, refusal, metric
 
 - Identity to the tool: equivalent in spirit to OAuth Token Exchange
@@ -146,6 +171,9 @@ orchestration") — none denotes this composite.
 
 ## 8. The literature this study's measurements answer to
 
+*(All of this study's own measurements referenced in this section ran on
+`gemini-3.1-flash-lite`; single-family scope in README § Honest limitations.)*
+
 **False success / corrupt success — the empirical claim must be narrowed.**
 The phenomenon our structured-output experiment exhibits is already named and
 measured:
@@ -163,6 +191,16 @@ measured:
   **27–78% of benchmark-reported successes are procedurally corrupt** (policy
   checks bypassed, communications fabricated); gating collapses Pass^4 to
   2–24% and reverses model rankings.
+- [SABER, "Small Actions, Big Errors — Safeguarding Mutating Steps in LLM
+  Agents" (arXiv 2512.07850)](https://arxiv.org/abs/2512.07850) (under review,
+  ICLR 2026) — decomposing τ-bench and SWE-bench Verified trajectories into
+  mutating vs. non-mutating steps: each additional deviation in a **mutating**
+  action reduces the odds of task success by up to 92% (Airline) and 96%
+  (Retail); deviations in non-mutating actions have little effect. The write
+  path is where failures become decisive — the step class this pattern's
+  `SYSTEM_OF_RECORD` boundary isolates. (Name collision, recorded per this
+  repo's convention: a distinct 2026 "SABER" benchmarks operational safety of
+  coding agents — [arXiv 2606.01317](https://arxiv.org/abs/2606.01317).)
 
 Consequence for this study: the false-success experiment is a **replication in
 a persistence-grounded setting, not a discovery**. What remains specifically
@@ -259,8 +297,7 @@ architectures comparable to this one** do not measure their own mechanisms. As
 of 2026-07-28 none of Conductor, Salesforce Agent Graph, Camunda, AWS, Google,
 or LangGraph has published agent-quality measurements (PayPal's DSL paper
 reports engineering-productivity metrics only). And the gap is narrowing from
-the research side: a 584-tool
-catalog study (F1 58.2%→42.1%), [ACE-Router (ACL 2026)](https://aclanthology.org/2026.acl-long.281/),
+the research side: [ACE-Router (ACL 2026)](https://aclanthology.org/2026.acl-long.281/),
 [GitHub Copilot's 40→13 toolset cut](https://github.blog/ai-and-ml/github-copilot/how-were-making-github-copilot-smarter-with-fewer-tools/)
 (2–5 p.p. resolution-rate effect), and
 [Layer-Isolated Evaluation (arXiv 2606.11686)](https://arxiv.org/abs/2606.11686)

@@ -36,15 +36,18 @@ n-tier, thin client / smart server) **being un-solved by agent-era wiring**:
   [Cyera's analysis](https://www.cyera.com/research/agent-inflicted-damage-inside-the-real-world-failures-of-enterprise-ai-systems)
   of 7,246 public AI incidents (2023-09 → 2026-05) counts **188 in which an
   autonomous system harmed production with no attacker in the chain** —
-  legitimate tokens, approved operations. Named cases: Replit (jul/2025,
+  legitimate tokens, approved operations. Named cases:
+  [Replit](https://incidentdatabase.ai/cite/1152/) (jul/2025,
   agent ignored a code freeze and deleted a live production DB) and
   [PocketOS](https://zenity.io/blog/current-events/ai-agent-database-deletion-pocketos)
   (abr/2026, production DB and its backups, seconds). The shared structural
   feature: **a write path to state that did not pass through a validating
   business API.** No ERP accepts "drop the table" as a business operation.
 - The everyday, non-catastrophic version is measured false success — the
-  agent's narrative diverging from the record — at 45–78% of failures in
-  single-control settings ([arXiv 2606.09863](https://arxiv.org/abs/2606.09863)).
+  agent's narrative diverging from the record — at 45–48% of failures in
+  single-control tau2-bench domains ([arXiv 2606.09863](https://arxiv.org/abs/2606.09863));
+  the related but distinct *corrupt success* reaches 27–78% of
+  benchmark-reported successes ([arXiv 2603.03116](https://arxiv.org/abs/2603.03116)).
 
 The pattern's answer is two mechanisms with **distinct jobs** (measured
 distinct by the integrity matrix — see NOTES):
@@ -65,6 +68,9 @@ is load-bearing where the default does not exist: greenfield platforms and
 MCP-era connections.
 
 ## Architectural guarantees (given the seven restrictions + the output-contract guard; each with its evidence)
+
+All real-model evidence cited in this section was measured on
+`gemini-3.1-flash-lite` (single-family scope: README § Honest limitations).
 
 - **Deterministic execution order** — the model selects and generates, never
   sequences; model-call count per execution is **bounded** and known per plan

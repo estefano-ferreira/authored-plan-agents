@@ -24,6 +24,10 @@ python scripts/selection_sweep.py --report-only
 
 ## Reading the evidence
 
+- **Model:** every real-model record in this directory is
+  `gemini-3.1-flash-lite`, except the cross-model spot-check records inside
+  `selection-sweep/selection_sweep.jsonl` (`gemini-3.6-flash`,
+  `gemini-3-flash-preview`).
 - **The DB is the ground truth, not the status.** The integrity matrix's
   central finding is that statuses and even audit counters can read clean
   while the database holds garbage (cell A). When in doubt, open the SQLite

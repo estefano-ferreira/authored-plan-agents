@@ -48,7 +48,7 @@ the cost: in [one analysis of 7,246 public AI incidents](https://www.cyera.com/r
 188 involve an autonomous system harming production with **no attacker in the
 chain**. The everyday version is measured false success — the agent's
 narrative diverging from the record — at
-[45–78% of agent failures](https://arxiv.org/abs/2606.09863). The shared
+[45–48% of failures in single-control tau2-bench domains](https://arxiv.org/abs/2606.09863). The shared
 structural feature: a write path to state that did not pass through a
 validating business API.
 
@@ -189,7 +189,7 @@ implementation must be able to claim.)
 
 **What conformance means today:** implementing the seven constraints of § 5
 plus § 5.1, each enforced at its declared moment, with the audit vocabulary
-of § 4.3 distinguishable in the trail.
+of § 4, principle 3, distinguishable in the trail.
 
 **What does not exist yet:** a language-independent conformance suite. The
 only executable criteria today are the reference implementation's own tests —

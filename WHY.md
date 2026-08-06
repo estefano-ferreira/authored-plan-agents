@@ -1,7 +1,7 @@
 # Why this pattern exists
 
-*Authored-Plan Agents — an architectural pattern for AI-driven business
-process automation with LLM agents.*
+*Authored-Plan Agents — an architectural pattern for business process
+automation with LLM agents.*
 
 **The problem.** Ten times in a row, an agent reported success. Ten times, the
 business database received garbage — a malformed blob written into a
@@ -10,7 +10,9 @@ downstream. The platform's own contract counters read **zero violations**: a
 tolerant parser "repaired" every response before any check could see it. The
 agent was polite, confident, fully authorized — and wrong ten out of ten
 times, silently. This repository reproduces that incident under controlled
-conditions and measures what closes it.
+conditions — the fault injected where the original round hit it naturally
+(the output schema stripped), on a real flash-tier model,
+`gemini-3.1-flash-lite` — and measures what closes it.
 
 **Why the obvious fixes don't close it.** Guardrails don't catch it — every
 permission held; corrupted *content* is orthogonal to authorization. Schema
@@ -30,8 +32,8 @@ pattern separates the three decisions and gives each to the party that can:
 | **Authorization** — may this run, now | policy (guardrails, intersection-only) |
 | **Validity** — is this business truth | the domain (the system of record) |
 
-The model still works — it selects among authored plans and generates content
-inside their steps. It never authors the steps, never grants itself
+The model still has a job — it selects among authored plans and generates
+content inside their steps. It never authors the steps, never grants itself
 permission, and never judges its own output valid.
 
 [![Authored-Plan Agents architecture poster](docs/authored-plan-agents-architecture.png)](docs/authored-plan-agents-architecture.png)

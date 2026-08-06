@@ -44,6 +44,8 @@ the repository names files. The map, so nobody has to reverse-engineer it:
 
 ## AI Platform layer
 
+![The AI Platform layer (behavior — depends on Core only) and the Infrastructure layer (technology — implements Core's ports), component by component](docs/ai-platform-and-infrastructure.jpg)
+
 ### Orchestrator
 
 **Responsibility.** The platform's single entry point: resolves the plan
@@ -294,7 +296,11 @@ guarantees — per the MCP maintainers themselves.
 
 ## Boundaries
 
+![The arrangement: AI Platform and Infrastructure both depend on Core; the System of Record sits outside all three and owns the business entities and their invariants](docs/layer-arrangement.jpg)
+
 ### Core (contracts *and* models, stdlib only)
+
+![Core — contracts and models, technology-agnostic: identity, capabilities, agents, orchestration, guardrails, memory, ports](docs/core-contracts-models.jpg)
 
 **Responsibility.** Every boundary contract and every cross-layer model, with
 zero third-party imports — verified by an AST test, not convention.
@@ -347,8 +353,9 @@ what upgrades restriction 4 from in-process verification to a real wall
 (NOTES, bend #5).
 
 **Without it.** The platform validates its own writes — generator and judge
-collapse into one party. Cell A is the measured picture of that collapse:
-`completed` 10/10, counters at zero, ten garbage rows. And the platform
+collapse into one party. Cell A is the measured picture of that collapse
+(`gemini-3.1-flash-lite`): `completed` 10/10, counters at zero, ten garbage
+rows. And the platform
 drifts into being a second system of record, which is the un-solving of the
 n-tier discipline DESIGN's Motivation documents.
 

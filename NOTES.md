@@ -530,10 +530,15 @@ limitation of the model port as it stood.
 prompt-only output control on a flash-tier model against a parser demanding
 raw JSON: without `responseMimeType` + schema, Gemini wraps JSON in markdown
 fences *by default*, so "100%" measured that default, not the pattern. Against
-the known per-enforcement-level failure rates (prompt-only 8–15% parse
-failure; JSON mode 2–5% schema mismatch; native structured output <0.1% — see
-the false-success literature, arXiv 2606.09863), our before/after (100% →
+the known enforcement-level gradient (prompt-only weakest; JSON mode
+intermediate; native structured output strongest), our before/after (100% →
 0/10) is a **replication of the enforcement-level gradient, not a discovery**.
+*(Correction, 2026-08-06 citation audit: an earlier version of this sentence
+attributed specific per-level failure rates — 8–15% / 2–5% / <0.1% — to
+arXiv 2606.09863. That paper contains no format-enforcement measurements;
+the figures circulate only in vendor engineering literature. The numbers are
+withdrawn per this study's observed-not-speculated criterion; the qualitative
+ordering stands on the measurement above.)*
 What the study adds is the downstream evidence: with persistence in place, the
 un-enforced configuration didn't just fail to parse — it silently wrote
 corrupted business records while reporting success.
@@ -678,6 +683,12 @@ direct counterfactual with no cross-task comparison involved, and it is the
 answer to the most likely objection ("you are paying an LLM to do
 switch-case"): the LLM selection layer buys paraphrase robustness that
 keyword routing cannot provide at any catalog size.
+*(Reclassified, 2026-08-06 citation audit: the ≈0% is a construction
+inference — the paraphrases share no catalog vocabulary by design — not a
+recorded run; no `results/` file backs it. Withdrawn from README's
+measured-results table; the queued replacement is a versioned
+embedding-similarity baseline on the same set, which is the strong semantic
+comparator a trigger-word stub is not.)*
 
 **Floor, not slope.** Read per column, catalog size barely matters: clear
 intents run 100 / 100 / 100 / 100 / 95 through N=40, and ambiguous intents

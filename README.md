@@ -12,12 +12,23 @@ field, `status='open'`, indistinguishable from a legitimate record to any
 downstream consumer. And the platform's own contract counters read **zero
 violations**: the tolerant parser "repaired" every response before any check
 could see it. This is measured, controlled and reproducible in this repository
-(integrity-matrix cell A — `results/integrity-matrix/integrity_matrix*`, [`NOTES.md`](NOTES.md)
-§ Integrity matrix), and it is not exotic: in the public incident record,
+— the fault injected where the original round hit it naturally, the output
+schema stripped — on a real flash-tier model, `gemini-3.1-flash-lite`
+(integrity-matrix cell A —
+`results/integrity-matrix/integrity_matrix*`, [`NOTES.md`](NOTES.md)
+§ Integrity matrix), and it is not exotic. False success — the agent's
+narrative diverging from the record — measures at [45–48% of failures in
+single-control tau2-bench domains](https://arxiv.org/abs/2606.09863);
+[27–78% of benchmark-reported successes conceal procedural
+violations](https://arxiv.org/abs/2603.03116) (corrupt success — a distinct
+failure mode over a different denominator); and action-level error analysis
+finds each additional deviation in a **mutating** action cuts the odds of
+task success by up to 92% (τ-bench Airline) and 96% (Retail), while
+non-mutating deviations have little effect
+([SABER, arXiv 2512.07850](https://arxiv.org/abs/2512.07850)). The public
+incident record illustrates the same shape reaching production:
 [188 of 7,246 AI incidents (2023–2026) are autonomous systems harming
-production with **no attacker in the chain**](https://www.cyera.com/research/agent-inflicted-damage-inside-the-real-world-failures-of-enterprise-ai-systems),
-and false success — the agent's narrative diverging from the record — measures
-at [45–78% of agent failures](https://arxiv.org/abs/2606.09863).
+production with **no attacker in the chain**](https://www.cyera.com/research/agent-inflicted-damage-inside-the-real-world-failures-of-enterprise-ai-systems).
 
 **Why the obvious fixes don't close it:**
 
@@ -57,6 +68,7 @@ The pattern separates the three decisions and gives each to the party that can:
 | Plan-and-Execute / ReWOO / LLMCompiler | model, generated per run | inside the plan |
 | Action-Selector ([arXiv 2506.08837](https://arxiv.org/abs/2506.08837)) | human, fixed action set | not addressed (security-motivated) |
 | Workflow engines / BPMN | human | inside the engine |
+| Durable-execution runtimes ([Temporal](https://temporal.io/blog/build-durable-ai-agents-pydantic-ai-and-temporal), DBOS, Restate; LangGraph checkpointing) | human (workflow code); model calls confined to activities | not addressed — completion and replay are guaranteed, content validity is not |
 | **Authored-Plan Agents** | **human, versioned, reviewed** | **outside the platform, by the system that owns the invariant** |
 
 **When to use it — and when not.** Use it when agents write business state
@@ -101,18 +113,23 @@ the pattern can be implemented in any stack without reading this code.
 
 ## Key results (measured, not claimed)
 
+All real-model rows below were measured on `gemini-3.1-flash-lite`; the
+single-family scope and its cross-model spot-check are discussed in
+[Honest limitations](#honest-limitations).
+
 | Measurement | Result | Evidence |
 |---|---|---|
-| **False success with real persistence** — prompt-only generation on a flash-tier model | 10/10 executions reported success while persisting corrupted business records; **0/10** after decoding-level structured output + `retry_once_then_fail`, at **−18% cost** | [`NOTES.md`](NOTES.md) § Structured output correction, [`results/`](results/) |
 | **Integrity matrix 2×2** — decoding constraint × boundary policy, single controlled condition (same codebase, same model, fault injected where the schema is stripped) | With a real schema both boundary policies are clean (the repair axis has nothing to do). Without it, the boundary alone decides: tolerant repair → `completed` 10/10 with **10 garbage rows and audit counters reading zero**; strict guard → `failed_clean` 10/10, **zero rows persisted** | [`NOTES.md`](NOTES.md) § Integrity matrix — controlled reproduction, `results/integrity-matrix/integrity_matrix*`, per-cell DB snapshots `results/integrity-matrix/matrix-*.sqlite` (cell A's garbage rows are directly inspectable) |
+| **False success with real persistence** — the naturally-occurring instance that motivated the matrix: prompt-only generation, no fault injected | 10/10 executions reported success while persisting corrupted business records; **0/10** after decoding-level structured output + `retry_once_then_fail`, at **−18% cost**. The baseline's raw per-execution file was lost pre-versioning (aggregates survive in NOTES — see Honest limitations); the controlled reproduction above is the tracked evidence for the phenomenon | [`NOTES.md`](NOTES.md) § Structured output correction, [`results/`](results/) |
 | **Failure stays loud** — a provider schema-dialect bug hit the corrected pipeline | 10/10 **typed, unpersisted** failures (vs. the original 10/10 silent corruptions for the same class of surprise). Their recorded status `compensated` predates the 3-way failure vocabulary and is itself flagged as misleading for this fault shape — see NOTES § Structured output correction | `results/runs/run-20260727-215429.json` |
-| **Selection at catalog scale** (N = 2→40 plans, real model) | Clear intents: 100/100/100/100/95%. Ambiguity is a **~75% floor, not a slope** — aggregate decline is eval-composition, not catalog size. Out-of-catalog refusal: **100% at every N**. Keyword routing on the same set: ≈0% | [`NOTES.md`](NOTES.md) § Large-catalog selection sweep (N = 2..40), `results/selection-sweep/selection_sweep*` |
+| **Selection at catalog scale** (N = 2→40 plans, real model) | Clear intents: 100/100/100/100/95%. Ambiguity is a **~75% floor, not a slope** — aggregate decline is eval-composition, not catalog size. Out-of-catalog refusal: **100% at every N**. Paraphrase robustness is the selection layer's justification and has **not yet been compared against a strong semantic baseline** — an embedding-similarity comparison on the same set is the next experiment | [`NOTES.md`](NOTES.md) § Large-catalog selection sweep (N = 2..40), `results/selection-sweep/selection_sweep*` |
 | **Compensation over persisted state** — incl. failure of the compensation itself | Orphaned row remains in the ERP's SQLite but is now fully traceable from the audit trail alone (`compensation` events carry the orphaned state) | [`NOTES.md`](NOTES.md) § Persistence and real boundary |
 | Cost per completed task (gemini-3.1-flash-lite) | $0.000058 (no-generation plan — 100% selection overhead) to $0.000247 (two-agent plan) | `results/runs/run-20260727-215811.json` |
 
-All real-model measurements ran **inside a free-tier quota** (~$0.06 at list
-price), which is itself a claim: the methodology is reproducible without a
-budget.
+All real-model measurements ran **inside free-tier quotas** (≈$0.075 at list
+price, summed from the tracked per-round costs; the 42-call cross-model
+spot-check is uncosted), which is itself a claim: the methodology is
+reproducible without a budget.
 
 ## The pattern at a glance
 
@@ -147,7 +164,9 @@ the bracket names the authority each restriction protects):
 4. *[sequence]* Channels reach the platform only through the Orchestrator (made structural by the deployment boundary — the platform container carries no path to business storage).
 5. *[authorization]* Identity propagates to the tool; without a user, a `SystemPrincipal` carries plan-declared scopes.
 6. *[sequence]* An effectful step without compensation must be the last effectful step — validated at plan load.
-7. *[sequence]* A request with no matching plan is refused, typed — never improvised. (Measured: 100% out-of-catalog refusal at every catalog size.)
+7. *[sequence]* A request with no matching plan is refused, typed — never improvised. (Measured: 100% out-of-catalog refusal at every catalog size, `gemini-3.1-flash-lite`.)
+
+![The rules that make it the pattern, and the five enforcement moments — load time, registration time, start time, runtime, every decision](docs/rules-and-enforcement-moments.jpg)
 
 Audit is separate from telemetry: complete, never sampled, with a five-kind
 vocabulary — what the agent **proposed**, what the **guardrail** decided, what
@@ -219,6 +238,8 @@ docs/                adr/ (architecture decision records) + the architecture pos
 Dependency direction (`core` ← `ai` ← `infrastructure`) is enforced by an AST
 test, not by convention.
 
+![Dependency direction: AI Platform (behavior) and Infrastructure (technology) both depend on Core (contracts and models); no dependency between the upper layers](docs/dependency-direction.jpg)
+
 ## Documentation
 
 | Document | What it is |
@@ -264,7 +285,14 @@ a second free-tier model" estimate: the viable candidates carry 20-request
 daily caps — see NOTES). Next: full selection curves on a second model
 (≈6 days of daily-cap accumulation, or one paid-tier run at ~$0.06 list
 price) and the ambiguity-detection experiment (can the selector *flag*
-ambiguity instead of choosing?).
+ambiguity instead of choosing?). Reprioritized ahead of both (2026-08-06):
+**cross-model integrity matrix** — cells A+B on a second model with the
+success criterion pre-registered, including the vacuity outcome (a model
+that never violates format without a schema measures its own defaults, not
+the boundary policy; the claim under test is conditional — *given* a
+violation, the boundary decides). Also queued: the embedding-similarity
+selection baseline on the sweep's exact intent set — the measured comparison
+that replaces the withdrawn keyword-counterfactual line.
 
 ## Citation
 
