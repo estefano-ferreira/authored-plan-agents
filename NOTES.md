@@ -818,6 +818,50 @@ the intermediate `custodial` never reached persisted evidence) — they are
 evidence, not documentation — and any reader script must accept both
 vocabularies.
 
+## Schema+fault cells E and F (2026-08-06)
+
+The two cells completing the fault arm of the integrity matrix — real
+`responseSchema` + `GenerationFaultInjectionClient` under each boundary
+policy — pre-registered in `docs/preregistration-schema-fault-cells.md`
+(committed before the runner change and before any number), run same-day on
+the matrix's model, 10 reps each. Data appended to
+`integrity_matrix.jsonl`; snapshots `matrix-E.sqlite` / `matrix-F.sqlite`
+tracked; `verify_costs.py` reproduces all 63 recorded costs exactly.
+
+| | status | viol/retry/fail | repairs | ERP rows | valid | garbage | cost/task |
+|---|---|---|---|---|---|---|---|
+| **E** schema + fault + tolerant | `completed` 10/10 | 0/0/0 | 10 | 10 | **0** | **10** | ≈$0.000246 |
+| **F** schema + fault + strict | `failed_clean` 10/10 | 1/1/1 per rep | 0 | **0** | — | 0 | ≈$0.000364–397 |
+
+**The pre-registered prediction was falsified — Branch B, not Branch A.**
+Three independent predictions (the pre-registration's own "cell E is where
+a discovery is possible" reasoning, this study's review round, and an
+external reviewer) expected fence-stripping repair to recover the valid
+JSON under the injected fence. Measured: it does not extract — it
+**absorbs**. All 10 of cell E's persisted `summary` fields carry the raw
+fenced blob (single-fenced this time; cell A's were double-fenced), with
+the cell-A signature intact under an *active* schema: contract counters
+0/0/0, ten "successful" repairs, ten corrupted business records. The
+counterfactual "tolerance would have recovered it" is measured false for
+this repair implementation, not conceded hypothetically.
+
+**What each cell adds.** E is the second observed instance of the paper's
+Proposition 1 under a different decoding condition — the blindness is
+positional, indifferent to what sits upstream of the absorption. F is the
+verification it was pre-declared to be (deterministic by construction:
+the injector re-fences the retry), with one new visibility: its typed
+errors *display* the refused content, which is schema-valid JSON — the
+guard refused corruption that was recoverable in principle, and the
+tolerant path did not recover it either. The clean sentence is about E,
+not F: the alternative to refusal was not recovery; it was corruption.
+
+**Still not a complete factorial.** The no-schema/no-fault arm (natural
+violations under each boundary policy) has never run as a matrix cell —
+the pre-matrix incident round covers only its tolerant half.
+
+Quota note: one 429 (~48 s backoff) inside each cell's run; latency
+aggregates carry those stalls, per-call tokens/costs unaffected.
+
 ## Open questions for the study
 
 - Does plan-level compensation stay manageable at 5+ steps, or does reverse-order

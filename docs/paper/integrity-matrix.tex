@@ -425,7 +425,12 @@ stands).
 
 \paragraph{Observed instance.} Cell \cellA{}: agent report
 \statuscompleted{}, contract counters at zero, repair count reporting
-ten successes, ten corrupted rows in the business database.
+ten successes, ten corrupted rows in the business database. A second
+instance was measured after this definition was written and
+pre-registered (\S\ref{sec:limits}): the same signature --- counters at
+zero, ten repairs, ten corrupted rows --- with decoding enforcement
+active upstream and the fault injected downstream of it. The condition
+is positional, indifferent to what sits upstream of the absorption.
 
 \paragraph{F3 --- with the schema, no violation occurred and the repair
 axis is invisible.} Cells \cellC{} and \cellD{} are byte-equivalent in
@@ -498,18 +503,33 @@ prompt-only control (10/10 in the original round) is an artifact of
 flash-tier defaults. All conditional claims are of the form ``given a
 violation''.
 
-\paragraph{Not a complete factorial.} The fault arm exists only in the
-no-schema column (\S\ref{sec:design}); the two missing cells ---
-schema~+~injected fault, under each boundary policy --- are the only ones
-that would show the boundary operating \emph{with} decoding enforcement
-active, and they are mechanically non-trivial to predict: the injector
-corrupts \emph{downstream} of the provider, so under an enforced schema
-the injected fence wraps schema-valid JSON --- tolerant repair would
-plausibly recover \emph{valid} content there, while the strict guard
-would refuse a recoverable corruption. Either outcome would sharpen the
-guard's price sheet, which is exactly why these cells are queued behind a
-pre-registration (this repository's discipline for any new number) rather
-than run ad hoc.
+\paragraph{Not a complete factorial --- and what the completed arm
+measured.} At the time of the four-cell comparison the fault arm existed
+only in the no-schema column (\S\ref{sec:design}). The two missing cells
+--- schema~+~injected fault, under each boundary policy --- were
+subsequently pre-registered (branches and the uncomfortable outcome fixed
+before any number existed) and run on the same model, 10 repetitions
+each. \textbf{The pre-registered prediction was falsified.} Because the
+injector corrupts downstream of the provider, the injected fence wraps
+schema-valid JSON, and we predicted --- in the pre-registration, in
+review, and in an earlier version of this paragraph --- that
+fence-stripping repair would plausibly recover \emph{valid} content
+there. Measured: it does not extract; it absorbs. The tolerant cell
+reported \statuscompleted{} 10/10 and persisted ten fenced blobs into
+the business field with contract counters at zero and ten repairs
+reported --- telemetry blindness reproduced under an \emph{active}
+decoding constraint, a second instance of Proposition~1 in a different
+decoding condition. The strict cell reported \statusfailedclean{} 10/10
+with zero rows, refusing content that was, under the fence, valid ---
+and remains the verification it was pre-declared to be (the injector
+re-fences the retry, so its outcome is deterministic by construction).
+The counterfactual ``tolerance would have recovered it'' is therefore
+measured false for this repair implementation, not conceded
+hypothetically: the alternative to refusal was not recovery; it was
+corruption. The design is \emph{still} not a complete factorial: the
+no-schema/no-fault arm (natural violations under each boundary policy)
+has never run as a cell --- the incident round covers only its tolerant
+half.
 
 \paragraph{One violation class.} The injected fault (markdown re-fencing)
 is the class the original incident exhibited. Tolerant repair in the wild
@@ -655,7 +675,7 @@ model-call logs, inspectable from a fresh clone.
 implementation, restriction-enforcing test suite (18 passed, 7
 strict-xfail anti-vacuity probes), and tracked evidence under
 \texttt{results/integrity-matrix/} (checkpointed JSONL, consolidated
-report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control\}.sqlite},
+report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite},
 audit trails) and \texttt{results/runs/} (the naturally occurring
 dialect-failure round, \texttt{run-20260727-215429.json}; the corrected
 round, \texttt{run-20260727-215811.json}). One caveat carried from
