@@ -36,6 +36,22 @@ JSON without a schema may change the *shape* of cell A's persisted blobs
 (single- rather than double-fenced) without changing the boundary-axis
 reading the registered branches decide on.
 
+**2026-08-06 — second cross-model arm added: `gpt-4o-mini` (OpenAI),
+before any run.** A distinct role from the frontier arm, stated so the
+two are never conflated: `claude-sonnet-5` carries **tier diversity**
+(answers the weak-model-artifact critique); `gpt-4o-mini` carries
+**family diversity only** — a third provider family at the same
+capability class as the measured model, upgrading "spot-checked across
+three families" (selection, N≤10) to "boundary cells measured across
+three families". Chosen on availability and price, never on eval
+performance: the OpenAI adapter, the pricing-table entry
+($0.15 / $0.60 per 1M tokens) and an API key all already exist; the
+model is the one already configured in the environment. Estimated cost
+from the original cells' token volumes: order of $0.01. Both arms run
+under the same registered branches; each model's evidence lands in its
+own model-suffixed files, read separately — no composite number across
+models (the registered Branch C discipline applies per family).
+
 ## Question
 
 On the boundary-behavior axis of the integrity matrix (NOTES.md §
