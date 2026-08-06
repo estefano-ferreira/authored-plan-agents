@@ -5,6 +5,38 @@ script exists. This document is committed before the experiment executes; any
 deviation from it must be recorded as a dated amendment above the results,
 never by editing the registered text.
 
+## Amendments (dated; the registered text below is unmodified)
+
+**2026-08-06 — script authored (`scripts/embedding_baseline.py`), no run
+performed.** Four specification gaps were resolved at implementation time and
+are recorded here before any number exists:
+
+1. *"Same generator with a different seed" does not exist to reuse.* The
+   sweep's dataset (`scripts/selection_sweep.py`) is hardcoded literal text,
+   not a seeded generator, so a different-seed construction is impossible as
+   registered. The τ-calibration set is instead a **hand-authored disjoint
+   set** (12 plans in 4 domains with zero id or vocabulary overlap with the
+   eval set), built by the same method — confusable clusters, no-leakage
+   clear paraphrases, ambiguous pairs, out-of-catalog intents — and labeled
+   `embedding-baseline-calibration-v1` in the frozen artifact.
+2. *Grid-search objective, unspecified in the registered text, is fixed as:*
+   micro-averaged accuracy over all calibration points (uniform weight, same
+   correctness rule as the eval report), ties broken toward the smallest τ
+   reaching the maximum.
+3. *"Chosen and frozen before the eval set is touched" is enforced
+   mechanically:* `calibrate` and `run` are separate subcommands; `run` has
+   no τ flag at all, refuses a missing or newer-than-start calibration
+   artifact, stamps the artifact's sha256 into every eval record and refuses
+   to resume against a changed artifact or a mismatched provider/model.
+4. *Reps default to 1, not the LLM sweep's 2.* The 240 recorded points are
+   120 unique intents × 2 reps; embedding selection is deterministic given
+   (model, text), so a second rep is a cache read carrying no information.
+   The unique intent set is asserted identical to the recorded JSONL at
+   startup (hard failure on any mismatch).
+
+The embedding model remains unnamed, per the registered text: it will be
+named by a further dated amendment before the run, on price/availability.
+
 ## Question
 
 On the selection sweep's exact intent set, does embedding-similarity
