@@ -88,6 +88,21 @@ single flip moves the rate by 50 points. Fixed before any number exists:
 5. The ambiguity-floor comparison stays descriptive, per the registered
    text.
 
+**2026-08-06 — embedding model named: `gemini-embedding-001` (Generative
+Language API, `embedContent`), before any API call.** Chosen on price and
+availability, never on eval performance: it is the GA text-embedding model
+of the API for which a key is already provisioned; the free tier (1,500
+requests/day as recorded 2026-08-06 from the official documentation)
+covers the entire experiment — the unique texts to embed (catalog
+entries, eval intents, and the disjoint calibration set) number in the
+low hundreds, and the script's content-addressed cache makes resumes
+free; list price $0.15 per 1M input tokens if run paid. The preview
+multimodal successor (`gemini-embedding-2-preview`) was deliberately not
+chosen: preview status fails the availability criterion. Invocation:
+`--provider gemini --embedding-model gemini-embedding-001` on
+`calibrate` first, then `run` — τ frozen before the eval set is touched,
+per the registered mechanism.
+
 ## Question
 
 On the selection sweep's exact intent set, does embedding-similarity

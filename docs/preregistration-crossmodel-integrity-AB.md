@@ -5,6 +5,37 @@ cross-model script or number exists. This document is committed before the
 experiment executes; any deviation from it must be recorded as a dated
 amendment above the registered text, never by editing it.
 
+## Amendments (dated; the registered text below is unmodified)
+
+**2026-08-06 — model named: `claude-sonnet-5` (Anthropic), before any
+run.** Chosen on availability and tier diversity, never on eval
+performance:
+
+- the runner already supports `--provider anthropic` natively, and the
+  platform's Anthropic adapter and pricing-table entry ($3 / $15 per 1M
+  tokens) exist — no provider code is written for this run;
+- an API key is already provisioned in the environment;
+- **tier diversity is the stated design reason**: every measurement in
+  this repository ran on a flash-tier model, and the standing external
+  critique is that the measured behavior could be a weak-model artifact.
+  A frontier-tier model answers that directly; a second flash-tier model
+  would not.
+
+Estimated cost from the original cells' recorded token volumes
+(A: 3893/1376, B: 4545/2636 per 10 reps): order of $0.10 at list price,
+one sitting, no daily-cap accumulation.
+
+Two mechanical notes fixed before the run: (1) the matrix resume keys
+records by (cell, rep), so the cross-model run requires model-suffixed
+evidence paths (per the registered Method) — that runner change happens
+after this amendment and before any call; (2) cells E/F were measured
+between registration and this amendment, and their result fixes the
+interpretive baseline: the repair emulation absorbs rather than extracts
+(NOTES § Schema+fault cells E and F), so a frontier model that emits raw
+JSON without a schema may change the *shape* of cell A's persisted blobs
+(single- rather than double-fenced) without changing the boundary-axis
+reading the registered branches decide on.
+
 ## Question
 
 On the boundary-behavior axis of the integrity matrix (NOTES.md §
