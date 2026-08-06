@@ -238,7 +238,13 @@ docs/                adr/ (architecture decision records) + the architecture pos
 Dependency direction (`core` ← `ai` ← `infrastructure`) is enforced by an AST
 test, not by convention.
 
-![Dependency direction: AI Platform (behavior) and Infrastructure (technology) both depend on Core (contracts and models); no dependency between the upper layers](docs/dependency-direction.jpg)
+![Dependency direction: AI Platform (behavior) imports Core only; Infrastructure (technology) imports Core and, in exactly one declared place — the composition root — the AI Platform; all arrows point from the dependent module to the module it depends on](docs/dependency-direction.jpg)
+
+The one arrow from Infrastructure into AI Platform is deliberate and unique:
+the composition root (`src/infrastructure/configurations.py`) must touch
+every concrete class to assemble the platform. That `ai` never imports
+`infrastructure` is what makes swapping a provider an infrastructure-only
+change.
 
 ## Documentation
 

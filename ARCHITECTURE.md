@@ -296,7 +296,11 @@ guarantees — per the MCP maintainers themselves.
 
 ## Boundaries
 
-![The arrangement: AI Platform and Infrastructure both depend on Core; the System of Record sits outside all three and owns the business entities and their invariants](docs/layer-arrangement.jpg)
+![The arrangement: AI Platform and Infrastructure both depend on Core; AI Platform never imports Infrastructure; Infrastructure imports AI Platform in exactly one place, the composition root; the System of Record sits outside all three and owns the business entities and their invariants](docs/layer-arrangement.jpg)
+
+The one arrow from Infrastructure into AI Platform is the composition root
+(see § Infrastructure below: exactly one layer may know everything, and it
+must be the outermost).
 
 ### Core (contracts *and* models, stdlib only)
 
