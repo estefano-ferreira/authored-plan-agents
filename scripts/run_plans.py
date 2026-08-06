@@ -37,7 +37,7 @@ Two modes:
   the primary variable under measurement. Per-execution and aggregate metrics (tokens, cost,
   latency, selection distribution, Output Contract violations) are printed to the console and
   written to `results/runs/run-<YYYYMMDD-HHMMSS>.json`.
-- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control}`, requires `--repeat`): one
+- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control,E,F}`, requires `--repeat`): one
   experiment, same codebase, only `build_platform()` flags vary per cell (see
   `infrastructure/configurations.py`'s `strip_response_schema`/`inject_generation_fault`/
   `tolerant_repair`). Each invocation runs one cell's not-yet-recorded reps against that cell's
@@ -690,6 +690,14 @@ def _run_measurement_mode(args) -> int:
 #      configuration. Inbound plan only.
 #   control: same configuration as D, but restricted to schedule-appointment only (no
 #      generation step at all) -- a pipeline sanity arm, not a cell under study.
+#   E: real schema + inject_generation_fault + tolerant_repair -- post-decoding corruption
+#      (the injected fence wraps schema-valid provider output) against the tolerant path.
+#      Added 2026-08-06 per docs/preregistration-schema-fault-cells.md (committed BEFORE this
+#      change, per the repo's pre-registration discipline). Inbound plan only.
+#   F: real schema + inject_generation_fault, no repair -- the same post-decoding corruption
+#      against the strict guard; the injector re-fences the retry too, so this cell verifies
+#      the guard's coded behavior (typed failure, nothing persisted) under real-model
+#      conditions. Same pre-registration as E. Inbound plan only.
 #
 # Mechanics:
 #   - Each cell is invoked separately (one `--matrix-cell X --repeat N` call per cell) against
@@ -713,7 +721,7 @@ def _run_measurement_mode(args) -> int:
 #     special-cased for matrix runs.
 # --------------------------------------------------------------------------------------
 
-_MATRIX_CELLS = ("A", "B", "C", "D", "control")
+_MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F")
 
 _MATRIX_CELL_CONFIGS: dict[str, dict] = {
     "A": {"strip_response_schema": True, "inject_generation_fault": True, "tolerant_repair": True},
@@ -721,9 +729,11 @@ _MATRIX_CELL_CONFIGS: dict[str, dict] = {
     "C": {"strip_response_schema": False, "inject_generation_fault": False, "tolerant_repair": True},
     "D": {"strip_response_schema": False, "inject_generation_fault": False, "tolerant_repair": False},
     "control": {"strip_response_schema": False, "inject_generation_fault": False, "tolerant_repair": False},
+    "E": {"strip_response_schema": False, "inject_generation_fault": True, "tolerant_repair": True},
+    "F": {"strip_response_schema": False, "inject_generation_fault": True, "tolerant_repair": False},
 }
 
-_MATRIX_DEFAULT_REPS: dict[str, int] = {"A": 10, "B": 10, "C": 10, "D": 10, "control": 3}
+_MATRIX_DEFAULT_REPS: dict[str, int] = {"A": 10, "B": 10, "C": 10, "D": 10, "control": 3, "E": 10, "F": 10}
 
 _MATRIX_DIR = _RESULTS_DIR / "integrity-matrix"
 _MATRIX_JSONL_PATH = _MATRIX_DIR / "integrity_matrix.jsonl"
