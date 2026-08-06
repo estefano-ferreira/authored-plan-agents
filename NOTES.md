@@ -862,6 +862,25 @@ the pre-matrix incident round covers only its tolerant half.
 Quota note: one 429 (~48 s backoff) inside each cell's run; latency
 aggregates carry those stalls, per-call tokens/costs unaffected.
 
+**Name collision search — "telemetry blindness" (2026-08-06, run per the
+no-unchecked-names rule after the term reached the paper's title).** No
+named counterpart found. The nearest industry phrase is "telemetry blind
+spots" — coverage gaps, areas the instrumentation does not observe — which
+is semantically distinct: telemetry blindness as defined here is full
+coverage reading *confidently wrong* (every observer reports success),
+not partial coverage. The nearest academic neighbor is the
+"fail-plausible" class of arXiv 2606.14589 — a *different* specialization
+of gray failure's differential observability: there the failure fabricates
+narrative that deceives the observer; here nothing is fabricated — the
+violation is absorbed upstream and every observer honestly reads success.
+Sibling specializations, not a collision; distinction recorded in the
+paper's related work. Fresh mechanism sweep same date: the
+repair-conceals warning remains prose-only in the practitioner literature
+(json_repair caveats and 2026 posts); no measurement of counter-blinding
+found. Read-queue additions from the sweep: arXiv 2607.14167 (structured
+feedback vs.\ silent repair in agent loops), 2601.00481 (MAESTRO),
+2606.01365 (failure-aware observability).
+
 ## Open questions for the study
 
 - Does plan-level compensation stay manageable at 5+ steps, or does reverse-order
