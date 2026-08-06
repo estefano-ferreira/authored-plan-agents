@@ -37,6 +37,57 @@ are recorded here before any number exists:
 The embedding model remains unnamed, per the registered text: it will be
 named by a further dated amendment before the run, on price/availability.
 
+**2026-08-06 — statistical-power amendment (added before any API call; the
+registered decision margin is superseded, not edited).** Review found the
+registered Branch A criterion — "clear-intent accuracy within 5 points of
+the LLM at every N" — undecidable at the eval set's cell sizes: with the
+script's reps=1, the unique-intent cells are 2/5/10/20/40 (clear),
+1/4/11/12 (ambiguous, N≥5) and 3 per size (out-of-catalog); at N=2 a
+single flip moves the rate by 50 points. Fixed before any number exists:
+
+1. **Paired analysis is primary.** The embedding selector answers the
+   identical unique intents the LLM already answered, so the comparison
+   is paired per unique intent (LLM correct vs. embedding correct),
+   pooled per intent kind across catalog sizes. Per-size numbers are
+   descriptive only; no branch decision reads them.
+2. **Statistic.** Exact one-sided sign test (McNemar) on discordant
+   pairs, α = 0.05, direction pre-registered as *embedding deficit*,
+   plus the exact bound on the paired accuracy difference. Five
+   discordant pairs all in one direction is the minimum that reaches
+   significance (0.5⁵ = 0.03125).
+3. **Computed power against the real counts** (pooled unique pairs:
+   clear 77, ambiguous 28, out-of-catalog 15; exact enumeration, no
+   approximation — one-sided α = 0.05, 80% power, by total discordance
+   rate π):
+
+   | kind | n pairs | π = 5% | π = 10% | π = 20% |
+   |---|---|---|---|---|
+   | clear | 77 | undetectable | **9.5 pts** | 13.5 pts |
+   | ambiguous | 28 | undetectable | undetectable | undetectable |
+   | out-of-catalog | 15 | undetectable | undetectable | undetectable |
+
+   Consequences, stated plainly: **the registered 5-point margin is not
+   detectable at any plausible discordance rate**; the clear-intent
+   comparison can detect only deficits of roughly 10 points or more; the
+   ambiguous and out-of-catalog comparisons carry no 80% power at these
+   n and are reported descriptively with exact intervals — except that
+   out-of-catalog retains a catastrophic-failure criterion: ≥5
+   one-directional discordant refusals out of 15 is significant on its
+   own (≈33 points).
+4. **Branches, recast in decidable terms.**
+   *Branch A (match, within power):* no significant clear-intent deficit
+   and the exact one-sided bound on that deficit is below 10 points, and
+   out-of-catalog shows fewer than 5 one-directional discordant
+   failures.
+   *Branch B (falls short):* a significant clear-intent deficit, or ≥5
+   one-directional out-of-catalog discordants.
+   *Branch C (everything else):* reported with its cause named —
+   **"underpowered to decide"** (intervals include both branches) is
+   distinguished from **"genuinely mixed"** (kinds significant in
+   opposite directions); the report states which.
+5. The ambiguity-floor comparison stays descriptive, per the registered
+   text.
+
 ## Question
 
 On the selection sweep's exact intent set, does embedding-similarity
