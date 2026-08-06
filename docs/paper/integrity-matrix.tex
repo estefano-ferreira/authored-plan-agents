@@ -24,10 +24,12 @@
 %       observer observes that system is healthy") is verbatim from S3.2;
 %       observer/reactor part of the system, app external (S3.1); author
 %       list verified from the paper's first page.
-%   - Verified by direct fetch, 2026-08-06: arXiv 2606.14589 (Wei Wu,
-%       silent-failure taxonomy) -- abstract confirms gray-failure
-%       framing and the error-swallowing class; cited without verbatim
-%       quotes because only the abstract was read.
+%   - Verified by direct fetch of the FULL TEXT, 2026-08-06: arXiv
+%       2606.14589 (Wei Wu, silent-failure taxonomy) -- the body uses
+%       gray-failure / differential-observability vocabulary, cites
+%       Huang et al. 2017 as its reference [1], and class C ("error
+%       swallowing and dilution") covers absorption of malformed
+%       responses into downstream fields. Citation upgraded accordingly.
 
 \documentclass[11pt]{article}
 
@@ -63,19 +65,25 @@ A Controlled Measurement of Output-Contract Enforcement}
 
 \begin{abstract}
 LLM agents that write business state can report success while persisting
-corrupted records. We reproduce this failure as a controlled four-cell
-comparison --- \emph{decoding constraint} (provider-enforced response
-schema vs.\ schema stripped) crossed with \emph{boundary policy}
-(tolerant repair vs.\ a strict retry-once-then-fail output-contract
-guard), a fault injector forcing format violations in the unconstrained
-cells --- on one codebase and one model, with ground truth read directly
-from the persisted SQLite of an external system of record. Two findings
+corrupted records. We reproduce this failure as a controlled six-cell
+comparison (plus a control arm) --- \emph{decoding constraint}
+(provider-enforced response schema vs.\ schema stripped) crossed with
+\emph{boundary policy} (tolerant repair vs.\ a strict
+retry-once-then-fail output-contract guard), a fault injector forcing
+format violations in the unconstrained cells and, in two pre-registered
+follow-up cells, downstream of the active schema --- on one codebase and
+one model, with ground truth read directly from the persisted SQLite of
+an external system of record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
 positioned before the contract check, the tolerant configuration
 reported success 10/10 and persisted ten garbage business records while
 every platform-side instrument --- status, contract counters, repair
 count --- read success or no violation; only the database showed the
-corruption. Second, the guard's price sheet: under enforced decoding
+corruption. The signature reproduced unchanged with the schema active
+and the fault injected downstream of it --- a pre-registered follow-up
+whose opposite prediction (that fence-stripping repair would recover the
+valid content under the fence) the data falsified. Second, the guard's
+price sheet: under enforced decoding
 both boundary policies were byte-equivalent and the guard's idle cost
 was zero (natural violations 0/10 --- a bounded observation, not an
 elimination claim); when a violation does arrive, the strict guard's
@@ -291,6 +299,11 @@ Rows & Valid & Cost \\
 10 & \$0.00246 \\
 ctrl & \cellD{} config, no-generation plan & \statuscompleted{} 3/3 &
 0/0/0 & 0 & 3 & n/a & \$0.00017 \\
+\midrule
+E & schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
+& 10 & 10 & \textbf{0} & \$0.00245 \\
+F & schema + fault + strict & \statusfailedclean{} 10/10 &
+10/10/10 & 0 & \textbf{0} & --- & \$0.00384 \\
 \bottomrule
 \end{tabular}
 \caption{The integrity matrix. ``Rows'' are records created in the
@@ -298,7 +311,10 @@ external ERP database; ``Valid'' counts rows whose persisted
 \texttt{summary} is clean one-line text (verified by direct SQL
 inspection). Cell \cellA{}'s ten rows each carry a double-fenced JSON blob
 in the business field while every counter the platform exposes reads
-zero. Latency means are omitted: they are contaminated by free-tier
+zero. Below the rule: the pre-registered follow-up cells E and F
+(\S\ref{sec:limits}), run after the original comparison --- E reproduces
+\cellA{}'s signature with the decoding constraint active upstream.
+Latency means are omitted: they are contaminated by free-tier
 429-backoff stalls (worst case 111\,s) and carry no signal about the
 axes.}
 \label{tab:matrix}
@@ -340,29 +356,36 @@ differently (\S\ref{sec:limits}).
 \begin{figure}[t]
 \centering
 \small
-\begin{tabular}{@{}lcc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
- & Cell \cellA{} & Cell \cellB{} \\
- & (no schema, tolerant) & (no schema, strict) \\
+ & Cell \cellA{} & Cell \cellB{} & Cell E \\
+ & (no schema, tolerant) & (no schema, strict) & (schema, tolerant) \\
 \midrule
 \rowcolor{gray!12}
-\multicolumn{3}{@{}l@{}}{\itshape what the platform reports} \\
-Agent report & \statuscompleted{} 10/10 & \statusfailedclean{} 10/10 \\
-Contract counters (viol.\,/\,retry\,/\,fail) & 0 / 0 / 0 & 10 / 10 / 10 \\
-Repair count & 10 & 0 \\
+\multicolumn{4}{@{}l@{}}{\itshape what the platform reports} \\
+Agent report & \statuscompleted{} 10/10 & \statusfailedclean{} 10/10 &
+\statuscompleted{} 10/10 \\
+Contract counters (viol.\,/\,retry\,/\,fail) & 0 / 0 / 0 & 10 / 10 / 10 &
+0 / 0 / 0 \\
+Repair count & 10 & 0 & 10 \\
 \midrule
 \rowcolor{gray!12}
-\multicolumn{3}{@{}l@{}}{\itshape what the database holds} \\
-Rows in ERP & 10 & 0 \\
-Valid rows & \cellcolor{gray!25}\textbf{0} & --- \\
+\multicolumn{4}{@{}l@{}}{\itshape what the database holds} \\
+Rows in ERP & 10 & 0 & 10 \\
+Valid rows & \cellcolor{gray!25}\textbf{0} & --- &
+\cellcolor{gray!25}\textbf{0} \\
 \bottomrule
 \end{tabular}
-\caption{What each observer sees, cells \cellA{} and \cellB{} (data from
-Table~\ref{tab:matrix}; no new measurement). The separation between the
-two bands is the finding: in cell \cellA{}, three platform-side
-instruments agree the runs succeeded --- status \statuscompleted{},
-contract counters at zero, ten ``successful'' repairs --- while the
-business database holds ten corrupted records and zero valid ones.}
+\caption{What each observer sees (data from Table~\ref{tab:matrix}; no
+new measurement). The separation between the two bands is the finding:
+in cells \cellA{} and E, three platform-side instruments agree the runs
+succeeded --- status \statuscompleted{}, contract counters at zero, ten
+``successful'' repairs --- while the business database holds ten
+corrupted records and zero valid ones. Cells \cellA{} and E differ in
+decoding condition (schema stripped vs.\ active, the fault injected
+downstream of it): the same blindness signature in both columns is
+Proposition~1's positional claim (\S\ref{sec:results}), visible at a
+glance.}
 \label{fig:observers}
 \end{figure}
 
@@ -615,8 +638,9 @@ telemetry blindness as a specialization of differential observability
 --- the case where the differential has collapsed --- not as a new
 phenomenon. At the agent layer, the nearest neighbour is a longitudinal
 taxonomy of silent failures in a production LLM agent runtime, itself
-described in gray-failure vocabulary, whose error-swallowing class the
-absorption step measured here instantiates~\cite{wu2026}; the
+framed in gray-failure terms and citing Huang et al., whose
+error-swallowing-and-dilution class the absorption step measured here
+instantiates~\cite{wu2026}; the
 difference is method --- taxonomy drawn from a production runtime
 there, controlled measurement of one mechanism here.
 
