@@ -46,6 +46,35 @@ python scripts/selection_sweep.py --report-only
   (gitignored); the tracked snapshots of those same databases sit in
   `integrity-matrix/` beside the report.
 
+## Price basis (how every cost figure here is computed)
+
+All `cost`/`cost_usd` fields in this directory — and the README's ≈$0.075
+list-price total — are computed by the runner from the per-model pricing
+table in `src/infrastructure/observability/console_writer.py`
+(`PRICING_USD_PER_MILLION_TOKENS`), the single source of truth:
+
+- **`gemini-3.1-flash-lite`: $0.25 per 1M input tokens, $1.50 per 1M output
+  tokens** — rates as recorded on 2026-07-28 from the official pricing page,
+  <https://ai.google.dev/gemini-api/docs/pricing>.
+- **Token counts come from the provider's own `usage_metadata`** (`prompt_token_count`;
+  `candidates_token_count` plus thought tokens where the model reports them;
+  `cached_content_token_count`) — mapped in
+  `src/infrastructure/providers/gemini_client.py`, never estimated.
+- **Cached input is billed at 10% of the input rate** in the runner's formula
+  (billable input = input − cached). **In the recorded evidence, cached
+  tokens are zero**: recomputing all 43 `integrity_matrix.jsonl` costs from
+  their token counts alone reproduces every recorded figure exactly, and the
+  earlier measurement rounds logged 0 cache-read tokens across all calls
+  (NOTES § Real-model findings). The recomputation is executable:
+  `python scripts/verify_costs.py` re-derives every recorded cost from the
+  token counts and the runner's own pricing table, failing on any mismatch.
+- **All runs executed inside free-tier quota** — figures are list-price
+  equivalents, not amounts billed.
+- List prices change; the figures are reproducible against the rates as of
+  the stated date, and the token counts — which do not change — are in the
+  tracked records themselves (`tokens_in`/`tokens_out` per (cell, rep) in
+  `integrity_matrix.jsonl`; per-execution metrics in `runs/*.json`).
+
 ## Provenance notes
 
 - `runs/run-20260727-212338.json` (the first real-model round's raw
