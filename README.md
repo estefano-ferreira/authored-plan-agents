@@ -113,14 +113,16 @@ the pattern can be implemented in any stack without reading this code.
 
 ## Key results (measured, not claimed)
 
-All real-model rows below were measured on `gemini-3.1-flash-lite`; the
-single-family scope and its cross-model spot-check are discussed in
+All real-model rows below were measured on `gemini-3.1-flash-lite` except
+where a row names another model; the single-family scope, its cross-model
+spot-check and the measured family arm are discussed in
 [Honest limitations](#honest-limitations).
 
 | Measurement | Result | Evidence |
 |---|---|---|
 | **Integrity matrix 2×2** — decoding constraint × boundary policy, single controlled condition (same codebase, same model, fault injected where the schema is stripped) | With a real schema both boundary policies are clean (the repair axis has nothing to do). Without it, the boundary alone decides: tolerant repair → `completed` 10/10 with **10 garbage rows and audit counters reading zero**; strict guard → `failed_clean` 10/10, **zero rows persisted** | [`NOTES.md`](NOTES.md) § Integrity matrix — controlled reproduction, `results/integrity-matrix/integrity_matrix*`, per-cell DB snapshots `results/integrity-matrix/matrix-*.sqlite` (cell A's garbage rows are directly inspectable) |
 | **Schema+fault cells E/F** — pre-registered follow-up completing the matrix's fault arm: fault injected downstream of an *active* schema, so the fence wraps valid JSON | The pre-registered prediction (fence-stripping repair recovers the valid content) was **falsified**: the tolerant cell `completed` 10/10 persisting **10 fenced blobs with contract counters at zero**; the strict cell `failed_clean` 10/10, zero rows — refusing content that was valid under the fence. Telemetry blindness reproduces with the schema active upstream; "tolerance would have recovered it" is measured false for this repair implementation | [`docs/preregistration-schema-fault-cells.md`](docs/preregistration-schema-fault-cells.md) (committed before the runner change), `results/integrity-matrix/integrity_matrix*`, `matrix-{E,F}.sqlite` |
+| **Cross-model family arm** (`gpt-4o-mini`, cells A/B, pre-registered) | Boundary reading transfers on every rep that reaches the boundary: tolerant 6/6 `completed` + fenced garbage + counters at zero (telemetry blindness, third family); strict 1/1 typed failure, **zero rows in all 10 strict reps regardless of failure locus**. 13/20 reps diverged upstream on selection format — the study's first id-only violations, reported separately (never composited) and correcting "naturally robust" to a family property | `results/integrity-matrix/integrity_matrix-gpt-4o-mini.jsonl`, `matrix-{A,B}-gpt-4o-mini.sqlite`, NOTES § Cross-model family arm |
 | **False success with real persistence** — the naturally-occurring instance that motivated the matrix: prompt-only generation, no fault injected | 10/10 executions reported success while persisting corrupted business records; **0/10** after decoding-level structured output + `retry_once_then_fail`, at **−18% cost**. The baseline's raw per-execution file was lost pre-versioning (aggregates survive in NOTES — see Honest limitations); the controlled reproduction above is the tracked evidence for the phenomenon | [`NOTES.md`](NOTES.md) § Structured output correction, [`results/`](results/) |
 | **Failure stays loud** — a provider schema-dialect bug hit the corrected pipeline | 10/10 **typed, unpersisted** failures (vs. the original 10/10 silent corruptions for the same class of surprise). Their recorded status `compensated` predates the 3-way failure vocabulary and is itself flagged as misleading for this fault shape — see NOTES § Structured output correction | `results/runs/run-20260727-215429.json` |
 | **Selection at catalog scale** (N = 2→40 plans, real model) | Clear intents: 100/100/100/100/95% (from 2/5/10/20/40 unique intents × 2 reps per size). Ambiguous intents: **~75% accuracy wherever confusable clusters exist** — but the cells are small (4/11/12 unique probes at N=10/20/40), so this supports the qualitative reading, not a precise rate; the aggregate decline is eval-composition, not catalog size. Out-of-catalog refusal: **0 errors on 15 unique probes** (3 per size × 2 reps; 95% upper bound ≈18% — too few probes per size to support any per-size claim). Paraphrase robustness is the selection layer's justification and has **not yet been compared against a strong semantic baseline** — an embedding-similarity comparison on the same set is the next experiment | [`NOTES.md`](NOTES.md) § Large-catalog selection sweep (N = 2..40), `results/selection-sweep/selection_sweep*` |
@@ -276,7 +278,9 @@ model family (`gemini-3.1-flash-lite`) — a cross-model spot-check exists
 out-of-catalog detection; only 1 ambiguous point per model, both at N=5;
 free-tier daily caps of 20 requests/model bounded it — see NOTES §
 Cross-model selection spot-check) but the catalog-scale and ambiguity-floor
-claims remain single-family; the selection sweep
+claims remain single-family (the boundary cells A/B are now measured in a
+second family — see the cross-model row — but the strict cell's boundary
+sample there is one, and the sweep's curves were never rerun); the selection sweep
 uses authored synthetic catalogs, not production intents; "compensation" of an
 `IRREVERSIBLE` step is forward-correction by generation, not rollback; and
 restriction 4 is a real wall only at the container boundary — in-process it is
@@ -293,20 +297,22 @@ per-execution records; every aggregate from it survives in the NOTES tables
 
 ## Status & roadmap
 
-Working reference implementation; measurements current as of 2026-07-28,
-including the cross-model spot-check (which falsified its own "30 minutes on
-a second free-tier model" estimate: the viable candidates carry 20-request
-daily caps — see NOTES). Next: full selection curves on a second model
-(≈6 days of daily-cap accumulation, or one paid-tier run at ~$0.06 list
-price) and the ambiguity-detection experiment (can the selector *flag*
-ambiguity instead of choosing?). Reprioritized ahead of both (2026-08-06):
-**cross-model integrity matrix** — cells A+B on a second model with the
-success criterion pre-registered, including the vacuity outcome (a model
-that never violates format without a schema measures its own defaults, not
-the boundary policy; the claim under test is conditional — *given* a
-violation, the boundary decides). Also queued: the embedding-similarity
-selection baseline on the sweep's exact intent set — the measured comparison
-that replaces the withdrawn keyword-counterfactual line.
+Working reference implementation; measurements current as of 2026-08-06.
+That day's rounds added, each pre-registered before its number existed:
+the **schema+fault cells E/F** (the pre-registered prediction — that
+fence-stripping repair would recover the valid content — was falsified:
+telemetry blindness reproduces with the schema active upstream) and the
+**cross-model family arm** (`gpt-4o-mini`: the boundary reading transfers
+on every repetition that reaches the boundary; 13/20 repetitions diverged
+upstream on selection-response format — the study's first id-only
+violations, which corrected "naturally robust" from a task property to a
+family property). Still queued: the frontier-tier arm
+(`claude-sonnet-5`, amendment recorded, key not yet provisioned), the
+embedding-similarity selection baseline (fully specified: model named,
+statistical power computed — one command from running), the
+ambiguity-detection experiment, and full selection curves on a second
+model. The measurement history — including the falsified predictions —
+is in [`NOTES.md`](NOTES.md).
 
 ## Citation
 

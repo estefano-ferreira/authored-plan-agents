@@ -7,21 +7,34 @@ authors:
   - family-names: "Senhor Ferreira"
     given-names: "Estefano"
     email: "estefano.senhor@gmail.com"
-date-released: "2026-07-27"
-version: "0.1.0"
+date-released: "2026-08-06"
+version: "0.3.0"
 keywords:
   - LLM agents
   - agent orchestration
   - architectural patterns
+  - telemetry blindness
+  - gray failure
   - saga compensation
   - structured output
   - false success
 abstract: >
   Reference implementation of an architectural pattern for LLM agent platforms
   in which non-determinism is confined to selection and generation, never to
-  sequence. Includes a restriction-enforcing test suite and three cycles of
-  real-model measurement: false success over real persistence (100% silent
-  corruption -> 0 with decoding-level structured output plus an architectural
-  contract guard), compensation over persisted state including failure of the
-  compensation itself, and selection accuracy at catalog scale (ambiguity as a
-  ~75% floor rather than a catalog-size slope; 100% out-of-catalog refusal).
+  sequence, with a restriction-enforcing test suite and four rounds of
+  real-model measurement over a persisted external system of record. Central
+  measured finding: telemetry blindness -- every platform-side observer
+  reports success while the business database holds corrupted state --
+  demonstrated in three model families and under two decoding conditions,
+  including a pre-registered follow-up whose opposite prediction the data
+  falsified (fence-stripping repair absorbs rather than extracts). Decoding-
+  level structured output suppressed every natural violation measured
+  (bounded observations, not elimination claims); the architectural output-
+  contract guard is what keeps the channel closed when that mechanism
+  silently breaks, at zero measured idle cost. Selection at catalog scale:
+  ambiguity behaves as a floor across the measured range rather than a
+  catalog-size slope (small cells; qualitative reading), out-of-catalog
+  refusal showed zero errors on its probes with stated bounds, and the
+  id-only selection contract's robustness proved to be a model-family
+  property, not a task property. Every absence claim is search- and
+  time-bound; falsified predictions are part of the record.
