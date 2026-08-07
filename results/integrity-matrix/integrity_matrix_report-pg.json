@@ -1,0 +1,64 @@
+{
+  "A": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "completed": 10
+      },
+      "tokens_in_total": 3893,
+      "tokens_out_total": 1403,
+      "cost_usd_total": 0.00307775,
+      "latency_ms_mean": 17624.81122998288,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 2,
+        "max_latency_ms": 90828.92939995509
+      },
+      "repairs_total": 10,
+      "output_contract": {
+        "contract_violations": 0,
+        "contract_retries": 0,
+        "contract_failures": 0
+      }
+    },
+    "erp": {
+      "db_path": "postgresql+psycopg://erp:***@127.0.0.1:5433/matrix_a",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 10,
+      "rows_valid_summary": 0,
+      "rows_garbage": 10
+    }
+  },
+  "B": {
+    "aggregate": {
+      "n": 10,
+      "status_counts": {
+        "failed_clean": 10
+      },
+      "tokens_in_total": 4545,
+      "tokens_out_total": 2615,
+      "cost_usd_total": 0.00505875,
+      "latency_ms_mean": 14666.27871998353,
+      "stalls": {
+        "threshold_ms": 30000.0,
+        "count": 2,
+        "max_latency_ms": 68192.12489994243
+      },
+      "repairs_total": 0,
+      "output_contract": {
+        "contract_violations": 10,
+        "contract_retries": 10,
+        "contract_failures": 10
+      }
+    },
+    "erp": {
+      "db_path": "postgresql+psycopg://erp:***@127.0.0.1:5433/matrix_b",
+      "exists": true,
+      "table": "service_requests",
+      "rows_created": 0,
+      "rows_valid_summary": 0,
+      "rows_garbage": 0
+    }
+  }
+}
