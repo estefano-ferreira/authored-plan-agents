@@ -719,6 +719,13 @@ def _run_measurement_mode(args) -> int:
 #     unset (checked at construction and re-checked by every public method -- see its own module
 #     docstring), so simply not exporting it is the entire mechanism; nothing else is skipped or
 #     special-cased for matrix runs.
+#   - Cross-model runs: the original matrix ran on `_MATRIX_BASELINE_MODEL`
+#     ("gemini-3.1-flash-lite"). Any other resolved model (see `_matrix_effective_model_id`) gets
+#     every evidence path suffixed with a slug of its model id (see `_matrix_evidence_paths` /
+#     `_matrix_model_slug`): `integrity_matrix-<slug>.jsonl`, `integrity_matrix_report-<slug>.json`,
+#     `var/erp/matrix-<cell>-<slug>.sqlite`, `audit-matrix-<cell>-<slug>-<ts>.jsonl` -- landing
+#     beside the baseline evidence rather than resuming into or overwriting it. The baseline model
+#     itself is unaffected: its paths stay exactly as they always were.
 # --------------------------------------------------------------------------------------
 
 _MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F")
@@ -743,9 +750,58 @@ _MATRIX_ERP_DIR = _VAR_DIR / "erp"
 # An execution's total latency above this threshold is counted as a "stall" in the per-cell report.
 _MATRIX_STALL_THRESHOLD_MS = 30_000.0
 
+# The model the original matrix ran on. When the effective model resolves to exactly this, every
+# evidence path below stays exactly as it already was (byte-identical to the pre-cross-model
+# behavior). Any other model gets its own, model-suffixed set of paths -- see
+# `_matrix_evidence_paths` -- so a cross-model run lands beside the original without ever
+# resuming into (or overwriting) its records.
+_MATRIX_BASELINE_MODEL = "gemini-3.1-flash-lite"
 
-def _matrix_erp_path(cell: str) -> Path:
-    return _MATRIX_ERP_DIR / f"matrix-{cell}.sqlite"
+# Mirrors each provider client's own model resolution (env var override, else its module-level
+# default -- see infrastructure/providers/{anthropic,openai,gemini,local}_client.py) so the
+# matrix runner can learn "which model is this run actually going to use" up front, before
+# `build_platform` ever instantiates a real client (which would require live API credentials just
+# to answer that question).
+_MATRIX_PROVIDER_MODEL_ENV: dict[str, tuple[str | None, str]] = {
+    "local": (None, "local-deterministic"),
+    "anthropic": ("ANTHROPIC_MODEL", "claude-sonnet-5"),
+    "openai": ("OPENAI_MODEL", "gpt-4o-mini"),
+    "gemini": ("GEMINI_MODEL", _MATRIX_BASELINE_MODEL),
+}
+
+
+def _matrix_effective_model_id(provider: str | None) -> str:
+    """Resolves the model id `provider` will actually run with, the same way the platform itself
+    resolves it: `build_platform`'s own provider fallback (explicit arg, else env `AI_PROVIDER`,
+    else "local"), then that provider client's own model fallback (its env var override, else its
+    module-level default)."""
+    provider = provider or os.environ.get("AI_PROVIDER", "local")
+    env_var, default = _MATRIX_PROVIDER_MODEL_ENV[provider]
+    return os.environ.get(env_var, default) if env_var else default
+
+
+def _matrix_model_slug(model_id: str) -> str:
+    return re.sub(r"[^a-z0-9.-]+", "-", model_id.lower())
+
+
+def _matrix_evidence_paths(model_id: str) -> dict:
+    """The JSONL/report paths this run's evidence should land at, plus the slug (or None) used to
+    derive them. `model_id == _MATRIX_BASELINE_MODEL`: unchanged baseline paths -- full backward
+    compatibility. Any other `model_id`: every path suffixed `-{slug}`, landing beside the
+    baseline evidence rather than overwriting or resuming into it."""
+    if model_id == _MATRIX_BASELINE_MODEL:
+        return {"jsonl": _MATRIX_JSONL_PATH, "report": _MATRIX_REPORT_PATH, "slug": None}
+    slug = _matrix_model_slug(model_id)
+    return {
+        "jsonl": _MATRIX_DIR / f"integrity_matrix-{slug}.jsonl",
+        "report": _MATRIX_DIR / f"integrity_matrix_report-{slug}.json",
+        "slug": slug,
+    }
+
+
+def _matrix_erp_path(cell: str, slug: str | None = None) -> Path:
+    suffix = f"-{slug}" if slug else ""
+    return _MATRIX_ERP_DIR / f"matrix-{cell}{suffix}.sqlite"
 
 
 def _matrix_request(cell: str, rep_index: int) -> dict:
@@ -842,13 +898,14 @@ def _is_garbage_summary(summary: str) -> bool:
     return False
 
 
-def _inspect_matrix_erp(cell: str) -> dict:
+def _inspect_matrix_erp(cell: str, db_path: Path | None = None) -> dict:
     """Direct sqlite3 (stdlib) inspection of this cell's ERP database -- no ASGI/HTTP call, no
     SQLAlchemy: opened read-only, queried once, closed. "control" only ever books appointments
     (its request never reaches the generation step this matrix studies, so no `service_requests`
     row is ever possible), so it reports `appointments` row counts instead and leaves the
-    summary-garbage fields as None (not applicable, not zero)."""
-    db_path = _matrix_erp_path(cell)
+    summary-garbage fields as None (not applicable, not zero). `db_path` defaults to the
+    unsuffixed (baseline) per-cell path when not given."""
+    db_path = db_path if db_path is not None else _matrix_erp_path(cell)
     if not db_path.exists():
         return {"db_path": db_path.relative_to(_REPO_ROOT).as_posix(), "exists": False}
 
@@ -910,13 +967,15 @@ def _load_matrix_report(report_path: Path = _MATRIX_REPORT_PATH) -> dict:
 
 
 def _write_matrix_cell_report(
-    cell: str, records: list[dict], report_path: Path = _MATRIX_REPORT_PATH,
+    cell: str, records: list[dict], report_path: Path = _MATRIX_REPORT_PATH, erp_path: Path | None = None,
 ) -> dict:
-    """Merges this cell's aggregate + ERP inspection into `integrity_matrix_report.json`,
-    preserving whatever other cells' blocks are already there (cells are run one invocation at a
-    time, in any order -- this must never clobber siblings)."""
+    """Merges this cell's aggregate + ERP inspection into `integrity_matrix_report.json` (or, for
+    a suffixed `report_path`, that model's own report file), preserving whatever other cells'
+    blocks are already there (cells are run one invocation at a time, in any order -- this must
+    never clobber siblings). `erp_path` defaults to the unsuffixed (baseline) per-cell path when
+    not given."""
     report = _load_matrix_report(report_path)
-    cell_report = {"aggregate": _aggregate_matrix_cell(records), "erp": _inspect_matrix_erp(cell)}
+    cell_report = {"aggregate": _aggregate_matrix_cell(records), "erp": _inspect_matrix_erp(cell, erp_path)}
     report[cell] = cell_report
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as fh:
@@ -932,11 +991,19 @@ def _run_matrix_cell_mode(args) -> int:
     reps = args.repeat
     config = _MATRIX_CELL_CONFIGS[cell]
 
-    all_records = _load_matrix_records()
+    model_id = _matrix_effective_model_id(args.provider)
+    evidence = _matrix_evidence_paths(model_id)
+    jsonl_path, report_path, slug = evidence["jsonl"], evidence["report"], evidence["slug"]
+    erp_path = _matrix_erp_path(cell, slug)
+    print(
+        f"[run_plans] matrix model={model_id} evidence: jsonl={jsonl_path} "
+        f"report={report_path} erp={erp_path}"
+    )
+
+    all_records = _load_matrix_records(jsonl_path)
     cell_records = [r for r in all_records if r.get("cell") == cell]
     done_reps = {r["rep"] for r in cell_records}
 
-    erp_path = _matrix_erp_path(cell)
     if not cell_records:
         # First execution ever recorded for this cell: start its ERP database from scratch. Once
         # at least one rep is on record, the file is resume state -- never touched here again.
@@ -959,7 +1026,8 @@ def _run_matrix_cell_mode(args) -> int:
     transport = httpx.ASGITransport(app=erp_app_inprocess)
 
     run_tag = datetime.now().strftime("%Y%m%d-%H%M%S")
-    audit_path = _VAR_DIR / f"audit-matrix-{cell}-{run_tag}.jsonl"
+    audit_suffix = f"-{slug}" if slug else ""
+    audit_path = _VAR_DIR / f"audit-matrix-{cell}{audit_suffix}-{run_tag}.jsonl"
 
     platform = build_platform(
         provider=args.provider, erp_transport=transport, audit_path=audit_path,
@@ -974,36 +1042,41 @@ def _run_matrix_cell_mode(args) -> int:
             continue
         execution = _run_matrix_rep(platform, cell, rep, rep - 1, global_index)
         _print_execution_row(execution)
-        _append_matrix_record(_matrix_jsonl_row(execution))
+        _append_matrix_record(_matrix_jsonl_row(execution), jsonl_path)
         global_index += 1
         new_reps += 1
 
     platform.connectors["rest"].close()
 
-    cell_records = [r for r in _load_matrix_records() if r.get("cell") == cell]
-    _write_matrix_cell_report(cell, cell_records)
+    cell_records = [r for r in _load_matrix_records(jsonl_path) if r.get("cell") == cell]
+    _write_matrix_cell_report(cell, cell_records, report_path, erp_path)
     print(
         f"[run_plans] matrix cell={cell}: {new_reps} new rep(s) run this invocation, "
-        f"{len(cell_records)}/{reps} total recorded; wrote {_MATRIX_REPORT_PATH}"
+        f"{len(cell_records)}/{reps} total recorded; wrote {report_path}"
     )
 
     return 0 if len(cell_records) >= reps else 1
 
 
-def _run_matrix_report_only() -> int:
+def _run_matrix_report_only(model_id: str | None = None) -> int:
     """Recomposes `results/integrity-matrix/integrity_matrix_report.json` from `integrity_matrix.jsonl` plus each
     cell's ERP SQLite file, for every cell with at least one recorded rep. No model calls, no ERP
-    calls, no Platform built at all."""
-    records = _load_matrix_records()
+    calls, no Platform built at all. `model_id` is `None` (default -- baseline paths, unchanged
+    behavior) unless `--matrix-model` was given, in which case it recomposes that model's own
+    suffixed report from its own suffixed JSONL instead."""
+    evidence = _matrix_evidence_paths(model_id or _MATRIX_BASELINE_MODEL)
+    jsonl_path, report_path, slug = evidence["jsonl"], evidence["report"], evidence["slug"]
+
+    records = _load_matrix_records(jsonl_path)
     if not records:
-        print(f"[run_plans] --matrix-report-only: no records found at {_MATRIX_JSONL_PATH}", file=sys.stderr)
+        print(f"[run_plans] --matrix-report-only: no records found at {jsonl_path}", file=sys.stderr)
         return 1
     cells = sorted({r["cell"] for r in records})
     for cell in cells:
         cell_records = [r for r in records if r["cell"] == cell]
-        _write_matrix_cell_report(cell, cell_records)
+        _write_matrix_cell_report(cell, cell_records, report_path, _matrix_erp_path(cell, slug))
         print(f"[run_plans] recomposed report for cell={cell} ({len(cell_records)} record(s))")
-    print(f"[run_plans] wrote {_MATRIX_REPORT_PATH}")
+    print(f"[run_plans] wrote {report_path}")
     return 0
 
 
@@ -1059,7 +1132,18 @@ def main() -> int:
         help=(
             "recomposes results/integrity-matrix/integrity_matrix_report.json from results/integrity-matrix/integrity_matrix.jsonl "
             "plus each cell's ERP SQLite file, for every cell with at least one recorded rep. No "
-            "model calls, no ERP calls; takes no other matrix/measurement flag."
+            "model calls, no ERP calls; takes no other matrix/measurement flag (except "
+            "--matrix-model)."
+        ),
+    )
+    parser.add_argument(
+        "--matrix-model", default=None,
+        help=(
+            "only with --matrix-report-only: recomposes the model-suffixed report instead of the "
+            f"baseline one -- reads results/integrity-matrix/integrity_matrix-<slug>.jsonl and writes "
+            "results/integrity-matrix/integrity_matrix_report-<slug>.json, where <slug> is this model id "
+            "lowercased with runs of non [a-z0-9.-] characters collapsed to '-'. Omit to recompose "
+            f"the baseline ({_MATRIX_BASELINE_MODEL}) report -- default, unchanged behavior."
         ),
     )
     args = parser.parse_args()
@@ -1070,7 +1154,10 @@ def main() -> int:
                 "--matrix-report-only stands alone: it takes no --matrix-cell/--repeat/"
                 "--inject-generation-fault"
             )
-        return _run_matrix_report_only()
+        return _run_matrix_report_only(args.matrix_model)
+
+    if args.matrix_model is not None:
+        parser.error("--matrix-model only applies together with --matrix-report-only")
 
     if args.matrix_cell is not None:
         if args.repeat is None:
