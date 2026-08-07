@@ -3,7 +3,7 @@
 % was extracted from -- necessarily the parent of the commit that
 % carries the PDF, since a PDF cannot embed its own commit hash. Clone
 % the named commit and everything except this compilation matches.
-% Current extraction commit: 14c7b86 (evidence complete at tag v0.6.0).
+% Current extraction commit: ae9e0f0 (evidence complete at tag v0.6.0).
 % Every number in this file traces to a tracked artifact under results/ or to
 % NOTES.md; do not edit a number here without editing its source first.
 %
@@ -81,6 +81,11 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage[hidelinks]{hyperref}
+% hyperref loads url.sty (providing \path); allow line breaks inside
+% paths at separators AND hyphens -- the pre-registration filenames are
+% hyphen-heavy and otherwise unbreakable (overfull lines).
+\def\UrlBreaks{\do\/\do\-\do\_\do\.}
+\emergencystretch=2em
 
 \newcommand{\cellA}{\textsf{A}}
 \newcommand{\cellB}{\textsf{B}}
@@ -98,7 +103,7 @@ A Controlled Measurement of Output-Contract Enforcement}
 \,\textperiodcentered\,
 \url{https://github.com/estefano-ferreira/authored-plan-agents}}
 
-\date{Draft --- extracted from repository commit \texttt{14c7b86},
+\date{Draft --- extracted from repository commit \texttt{ae9e0f0},
 2026-08-07}
 
 \begin{document}
@@ -329,7 +334,7 @@ cost, not that decoding ``holds under attack'').
 
 \paragraph{A third boundary policy: the genuine extractor.} Two further
 pre-registered cells (G and H;
-\texttt{docs/preregistration-extractor-repair-cells.md}, committed
+\path{docs/preregistration-extractor-repair-cells.md}, committed
 before the instrument existed) added a genuine fence-stripping
 extractor, \texttt{ExtractorRepairClient}, as a third value on the
 boundary-policy axis alongside the absorbing fallback and the strict
@@ -339,7 +344,7 @@ the content with the captured inner text and records one repair;
 anything that does not match --- bare JSON, prose, a double-fenced
 envelope's outer layer once stripped --- passes through unchanged, with
 no absorption and no field-stuffing. Cells I and J
-(\texttt{docs/preregistration-natural-violation-cells.md}, committed
+(\path{docs/preregistration-natural-violation-cells.md}, committed
 before the runner change) close the design's other remaining gap: the
 no-schema arm's natural, uninjected violation rate against the absorbing
 and strict policies. Results for both pairs are in \S\ref{sec:limits}.
@@ -391,6 +396,8 @@ rates as of the stated date, and the token counts --- which do not change
 \begin{table}[t]
 \centering
 \small
+\setlength{\tabcolsep}{4pt}%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllrrrrr@{}}
 \toprule
 Cell & Configuration & Status (10 reps) & Viol./Retry/Fail & Repairs &
@@ -415,13 +422,13 @@ F & schema + fault + strict & \statusfailedclean{} 10/10 &
 G & schema + fault + extractor & \statuscompleted{} 10/10 & 0/0/0 & 10 &
 10 & 10 & \$0.00248 \\
 H & no schema + fault + extractor & \statusfailedclean{} 8/10,
-\statuscompleted{} 2 & 9/9/8 & 19 & 2 & 2 & \$0.00492 \\
+\statuscompleted{} 2 & 9/9/8 & 19 & 2 & 2 & \$0.00491 \\
 I & no schema, natural, tolerant & \statuscompleted{} 10/10 & 0/0/0 & 10
 & 10 & \textbf{0} & \$0.00295 \\
 J & no schema, natural, strict & \statusfailedclean{} 9/10,
 \statuscompleted{} 1 & 10/10/9 & 0 & 1 & 1 & \$0.00500 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{The integrity matrix. ``Rows'' are records created in the
 external ERP database; ``Valid'' counts rows whose persisted
 \texttt{summary} is clean one-line text (verified by direct SQL
@@ -486,6 +493,7 @@ differently (\S\ref{sec:limits}).
 \begin{figure}[t]
 \centering
 \small
+\setlength{\tabcolsep}{4.5pt}%
 \begin{tabular}{@{}lccc@{}}
 \toprule
  & Cell \cellA{} & Cell \cellB{} & Cell E \\
@@ -707,7 +715,7 @@ the client never strips fences at all; for any response that does not
 parse as a bare JSON object it absorbs the original text --- fences
 included --- into the contract's fields. The pre-registration carries a
 dated erratum (2026-08-07,
-\texttt{docs/preregistration-schema-fault-cells.md}) recording this
+\path{docs/preregistration-schema-fault-cells.md}) recording this
 correction. The tolerant cell
 reported \statuscompleted{} 10/10 and persisted ten fenced blobs into
 the business field with contract counters at zero and ten repairs
@@ -739,7 +747,7 @@ of the decode-shape check? The arm was pre-registered under a new
 discipline adopted the same day: a mandatory ``what the code already
 determines'' section, written before any prediction, so that a
 deterministic outcome cannot later be dressed up as a discovery
-(\texttt{docs/preregistration-boundary-schema-validation.md}).
+(\path{docs/preregistration-boundary-schema-validation.md}).
 Determination: cells E and F were code-determined before the run --- the
 absorbing fallback's payload passes full schema validation by
 construction (it supplies exactly the three declared keys, all strings,
@@ -758,7 +766,7 @@ recorded baseline C/D. Consequence stated plainly: ``position, not
 strength'' is no longer only a structural argument --- it is measured at
 the strongest boundary check the declared schema admits. A further
 pre-registered engine replication
-(\texttt{docs/preregistration-fullschema-postgres.md}) then re-ran this
+(\path{docs/preregistration-fullschema-postgres.md}) then re-ran this
 arm's four cells against PostgreSQL --- its registered Branch A (full
 transfer) materialized exactly: C/D 10/10 clean, E ten fenced garbage
 rows with counters at zero, read from the live Postgres by direct SQL,
@@ -772,7 +780,7 @@ observed that this study had measured only an \emph{absorbing} repairer
 contract's fields --- while the practitioner literature's default repair
 is \emph{extraction} (markdown fence removal). Two cells, pre-registered
 under the same discipline
-(\texttt{docs/preregistration-extractor-repair-cells.md}, committed
+(\path{docs/preregistration-extractor-repair-cells.md}, committed
 before the instrument existed), completed the repair-policy axis with a
 genuine extractor, \texttt{ExtractorRepairClient} (single-pass markdown
 fence removal, no absorption, no field-stuffing). Determination, fixed
@@ -808,7 +816,7 @@ counters exactly as blind as the absorber does.
 admitted gap --- the no-schema/no-fault arm, the model's natural
 violation behavior under each boundary policy, never run as a matrix
 cell --- closed under the same pre-registration discipline
-(\texttt{docs/preregistration-natural-violation-cells.md}, committed
+(\path{docs/preregistration-natural-violation-cells.md}, committed
 before the runner change): cells I (no schema, no injector, tolerant)
 and J (no schema, no injector, strict), 10 repetitions each, no new
 instrument, only configuration. The natural violation rate measured
@@ -831,7 +839,8 @@ aggregates --- the loss itself (below) stays disclosed, not retracted.
 \begin{table}[t]
 \centering
 \small
-\begin{tabular}{@{}llll@{}}
+\renewcommand{\arraystretch}{1.2}%
+\begin{tabular}{@{}lp{2.9cm}lp{8.3cm}@{}}
 \toprule
 Arm & Varies & Cells & Reading \\
 \midrule
@@ -1148,23 +1157,23 @@ snapshots (\texttt{matrix-\{G,H,I,J\}.sqlite} and their audit trails,
 all in the baseline namespace, appended to the same
 \texttt{integrity\_matrix.jsonl} and consolidated report; evidence of
 the pre-registrations in
-\texttt{docs/preregistration-extractor-repair-cells.md} and
-\texttt{docs/preregistration-natural-violation-cells.md}), the
+\path{docs/preregistration-extractor-repair-cells.md} and
+\path{docs/preregistration-natural-violation-cells.md}), the
 full-schema boundary arm's own snapshots
 (\texttt{matrix-\{C,D,E,F\}-fullschema.sqlite} and the
 \texttt{-fullschema} JSONL, report and audit trails, evidence of the
 arm pre-registered in
-\texttt{docs/preregistration-boundary-schema-validation.md}; its
+\path{docs/preregistration-boundary-schema-validation.md}; its
 PostgreSQL replication beside them with the layered
 \texttt{-fullschema-pg} suffix, per
-\texttt{docs/preregistration-fullschema-postgres.md}) and
+\path{docs/preregistration-fullschema-postgres.md}) and
 \texttt{results/runs/} (the naturally occurring
 dialect-failure round, \texttt{run-20260727-215429.json}; the corrected
 round, \texttt{run-20260727-215811.json}). The Postgres arm's ground
 truth was read from the live PostgreSQL database by direct SQL and
 exported as the tracked \texttt{-pg} SQLite snapshots noted above ---
 the uniform format the reader scripts accept (see
-\texttt{docs/preregistration-postgres-sor.md}). One caveat carried from
+\path{docs/preregistration-postgres-sor.md}). One caveat carried from
 \S\ref{sec:limits}: the baseline round's raw file
 (\texttt{run-20260727-212338.json}) does not exist --- lost to a
 pre-versioning cleanup; its aggregates survive in the repository's study
