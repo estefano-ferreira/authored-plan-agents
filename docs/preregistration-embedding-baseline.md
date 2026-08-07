@@ -103,6 +103,25 @@ chosen: preview status fails the availability criterion. Invocation:
 `calibrate` first, then `run` — τ frozen before the eval set is touched,
 per the registered mechanism.
 
+**2026-08-06 — collapse-rule amendment (recorded before the results enter
+any document).** The power amendment fixed the paired test but not how the
+LLM's two recorded reps collapse into one per-intent verdict. The gap is
+material: the clear-intent significance flips with the rule (strict
+both-reps: p = 0.1875; rep1: p = 0.0312), because the LLM's three unstable
+intents (its only cross-rep flips, all at N = 40) sit exactly in the
+discordant set. Decision, fixed now: **both rules are computed and
+reported side by side** (`scripts/paired_selection_analysis.py`), no rule
+is designated primary after the fact, and a decision that is not
+invariant to the rule is Branch C ("underpowered/undecidable at the
+margin") by definition. Under that reading the measured outcome is
+**Branch C**: clear-intent deficit +3.9 to +6.5 points
+(rule-dependent significance, both below the ~10-point MDD);
+out-of-catalog 4/15 one-directional discordants (one short of the
+catastrophic criterion, p = 0.0625); ambiguous **descriptively favors
+embeddings by 21.4 points** (27/28 vs. the LLM's floor) — resolving the
+registered question about the ambiguity floor: it was substantially a
+property of the measured model, not of the eval set.
+
 ## Question
 
 On the selection sweep's exact intent set, does embedding-similarity

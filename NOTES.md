@@ -977,6 +977,39 @@ the Postgres cell-A blobs are double-fenced (the injector re-fenced an
 already-fenced response, as in the original cell A), the `gpt-oss-120b`
 ones single-fenced — model-dependent shape, engine-independent reading.
 
+## Embedding-similarity selection baseline — measured (2026-08-06)
+
+The pre-registered strong semantic comparator
+(`docs/preregistration-embedding-baseline.md`: registered text + power
+amendment + collapse-rule amendment, all dated before their numbers).
+`gemini-embedding-001`, τ = 0.53 frozen on the disjoint calibration set
+(100% there, 31 embedding calls) before the eval set was touched; 120
+unique intents, 0 format violations, cost ≈ free tier. Evidence:
+`embedding_baseline.jsonl` + report + the frozen calibration artifact;
+paired analysis executable as `scripts/paired_selection_analysis.py`.
+
+| kind | n | both | LLM-only | EMB-only | paired diff | p (deficit, one-sided) |
+|---|---|---|---|---|---|---|
+| clear | 77 | 70–71 | 4–5 | 0–1 | +3.9 to +6.5 pts | 0.1875 / **0.0312** (rule-dependent) |
+| ambiguous | 28 | 20 | 1 | **7** | **−21.4 pts (embeddings ahead)** | 0.996 |
+| out-of-catalog | 15 | 11 | 4 | 0 | +26.7 pts | 0.0625 |
+
+**Outcome: Branch C, causes named.** The clear-intent decision flips with
+the LLM rep-collapse rule (the three N=40 cross-rep flips sit exactly in
+the discordant set) — undecidable at the margin by the amendment's own
+definition; refusal stopped one discordant short of its catastrophic
+criterion. **The descriptive result nobody predicted: embeddings beat the
+LLM on ambiguous intents by 21.4 points (27/28).** The registered text
+pre-committed this comparison as evidence about the eval set versus the
+model — answered: **the ~75% ambiguity floor was substantially a property
+of the measured model, not of the intent set** (third
+correction-by-measurement of the study). The coherent narrowing, exactly
+the shape the registered Branch A anticipated: the LLM selection layer's
+measured justification narrows to **typed out-of-catalog refusal** (the
+one kind where embeddings fell short, 4/15 missed); clear intents are a
+near-tie at ~zero marginal cost; ambiguity favors the embedding
+comparator.
+
 ## Open questions for the study
 
 - Does plan-level compensation stay manageable at 5+ steps, or does reverse-order

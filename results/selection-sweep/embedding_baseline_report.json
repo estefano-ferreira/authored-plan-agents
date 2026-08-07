@@ -1,0 +1,172 @@
+{
+  "generated_at": "2026-08-07T02:27:39.059190+00:00",
+  "source_jsonl": "results/selection-sweep/embedding_baseline.jsonl",
+  "n_records": 120,
+  "models_present": [
+    "gemini-embedding-001"
+  ],
+  "by_model": {
+    "gemini-embedding-001": {
+      "by_catalog_size": {
+        "2": {
+          "overall": {
+            "n": 5,
+            "accuracy": 1.0,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 2,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 1.0,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 83.2,
+          "avg_output_tokens": 0,
+          "avg_latency_ms": 732.5367199955508
+        },
+        "5": {
+          "overall": {
+            "n": 9,
+            "accuracy": 0.8888888888888888,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 5,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 1,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 0.6666666666666666,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 176,
+          "avg_output_tokens": 0,
+          "avg_latency_ms": 445.0963333430183
+        },
+        "10": {
+          "overall": {
+            "n": 17,
+            "accuracy": 0.9411764705882353,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 10,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 4,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 0.6666666666666666,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 319.2352941176471,
+          "avg_output_tokens": 0,
+          "avg_latency_ms": 407.11648234933176
+        },
+        "20": {
+          "overall": {
+            "n": 34,
+            "accuracy": 0.9411764705882353,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 20,
+              "accuracy": 0.95,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 11,
+              "accuracy": 1.0,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 0.6666666666666666,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 627.5,
+          "avg_output_tokens": 0,
+          "avg_latency_ms": 428.58857058522784
+        },
+        "40": {
+          "overall": {
+            "n": 55,
+            "accuracy": 0.8727272727272727,
+            "format_violations": 0
+          },
+          "by_kind": {
+            "clear": {
+              "n": 40,
+              "accuracy": 0.875,
+              "format_violations": 0
+            },
+            "ambiguous": {
+              "n": 12,
+              "accuracy": 0.9166666666666666,
+              "format_violations": 0
+            },
+            "none": {
+              "n": 3,
+              "accuracy": 0.6666666666666666,
+              "format_violations": 0
+            }
+          },
+          "avg_input_tokens": 1239.2727272727273,
+          "avg_output_tokens": 0,
+          "avg_latency_ms": 451.62222545424646
+        }
+      },
+      "accuracy_curve": [
+        {
+          "catalog_size": 2,
+          "n": 5,
+          "accuracy": 1.0
+        },
+        {
+          "catalog_size": 5,
+          "n": 9,
+          "accuracy": 0.8888888888888888
+        },
+        {
+          "catalog_size": 10,
+          "n": 17,
+          "accuracy": 0.9411764705882353
+        },
+        {
+          "catalog_size": 20,
+          "n": 34,
+          "accuracy": 0.9411764705882353
+        },
+        {
+          "catalog_size": 40,
+          "n": 55,
+          "accuracy": 0.8727272727272727
+        }
+      ],
+      "n_records": 120
+    }
+  }
+}
