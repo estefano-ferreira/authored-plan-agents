@@ -27,7 +27,7 @@ from infrastructure.observability.console_writer import (  # noqa: E402
     PRICING_USD_PER_MILLION_TOKENS,
 )
 
-MATRIX_JSONL = REPO / "results" / "integrity-matrix" / "integrity_matrix.jsonl"
+MATRIX_DIR = REPO / "results" / "integrity-matrix"
 TOLERANCE = 1e-9  # float noise only; recorded costs are sums of exact per-call terms
 
 
@@ -39,17 +39,20 @@ def recompute(model: str, tokens_in: int, tokens_out: int) -> float:
 def main() -> int:
     mismatches = []
     records = 0
-    for line in MATRIX_JSONL.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        r = json.loads(line)
-        records += 1
-        expected = recompute(r["model"], r["tokens_in"], r["tokens_out"])
-        if abs(expected - r["cost"]) > TOLERANCE:
-            mismatches.append(
-                f"  cell={r['cell']} rep={r['rep']}: recorded {r['cost']!r}, "
-                f"recomputed {expected!r} from {r['tokens_in']}/{r['tokens_out']} tokens"
-            )
+    # Baseline file plus every model-suffixed cross-model file (integrity_matrix-<slug>.jsonl).
+    jsonl_files = sorted(MATRIX_DIR.glob("integrity_matrix*.jsonl"))
+    for jsonl in jsonl_files:
+        for line in jsonl.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            records += 1
+            expected = recompute(r["model"], r["tokens_in"], r["tokens_out"])
+            if abs(expected - r["cost"]) > TOLERANCE:
+                mismatches.append(
+                    f"  {jsonl.name} cell={r['cell']} rep={r['rep']}: recorded {r['cost']!r}, "
+                    f"recomputed {expected!r} from {r['tokens_in']}/{r['tokens_out']} tokens"
+                )
     if mismatches:
         print(f"[verify_costs] {len(mismatches)}/{records} records do NOT reproduce:", file=sys.stderr)
         print("\n".join(mismatches), file=sys.stderr)

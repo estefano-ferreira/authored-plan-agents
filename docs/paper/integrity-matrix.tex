@@ -572,10 +572,24 @@ round's raw file is tracked; the 10/10 figure is therefore reproducible
 from surviving aggregates, not from raw records. The repository discloses
 this loss, and so does this paper.
 
-\paragraph{Single model family.} All cells ran on
-\texttt{gemini-3.1-flash-lite}. A cross-model replication of cells
-\cellA{}/\cellB{} is pre-registered (branches and vacuity outcome fixed
-before any number exists) but not yet run.
+\paragraph{Single model family --- partially addressed.} All cells of
+the main comparison ran on \texttt{gemini-3.1-flash-lite}. A pre-registered
+cross-model replication of cells \cellA{}/\cellB{} has since run its
+family arm (\texttt{gpt-4o-mini}, 10 repetitions per cell,
+model-suffixed tracked evidence): every repetition that reached the
+generation boundary reproduced the original reading --- tolerant: 6/6
+\statuscompleted{} with fenced garbage persisted and counters at zero
+(telemetry blindness in a third model family); strict: 1/1 typed
+failure --- and zero rows persisted in all 10 strict repetitions
+regardless of failure locus. The caveats are part of the result: the
+strict cell's boundary sample is one, because 13/20 repetitions
+diverged \emph{upstream} on selection-response format (the model
+answers a sentence instead of the bare id) --- a per-family selection
+result reported separately per the pre-registration, and itself a
+falsification of this study's earlier reading that the id-only
+selection contract is ``naturally robust'' as a property of the task.
+The frontier-tier arm (\texttt{claude-sonnet-5}, amendment recorded) has
+not run.
 
 \paragraph{Self-built system of record.} The ERP is a mock written by the
 same author, with two invariants designed to be checkable. The pattern's

@@ -706,7 +706,12 @@ choosing one short id from an offered list is a trivially constrained output
 task, which is what makes the selection contract naturally robust; generating
 a structured object is not — that contract violated 100% until enforced at
 the decoding level. The two results are one lesson about contract difficulty,
-not a miracle of typed refusal. Stability: 117/120 points identical across both reps; the 3 flips are
+not a miracle of typed refusal. *(Correction, 2026-08-06 cross-model arm:
+"naturally robust" was a family property, not a task property —
+`gpt-4o-mini` violated the id-only selection format in 13/20 matrix
+executions (verbose id responses), the study's first selection-format
+violations; see § Cross-model family arm. The 0/240 stands as recorded
+for its model; the generalization is withdrawn.)* Stability: 117/120 points identical across both reps; the 3 flips are
 all at N=40 inside confusable clusters.
 
 **On DACS (arXiv 2604.07911) — a design argument, not a measured comparison.**
@@ -880,6 +885,46 @@ repair-conceals warning remains prose-only in the practitioner literature
 found. Read-queue additions from the sweep: arXiv 2607.14167 (structured
 feedback vs.\ silent repair in agent loops), 2601.00481 (MAESTRO),
 2606.01365 (failure-aware observability).
+
+## Cross-model family arm — gpt-4o-mini, cells A and B (2026-08-06)
+
+The family-diversity arm of the pre-registered cross-model run
+(`docs/preregistration-crossmodel-integrity-AB.md`, amendment of
+2026-08-06), on the model-suffixed evidence paths the runner gained the
+same day. The tier arm (`claude-sonnet-5`) remains unrun — key not
+provisioned by decision at run time. Evidence:
+`integrity_matrix-gpt-4o-mini.jsonl`, its report, and tracked snapshots
+`matrix-{A,B}-gpt-4o-mini.sqlite`; all 20 recorded costs recompute
+exactly from tokens at the model's list rates ($0.15/$0.60 per 1M);
+total spend for both cells ≈ $0.0015, zero stalls.
+
+| | status | reached boundary | boundary outcome | ERP rows |
+|---|---|---|---|---|
+| **A** (tolerant) | `completed` 6 / `failed_clean` 4 | 6 | **6/6 garbage persisted, counters 0/0/0, repairs 6** | 6 (0 valid) |
+| **B** (strict) | `failed_clean` 10/10 | 1 | 1/1 violation→retry→typed failure | **0** |
+
+**Boundary axis: transfers where reached, with the sample stated.** Every
+repetition that reached the generation boundary reproduced the original
+reading in a third model family — tolerant absorbed and persisted fenced
+garbage with the platform's counters at zero (telemetry blindness,
+family #3), strict failed typed with nothing persisted. Honest bounds:
+the strict cell's boundary sample is **one**; zero persistence held
+10/10 in B regardless of failure locus.
+
+**Branch C dominated — and falsified a task-robustness claim.** 13/20
+repetitions failed *upstream*, on capability-selection response format:
+`gpt-4o-mini` answers `id: read-and-reply` or a full sentence instead of
+the bare id. These are the first selection-format violations in the
+entire study (0/240 on `gemini-3.1-flash-lite`; 0/42 on two further
+Gemini-family models), and they falsify, as a general claim, the sweep
+section's "choosing one short id from an offered list is a trivially
+constrained output task, which is what makes the selection contract
+naturally robust": **the observed robustness was a property of the model
+family, not of the task** (correction annotated in place). Per the
+pre-registration, this selection result is reported separately from the
+boundary axis, never composited. Restriction 7 held under the stress:
+all 13 upstream failures were typed `failed_clean`, zero improvisation,
+zero persistence.
 
 ## Open questions for the study
 
