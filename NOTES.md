@@ -1138,6 +1138,21 @@ single fence with/without language tag, pass-through for bare JSON,
 double-fenced content and prose, repair counting — account for the
 growth from 27).
 
+**Prior-work search — measured repair-policy comparison (2026-08-07,
+per the repo's read-before-claiming rule).** Searched for prior
+*measured* comparisons of boundary repair policies (extraction vs.
+absorption vs. strict rejection) against persisted state and telemetry
+counters. None found by this search at this date. Nearest neighbors are
+of a different kind: practitioner prose recommending fence-strip
+helpers and "don't auto-fix — surface the error typed" (the genre the
+paper already cites as warning in prose; cells J/B now supply the
+measurement that prose lacked), and the academic repair literature on
+feedback-driven *regeneration* (a different axis: the informed retry,
+not silent boundary repair — e.g. arXiv 2607.14167). Standard absence
+discipline applies: "not found by a stated search at a stated date",
+never "does not exist". The paper claims no novelty for the comparison,
+so no paper text depends on this note.
+
 ## Cross-model family arm — gpt-4o-mini, cells A and B (2026-08-06)
 
 The family-diversity arm of the pre-registered cross-model run
