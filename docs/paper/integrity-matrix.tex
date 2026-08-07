@@ -802,6 +802,25 @@ evidence for every sentence above is a version-controlled artifact:
 per-cell database snapshots, append-only audit trails, and raw
 model-call logs, inspectable from a fresh clone.
 
+\paragraph{Implications for platform design.} Three design consequences
+follow from the measurements, stated as requirements the findings
+support rather than as a new architecture. First, an output-contract
+guard on the business write path is an architectural requirement, not an
+optimization: its measured idle cost is zero and its per-violation price
+is one model call, so omitting it buys nothing and forfeits the only
+loud-failure path this study observed. Second, platform-side telemetry
+must not be treated as integrity evidence --- audit has to read the
+system of record, because the configuration in which every instrument
+agrees and is wrong is demonstrated, named, and cheap to produce.
+Third, repair-before-check must be made structurally impossible on
+business writes --- the mechanism is positional, so no policy applied
+after the absorption can recover the signal. The reference
+implementation's pattern (Authored-Plan Agents) encodes these three as
+registration- and load-time restrictions with their own violation
+probes; its specification and test suite are in the repository for any
+platform that wants to adopt the requirements without adopting the
+implementation.
+
 \paragraph{Data availability.} Repository tag \texttt{v0.4.0}:
 implementation, restriction-enforcing test suite (18 passed, 7
 strict-xfail anti-vacuity probes), and tracked evidence under
