@@ -91,12 +91,12 @@ comparison (plus a control arm) --- \emph{decoding constraint}
 \emph{boundary policy} (tolerant repair vs.\ a strict
 retry-once-then-fail output-contract guard), a fault injector forcing
 format violations in the unconstrained cells and, in two pre-registered
-follow-up cells, downstream of the active schema --- on one codebase and
-one model (pre-registered follow-up arms, reported in the limitations,
-rerun two cells across further model configurations and a second
-system-of-record engine), with ground
-truth read directly from the persisted SQLite of
-an external system of record. Two findings
+follow-up cells, downstream of the active schema --- on one codebase, with the
+main comparison on one model. Pre-registered follow-up arms replicate
+cells A and B across two further model configurations and a second
+system-of-record engine (reported in the limitations). Ground truth is
+read directly from the persisted database of an external system of
+record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
 positioned before the contract check, the tolerant configuration
 reported success 10/10 and persisted ten garbage business records while
@@ -600,7 +600,8 @@ round's raw file is tracked; the 10/10 figure is therefore reproducible
 from surviving aggregates, not from raw records. The repository discloses
 this loss, and so does this paper.
 
-\paragraph{Single model family --- partially addressed.} All cells of
+\paragraph{Model scope --- one model in the main comparison, arms
+beyond it.} All cells of
 the main comparison ran on \texttt{gemini-3.1-flash-lite}. A pre-registered
 cross-model replication of cells \cellA{}/\cellB{} has since run its
 family arm (\texttt{gpt-4o-mini}, 10 repetitions per cell,
