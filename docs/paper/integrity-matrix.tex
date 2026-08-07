@@ -1,5 +1,5 @@
 % !TEX program = pdflatex
-% Draft extracted from the repository evidence at tag v0.4.0.
+% Draft extracted from the repository evidence at tag v0.5.0.
 % Every number in this file traces to a tracked artifact under results/ or to
 % NOTES.md; do not edit a number here without editing its source first.
 %
@@ -91,7 +91,7 @@ A Controlled Measurement of Output-Contract Enforcement}
 \,\textperiodcentered\,
 \url{https://github.com/estefano-ferreira/authored-plan-agents}}
 
-\date{Draft --- extracted from repository state \texttt{v0.4.1}, 2026-08-07}
+\date{Draft --- extracted from repository state \texttt{v0.5.0}, 2026-08-07}
 
 \begin{document}
 \maketitle
@@ -107,7 +107,9 @@ format violations in the unconstrained cells and, in two pre-registered
 follow-up cells, downstream of the active schema --- on one codebase, with the
 main comparison on one model. Pre-registered follow-up arms replicate
 cells A and B across two further model configurations and a second
-system-of-record engine (reported in the limitations). Ground truth is
+system-of-record engine, and re-run the schema cells with the boundary
+strengthened to full-schema validation (the blindness signature is
+unchanged) --- all reported in the limitations. Ground truth is
 read directly from the persisted database of an external system of
 record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
@@ -229,16 +231,18 @@ database, never from platform state.
 \item \textbf{Output contract on the write path.} The \emph{boundary} is
 the single interface through which generated content becomes business
 state. The declared JSON Schema is enforced at the \emph{decoding}
-level (the provider-side \texttt{responseSchema}); the boundary itself
-applies a strict decode-shape check --- \texttt{json.loads}, a
-bare-JSON-object test, and presence of the contract's required keys,
-with no type, enum, format, or \texttt{additionalProperties}
-validation --- to the content that feeds a business write, at a point
-the generator cannot bypass; on violation, at most one retry, then a
-typed failure --- nothing unvalidated persists. Consequently, the
-paper's boundary result is about the \emph{position} of this check
-relative to absorption, not about the strength of its validation. This
-is the mechanism under test.
+level (the provider-side \texttt{responseSchema}); for the main
+comparison the boundary itself applies a strict decode-shape check ---
+\texttt{json.loads}, a bare-JSON-object test, and presence of the
+contract's required keys, with no type, enum, format, or
+\texttt{additionalProperties} validation --- to the content that feeds
+a business write, at a point the generator cannot bypass; on
+violation, at most one retry, then a typed failure --- nothing
+unvalidated persists. A pre-registered follow-up arm (\S\ref{sec:limits})
+then strengthened the boundary to full validation of the declared
+schema --- exact key set, string types, enum --- and re-ran the schema
+cells, so the positional result is now measured at both validation
+strengths. This is the mechanism under test.
 \item \textbf{Unsampled audit.} Proposals, policy decisions, business
 validations, output-contract events and compensations are recorded
 append-only, as distinct kinds. The experiment measures, among other
@@ -326,11 +330,12 @@ from the provider's own \texttt{usage\_metadata}
 thought tokens where the model reports them,
 \texttt{cached\_content\_token\_count}), not from an estimator. Cached
 input is billed at 10\% of the input rate in the runner's formula; in
-these runs cached tokens were zero --- verified by recomputing all 123
+these runs cached tokens were zero --- verified by recomputing all 203
 recorded per-execution costs (the six-cell comparison, the control arm,
 and the follow-up arms at their own list rates: \texttt{gpt-4o-mini}
 and Groq-served \texttt{gpt-oss-120b}, both \$0.15 / \$0.60 per
-million as recorded; the Postgres arm on the baseline model's rates)
+million as recorded; the Postgres and full-schema arms on the baseline
+model's rates)
 from their token counts alone, which
 reproduces every recorded figure exactly
 (\texttt{scripts/verify\_costs.py} in the repository). All runs executed inside
@@ -413,9 +418,10 @@ integrity telemetry is not evidence either}. Only the system of record is
 property of repair itself (Figure~\ref{fig:order}). Two levels of this
 claim must be kept apart. The \emph{positional} mechanism is general:
 any absorption upstream of a check blinds the counters that check feeds.
-The \emph{measured} result is narrower: format repair ahead of a format
-check. A repair that normalizes content ahead of a form check, or form
-repair ahead of a semantic check, was not tested and may behave
+The \emph{measured} result is narrower: absorption of format violations
+ahead of a format check. A repair that genuinely normalizes content
+ahead of a form check, or form repair ahead of a semantic check, was
+not tested and may behave
 differently (\S\ref{sec:limits}).
 
 \begin{figure}[t]
@@ -508,7 +514,7 @@ the check that feeds those observers suffices: the check never sees the
 violation, so the counters it feeds cannot record it --- and the
 absorption step's own counter reads as successes, not violations. The
 condition is mechanism-agnostic: it holds for any absorption step, not
-only the format repair measured here (the measured narrowing above
+only the absorbing fallback measured here (the measured narrowing above
 stands).
 
 \paragraph{Observed instance.} Cell \cellA{}: agent report
@@ -517,8 +523,15 @@ ten successes, ten corrupted rows in the business database. A second
 instance was measured after this definition was written and
 pre-registered (\S\ref{sec:limits}): the same signature --- counters at
 zero, ten repairs, ten corrupted rows --- with decoding enforcement
-active upstream and the fault injected downstream of it. The condition
-is positional, indifferent to what sits upstream of the absorption.
+active upstream and the fault injected downstream of it. A third
+instance was measured under a further pre-registered arm
+(\S\ref{sec:limits}): the same signature again, with the boundary
+performing full validation of the declared schema --- the absorbed
+payload is schema-valid by construction, so no boundary-side validation
+strength can reject it; this outcome was determined by the code before
+the run and is reported as a verification. The condition is positional,
+indifferent to what sits upstream of the absorption and to how strong
+the downstream check is.
 
 \paragraph{F3 --- with the schema, no violation occurred and the repair
 axis is invisible.} Cells \cellC{} and \cellD{} are byte-equivalent in
@@ -532,7 +545,10 @@ violations under prompt-only control $\rightarrow$ 0/10 with the schema,
 at $-18\%$ cost per completed task. What \cellC{}/\cellD{} add is the
 guard's price sheet: under the enforced-decoding configuration the guard
 has literally nothing to do, and its idle cost --- extra model calls,
-extra tokens --- is zero.
+extra tokens --- is zero. The pre-registered full-schema arm
+(\S\ref{sec:limits}) re-measured this idle cost at full validation
+strength --- still zero: cells \cellC{}/\cellD{} remain byte-equivalent
+under the strengthened check, with no additional model calls.
 
 \paragraph{F4 --- the guard's price is one extra call per violation.}
 \cellB{} spent 1.92$\times$ \cellA{}'s output tokens (2636 vs.\ 1376)
@@ -632,6 +648,41 @@ no-schema/no-fault arm (natural violations under each boundary policy)
 has never run as a cell --- the incident round covers only its tolerant
 half.
 
+\paragraph{The full-schema boundary arm.} The v0.4.0 review asked the
+strong form of the boundary question: does the positional result survive
+when the boundary performs full validation of the declared schema ---
+exact key set, string types, the \texttt{request\_type} enum --- instead
+of the decode-shape check? The arm was pre-registered under a new
+discipline adopted the same day: a mandatory ``what the code already
+determines'' section, written before any prediction, so that a
+deterministic outcome cannot later be dressed up as a discovery
+(\texttt{docs/preregistration-boundary-schema-validation.md}).
+Determination: cells E and F were code-determined before the run --- the
+absorbing fallback's payload passes full schema validation by
+construction (it supplies exactly the three declared keys, all strings,
+with \texttt{request\_type} in the enum), and the injector re-fences the
+retry, defeating the strict guard's recovery path exactly as in the
+original F --- and are reported here as verifications, not discoveries.
+The open cells were C and D: under active decoding, does the
+strengthened check reject content the shape check would have passed?
+The run confirmed both registered predictions. P1: zero full-schema-only
+rejections in ten natural repetitions per cell (0/10 each, bounding the
+underlying rate at $\le 25.9\%$ one-sided 95\%, as everywhere in this
+study), with C and D remaining byte-equivalent (10 clean rows each,
+$\sim$same tokens, $\sim$same cost). P2: the strengthened check's idle
+cost is zero --- no additional model calls in C/D relative to the
+recorded baseline C/D. Consequence stated plainly: ``position, not
+strength'' is no longer only a structural argument --- it is measured at
+the strongest boundary check the declared schema admits. A further
+pre-registered engine replication
+(\texttt{docs/preregistration-fullschema-postgres.md}) then re-ran this
+arm's four cells against PostgreSQL --- its registered Branch A (full
+transfer) materialized exactly: C/D 10/10 clean, E ten fenced garbage
+rows with counters at zero, read from the live Postgres by direct SQL,
+F 10/10 typed failures with zero rows --- closing a scope gap this
+paper had carried silently: cells C--F had never run against the second
+engine.
+
 \paragraph{One violation class.} The injected fault (markdown re-fencing)
 is the class the original incident exhibited. Tolerant repair in the wild
 absorbs other classes (truncation, wrong fields, schema-valid-but-wrong
@@ -679,9 +730,12 @@ same author, with two invariants designed to be checkable. The pattern's
 guarantee delegates wholesale to the system of record's competence; this
 study cannot measure an incompetent one. A pre-registered engine arm
 reran cells \cellA{}/\cellB{} with the same ERP on PostgreSQL (baseline
-model held fixed) and reproduced both readings exactly --- the results
-are engine-portable and a SQLite artifact is ruled out --- but the
-circularity itself is untouched: the engine varied, the owner did not.
+model held fixed) and reproduced both readings exactly, and a second
+pre-registered engine replication later re-ran the full-schema arm's
+cells C--F on PostgreSQL with the same result (full transfer) --- the
+results are engine-portable and a SQLite artifact is ruled out --- but
+the circularity itself is untouched: the engine varied, the owner did
+not.
 Relatedly, the platform's
 registration-time checks validate \emph{coherence of declared} tool
 metadata, not the truth of the declarations.
@@ -828,7 +882,7 @@ the two remaining worlds: when the decoding constraint silently breaks
 tolerant pipeline persists garbage while reporting success and zeroing
 its own counters --- the telemetry blindness of \S\ref{sec:results} ---
 while a strict boundary fails loudly, typed, with nothing
-persisted. In the combination we measured --- format repair ahead of a
+persisted. In the combination we measured --- absorption ahead of a
 format check --- repair-before-check did not repair; it concealed. What
 generalizes is the position, not the repair: any absorption upstream of
 a check blinds the counters that check feeds (Figure~\ref{fig:order}),
@@ -840,38 +894,57 @@ model-call logs, inspectable from a fresh clone.
 \paragraph{Implications for platform design.} Three design consequences
 follow from the measurements, stated as requirements the findings
 support rather than as a new architecture, at three different levels of
-evidential support. First, an output-contract guard --- a decode-shape
-check at the boundary --- on the business write path is an
+evidential support. First, an output-contract guard on the business
+write path --- measured here at decode-shape strength and, in the
+follow-up arm, at full-schema strength --- is an
 architectural requirement, not an
 optimization: its idle cost was measured at zero in the tested
-configuration (a bounded observation, F3/F4, \S\ref{sec:limits}) and its
+configuration (a bounded observation, F3/F4, \S\ref{sec:limits}), and
+was re-measured at zero under the full-schema boundary arm's
+strengthened validation (\S\ref{sec:limits}), and its
 per-violation price is one model call, so omitting it saves nothing
-measurable and forfeits the only loud-failure path this study observed
---- this requirement rests on the measured price sheet alone. Second,
+measurable and forfeits the only loud-failure path this study observed.
+This requirement rests on two supports of different kinds: the measured
+price sheet (F3/F4) prices it, and the naturally occurring dialect
+accident (\S\ref{sec:accident}) --- the one observed event in which the
+guard caught what the decoding constraint had silently stopped catching
+--- is what argues it is \emph{necessary}, an existence proof at
+$n{=}1$, stated as such. Second,
 platform-side telemetry
 must not be treated as integrity evidence --- audit has to read the
 system of record, because the configuration in which every instrument
 agrees and is wrong is demonstrated, named, and cheap to produce --- this
-requirement rests on the two demonstrated instances, cells \cellA{} and
-E. Third, repair-before-check must be made structurally impossible on
+requirement rests on the three demonstrated instances: cell \cellA{},
+cell E, and cell E re-run under full-schema boundary validation
+(\S\ref{sec:limits}). Third, repair-before-check must be made
+structurally impossible on
 business writes --- the mechanism is positional, so no policy applied
 after the absorption can recover the signal --- this requirement rests
-on Proposition~1's structural argument, of which cells \cellA{} and E
-are observed instances rather than its proof. The reference
+on Proposition~1's structural argument, of which cells \cellA{}, E and
+the full-schema arm's E are observed instances rather than its proof.
+The reference
 implementation's pattern (Authored-Plan Agents) encodes these three as
 registration- and load-time restrictions with their own violation
 probes; its specification and test suite are in the repository for any
 platform that wants to adopt the requirements without adopting the
 implementation.
 
-\paragraph{Data availability.} Repository tag \texttt{v0.4.1}:
-implementation, restriction-enforcing test suite (18 passed, 7
+\paragraph{Data availability.} Repository tag \texttt{v0.5.0}:
+implementation, restriction-enforcing test suite (27 passed, 7
 strict-xfail anti-vacuity probes), and tracked evidence under
 \texttt{results/integrity-matrix/} (checkpointed JSONL, consolidated
 report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite}
 plus the model- and engine-suffixed arm snapshots
 (\texttt{-gpt-4o-mini}, \texttt{-openai-gpt-oss-120b}, \texttt{-pg}),
-audit trails) and \texttt{results/runs/} (the naturally occurring
+audit trails), the full-schema boundary arm's own snapshots
+(\texttt{matrix-\{C,D,E,F\}-fullschema.sqlite} and the
+\texttt{-fullschema} JSONL, report and audit trails, evidence of the
+arm pre-registered in
+\texttt{docs/preregistration-boundary-schema-validation.md}; its
+PostgreSQL replication beside them with the layered
+\texttt{-fullschema-pg} suffix, per
+\texttt{docs/preregistration-fullschema-postgres.md}) and
+\texttt{results/runs/} (the naturally occurring
 dialect-failure round, \texttt{run-20260727-215429.json}; the corrected
 round, \texttt{run-20260727-215811.json}). The Postgres arm's ground
 truth was read from the live PostgreSQL database by direct SQL and

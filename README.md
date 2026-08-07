@@ -122,6 +122,7 @@ spot-check and the measured family arm are discussed in
 |---|---|---|
 | **Integrity matrix 2×2** — decoding constraint × boundary policy, single controlled condition (same codebase, same model, fault injected where the schema is stripped) | With a real schema both boundary policies are clean (the repair axis has nothing to do). Without it, the boundary alone decides: tolerant repair → `completed` 10/10 with **10 garbage rows and audit counters reading zero**; strict guard → `failed_clean` 10/10, **zero rows persisted** | [`NOTES.md`](NOTES.md) § Integrity matrix — controlled reproduction, `results/integrity-matrix/integrity_matrix*`, per-cell DB snapshots `results/integrity-matrix/matrix-*.sqlite` (cell A's garbage rows are directly inspectable) |
 | **Schema+fault cells E/F** — pre-registered follow-up completing the matrix's fault arm: fault injected downstream of an *active* schema, so the fence wraps valid JSON | The tolerant cell `completed` 10/10, persisting **10 fenced blobs with contract counters at zero** — telemetry blindness under an active schema, and a verification that the historical absorbing fallback persists garbage independently of the decoding condition; the strict cell `failed_clean` 10/10, zero rows — refusing content that was valid under the fence, unchanged. The registered contrary expectation ("fence-stripping repair recovers the valid content") is corrected by a dated erratum in the pre-registration: the repair never strips fences, it absorbs non-JSON content wholesale, so the outcome was determinable from the code before the run | [`docs/preregistration-schema-fault-cells.md`](docs/preregistration-schema-fault-cells.md) (committed before the runner change; dated erratum 2026-08-07), `results/integrity-matrix/integrity_matrix*`, `matrix-{E,F}.sqlite` |
+| **Full-schema boundary arm** (cells C/D/E/F, pre-registered, first under the what-the-code-already-determines rule) | Boundary strengthened from decode-shape to full validation of the declared schema (exact key set, string types, `request_type` enum). C/D: zero full-schema-only rejections (10/10 clean each, byte-equivalent, idle cost still zero). E: telemetry blindness unchanged under full validation — the absorbed payload is schema-valid by construction (verification of a code-determined outcome, third observed instance of Proposition 1). F: 10/10 typed failures, zero rows (verification). "Position, not strength" is now measured, not only argued — and replicated on PostgreSQL (pre-registered Branch A, full transfer, live-Postgres ground truth), closing the C–F engine-coverage gap | [`docs/preregistration-boundary-schema-validation.md`](docs/preregistration-boundary-schema-validation.md), [`docs/preregistration-fullschema-postgres.md`](docs/preregistration-fullschema-postgres.md), `integrity_matrix-fullschema{,-pg}.jsonl`, `matrix-{C,D,E,F}-fullschema{,-pg}.sqlite` |
 | **Cross-model family arm** (`gpt-4o-mini`, cells A/B, pre-registered) | Boundary reading transfers on every rep that reaches the boundary: tolerant 6/6 `completed` + fenced garbage + counters at zero (telemetry blindness, third family); strict 1/1 typed failure, **zero rows in all 10 strict reps regardless of failure locus**. 13/20 reps diverged upstream on selection format — the study's first id-only violations, reported separately (never composited) and correcting "naturally robust" to a family property | `results/integrity-matrix/integrity_matrix-gpt-4o-mini.jsonl`, `matrix-{A,B}-gpt-4o-mini.sqlite`, NOTES § Cross-model family arm |
 | **Open-weights arm** (`gpt-oss-120b` via Groq, cells A/B, pre-registered) | Full Branch A transfer with a **full boundary sample**: every rep reached the boundary in both cells (id-only selection held in this family) — A: 10/10 garbage + counters at zero; B: 10/10 typed failures, zero rows. Resolves the mini arm's n=1 caveat by measurement | `integrity_matrix-openai-gpt-oss-120b.jsonl`, `matrix-{A,B}-openai-gpt-oss-120b.sqlite` |
 | **Postgres system-of-record arm** (cells A/B, baseline model, pre-registered) | The readings are **engine-portable**: same blindness signature persisted into PostgreSQL with real constraints validating (A: 10 garbage, counters zero), same zero persistence under the guard (B). A SQLite artifact is ruled out; the self-built-ERP circularity stays open and declared | [`docs/preregistration-postgres-sor.md`](docs/preregistration-postgres-sor.md), `integrity_matrix-pg.jsonl`, `matrix-{A,B}-pg.sqlite` |
@@ -198,8 +199,9 @@ default run (a deterministic local model client and stub connectors stand in).
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 
-# Expected: "18 passed, 7 xfailed" — 18 tests (7 restrictions + dependency
-# direction + persistence + e2e) plus 7 strict-xfail probes that try to
+# Expected: "27 passed, 7 xfailed" — 27 tests (7 restrictions + dependency
+# direction + persistence + e2e + the 9 full-schema boundary-validation
+# unit tests) plus 7 strict-xfail probes that try to
 # violate each restriction on purpose (an XPASS would mean an unenforced rule)
 pytest tests/ -q
 
@@ -304,7 +306,7 @@ per-execution records; every aggregate from it survives in the NOTES tables
 
 ## Status & roadmap
 
-Working reference implementation; measurements current as of 2026-08-06.
+Working reference implementation; measurements current as of 2026-08-07.
 That day's rounds added, each pre-registered before its number existed:
 the **schema+fault cells E/F** (telemetry blindness reproduces with the
 schema active upstream — cell E verifies that the historical absorbing
@@ -324,7 +326,12 @@ artifact ruled out). The embedding-similarity baseline also ran (pre-registered,
 power-computed): Branch C at the margin on clear intents, embeddings
 ahead by 21.4 points on ambiguous ones — the ambiguity floor was a model
 property, and the LLM selection layer's measured justification narrows
-to typed refusal. Still queued: the frontier-tier arm
+to typed refusal. A further pre-registered round on 2026-08-07 strengthened
+the boundary to full validation of the declared schema and re-ran cells
+C/D/E/F: C/D confirmed zero full-schema-only rejections and zero idle
+cost, and E reproduced telemetry blindness under full validation — a
+verification of a code-determined outcome, not a discovery, since the
+absorbed payload is schema-valid by construction. Still queued: the frontier-tier arm
 (`claude-sonnet-5`, amendment recorded, key not yet provisioned), the
 ambiguity-detection experiment, and full selection curves on a second
 model. The measurement history — including the falsified predictions —

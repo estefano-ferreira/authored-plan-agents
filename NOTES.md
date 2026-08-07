@@ -911,6 +911,102 @@ the case. Audit's further read-queue: 2604.25359 (structured-output
 benchmark — the family-property genre), 2606.11217, 2605.07472 (HBEE),
 2606.19704 (pre-registration wave in agent research).)*
 
+## Full-schema boundary arm — position vs. strength, measured (2026-08-07)
+
+**The question.** The v0.4.0 external review posed the strong version of
+the boundary question: the paper's positional claim ("position, not
+strength") was measured against a boundary that applies only a
+decode-shape check (`json.loads`, bare-object test, required-key
+presence). Does the result survive when the boundary instead performs
+**full validation of the declared schema** — exact key set
+(`additionalProperties: false`), string types, and the `request_type`
+enum — in place of the shape check?
+
+**Pre-registration.** `docs/preregistration-boundary-schema-validation.md`,
+committed before the boundary code changed and before any number
+existed — the first pre-registration written under the process rule
+adopted in the 2026-08-07 erratum to
+`preregistration-schema-fault-cells.md`: a "What the code already
+determines" section had to be written first, and only what survived it
+was registered as a prediction. That section determined cells E and F
+in advance (the absorbing fallback's payload is schema-valid by
+construction; the injector defeats the strict guard's retry exactly as
+in the original F) and left only C and D open.
+
+**The boundary upgrade.** `_parse_strict`
+(`src/ai/agents/correspondence/read_and_reply.py`) now validates the
+complete `_RESPONSE_SCHEMA` — a permanent upgrade of the reference
+implementation, pure stdlib, no new dependency. Nine new unit tests
+cover each rejection class (missing key, extra key, non-string value,
+out-of-enum `request_type`, non-object, invalid JSON) and, as executable
+documentation of the determination above, the absorbing fallback's
+payload passing the full check. Suite: 27 passed, 7 xfailed (was 18 + 7
+before these tests). The runner gained a generic evidence-suffix
+mechanism (`MATRIX_EVIDENCE_SUFFIX`), layered exactly like the existing
+`-pg` suffix, so this arm's records land beside — never over — the
+immutable baseline evidence.
+
+**Cells C, D, E, F; 10 reps each (40 executions), `gemini-3.1-flash-lite`,
+evidence suffix `fullschema`.**
+
+| | status | contract v/r/f | repairs | ERP rows | valid | garbage | cost/10 reps |
+|---|---|---|---|---|---|---|---|
+| **C** schema + tolerant | `completed` 10/10 | 0/0/0 | 0 | 10 | 10 | 0 | $0.002478 |
+| **D** schema + strict | `completed` 10/10 | 0/0/0 | 0 | 10 | 10 | 0 | $0.002487 |
+| **E** schema + fault + tolerant | `completed` 10/10 | 0/0/0 | 10 | 10 | **0** | **10** | $0.002487 |
+| **F** schema + fault + strict | `failed_clean` 10/10 | 10/10/10 | 0 | **0** | — | 0 | $0.003845 |
+
+(C tokens_out 1003, D tokens_out 1009, F tokens_out 1806 — token counts
+are in the tracked evidence, not restated here beyond what distinguishes
+the cells.)
+
+**Readings.**
+
+- **P1 confirmed.** Zero full-schema-only rejections in C/D (0/10 each,
+  bounding the underlying rate at ≤25.9% one-sided 95%, as everywhere in
+  this study); C and D remain byte-equivalent (10 clean rows each,
+  ~same tokens: 1003 vs. 1009, ~same cost: $0.002478 vs. $0.002487).
+- **P2 confirmed.** The strengthened check's idle cost is zero — compare
+  the original C/D (tokens_out 995/993, costs $0.00247/$0.00246): no
+  additional model calls from the stronger validation.
+- **E is the third observed instance of Proposition 1** — same
+  signature as cell A and the earlier schema-active E (counters at
+  zero, ten repairs, ten corrupted rows), now with the boundary
+  performing full schema validation. This is reported as a
+  **verification of a code-determined outcome, not a discovery**: the
+  absorbed payload is schema-valid by construction, so no boundary-side
+  validation strength can reject it.
+- **F is the verification it was pre-declared to be**: 10/10
+  `failed_clean`, contract counters 10/10/10, zero rows — the injector
+  re-fences the retry, defeating the strict guard exactly as in the
+  original F.
+
+**Evidence** (tracked under `results/integrity-matrix/`):
+`integrity_matrix-fullschema.jsonl`,
+`integrity_matrix_report-fullschema.json`,
+`matrix-{C,D,E,F}-fullschema.sqlite`,
+`audit-matrix-{C,D,E,F}-fullschema-<ts>.jsonl`.
+
+**PostgreSQL replication (same day, pre-registered).** A second engine
+replication (`docs/preregistration-fullschema-postgres.md`, committed
+before any number) re-ran the arm's four cells with the ERP on the
+`postgres-erp` compose service — its registered Branch A (full transfer)
+materialized exactly: C `completed` 10/10 (10 clean rows), D `completed`
+10/10 (10 clean rows), E `completed` 10/10 with **10 fenced garbage rows
+and counters at zero**, F `failed_clean` 10/10 with zero rows — all read
+from the **live Postgres by direct SQL** (per-cell databases
+`matrix_{c,d,e,f}_fullschema`), then exported to the tracked
+`-fullschema-pg` snapshots. This closes a scope gap the study had
+carried silently: cells C–F had never run against the second engine
+(the 2026-08-06 engine arm covered A/B only). With both fullschema
+arms tracked, `verify_costs.py` reproduces **203/203** recorded costs
+exactly.
+
+**Control arm not re-run.** The exclusion is registered in the
+pre-registration itself: the boundary code runs only on the generation
+step, which the no-generation plan never reaches, so the control cell
+is unaffected by construction and was not repeated under this arm.
+
 ## Cross-model family arm — gpt-4o-mini, cells A and B (2026-08-06)
 
 The family-diversity arm of the pre-registered cross-model run
