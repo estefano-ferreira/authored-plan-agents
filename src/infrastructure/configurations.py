@@ -110,6 +110,7 @@ def build_platform(
     strip_response_schema: bool = False,
     tolerant_repair: bool = False,
     extractor_repair: bool = False,
+    measurement_mode: bool = False,
 ) -> Platform:
     """Composition root: assembles orchestrator + registries + runtime + guardrails + connectors + stores.
 
@@ -128,32 +129,40 @@ def build_platform(
     injected into the runtime/orchestrator, so every `complete()` call (selection and generation) is
     logged for post-hoc analysis; the log is exposed as `Platform.model_log` (empty list otherwise).
     `inject_generation_fault`: measurement instrumentation only (see
-    `infrastructure/providers/fault_injection_client.py`; NEVER set True in production) -- when True,
-    wraps the model client in a `GenerationFaultInjectionClient` that re-fences every
+    `infrastructure/providers/fault_injection_client.py`; rejected unless `measurement_mode=True`)
+    -- when True, wraps the model client in a `GenerationFaultInjectionClient` that re-fences every
     `purpose=="generation"` response in markdown JSON fences, reproducing on purpose the "output
     contract guard catches a provider-side envelope surprise" cell of the integrity matrix (NOTES.md,
     "Structured output correction").
     `strip_response_schema`: measurement instrumentation only (see
-    `infrastructure/providers/schema_stripping_client.py`; NEVER set True in production) -- when
-    True, wraps the model client in a `SchemaStrippingClient` that intercepts every REQUEST and
-    forces `response_schema=None`, emulating an "enforcement=none" provider configuration without
-    touching the capability that declared the schema.
+    `infrastructure/providers/schema_stripping_client.py`; rejected unless `measurement_mode=True`)
+    -- when True, wraps the model client in a `SchemaStrippingClient` that intercepts every REQUEST
+    and forces `response_schema=None`, emulating an "enforcement=none" provider configuration
+    without touching the capability that declared the schema.
     `tolerant_repair`: measurement instrumentation only (see
-    `infrastructure/providers/tolerant_repair_client.py`; NEVER set True in production) -- when
-    True, wraps the model client in a `TolerantRepairClient` that intercepts non-conforming
+    `infrastructure/providers/tolerant_repair_client.py`; rejected unless `measurement_mode=True`)
+    -- when True, wraps the model client in a `TolerantRepairClient` that intercepts non-conforming
     `purpose=="generation"` RESPONSES and replaces their content with a byte-faithful replica of
     the historical tolerant fallback removed from `read_and_reply.py`, so the capability's strict
     guard then accepts it. The wired instance (or None) is exposed as `Platform.repair_client` so
     callers can read `.repairs` for post-hoc counting.
     `extractor_repair`: measurement instrumentation only (see
-    `infrastructure/providers/extractor_repair_client.py`; NEVER set True in production) -- when
-    True, wraps the model client in an `ExtractorRepairClient` that intercepts non-conforming
+    `infrastructure/providers/extractor_repair_client.py`; rejected unless `measurement_mode=True`)
+    -- when True, wraps the model client in an `ExtractorRepairClient` that intercepts non-conforming
     `purpose=="generation"` RESPONSES and, if `content` matches a single markdown fence envelope,
     replaces it with the fenced-out inner text (one pass, no recursion) -- the practitioner
     "code fence removal" repair strategy, deliberately narrower than `tolerant_repair`'s absorbing
     fallback. Mutually exclusive with `tolerant_repair` (`ValueError` if both are True: only one
     repair instrument can be wired at a time). The wired instance (or None) is exposed as
     `Platform.repair_client`, same field `tolerant_repair` uses.
+    `measurement_mode`: the composition-time gate for the four instrumentation flags above
+    (SPECIFICATION.md § 5.1: production composition must not be able to wire a repair or fault
+    decorator onto the write path). Default False. If any of `inject_generation_fault`,
+    `strip_response_schema`, `tolerant_repair`, `extractor_repair` is True while `measurement_mode`
+    is False, `build_platform` raises `ValueError` naming the offending flag -- before any other
+    collaborator is assembled. Callers that need instrumentation (the integrity-matrix runner,
+    measurement-mode `scripts/run_plans.py`) must pass `measurement_mode=True` explicitly; nothing
+    else changes when it is True -- it is a pure permission gate, not a behavior switch.
 
     Wiring order (all four instrumentation flags together, integrity-matrix cell "A"):
     `Recorder(TolerantRepair(FaultInjection(SchemaStrip(base))))` -- i.e. a REQUEST flows outside
@@ -166,6 +175,25 @@ def build_platform(
     """
     if tolerant_repair and extractor_repair:
         raise ValueError("tolerant_repair and extractor_repair are mutually exclusive repair instruments")
+
+    # SPECIFICATION 5.1 (output-contract enforcement on the write path): repair-before-check must be
+    # structurally impossible in production composition, not merely discouraged by docstring warning.
+    # Checked before any other collaborator is assembled -- nothing beyond arguments has been touched
+    # yet, so a rejection here has zero side effects.
+    if not measurement_mode:
+        instrumentation_flags = {
+            "inject_generation_fault": inject_generation_fault,
+            "strip_response_schema": strip_response_schema,
+            "tolerant_repair": tolerant_repair,
+            "extractor_repair": extractor_repair,
+        }
+        for flag_name, flag_value in instrumentation_flags.items():
+            if flag_value:
+                raise ValueError(
+                    f"measurement instrumentation ({flag_name}) requires measurement_mode=True; "
+                    "production composition rejects repair or fault decorators on the write path "
+                    "-- SPECIFICATION 5.1"
+                )
 
     provider = provider or os.environ.get("AI_PROVIDER", "local")
     model = _build_model(provider)

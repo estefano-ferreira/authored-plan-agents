@@ -37,7 +37,7 @@ Two modes:
   the primary variable under measurement. Per-execution and aggregate metrics (tokens, cost,
   latency, selection distribution, Output Contract violations) are printed to the console and
   written to `results/runs/run-<YYYYMMDD-HHMMSS>.json`.
-- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control,E,F,G,H,I,J}`, requires `--repeat`):
+- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control,E,F,G,H,I,J,K,L}`, requires `--repeat`):
   one experiment, same codebase, only `build_platform()` flags vary per cell (see
   `infrastructure/configurations.py`'s `strip_response_schema`/`inject_generation_fault`/
   `tolerant_repair`/`extractor_repair`). Each invocation runs one cell's not-yet-recorded reps against that cell's
@@ -615,7 +615,7 @@ def _run_measurement_mode(args) -> int:
 
     platform = build_platform(
         provider=args.provider, erp_transport=erp_transport, audit_path=audit_path, record_model_calls=True,
-        inject_generation_fault=args.inject_generation_fault,
+        inject_generation_fault=args.inject_generation_fault, measurement_mode=True,
     )
     provider = args.provider or os.environ.get("AI_PROVIDER", "local")
     fault_note = " inject_generation_fault=True" if args.inject_generation_fault else ""
@@ -715,6 +715,15 @@ def _run_measurement_mode(args) -> int:
 #      plan only.
 #   J: schema stripped, no injector, no repair -- the same natural-violation arm against the
 #      strict guard alone. Same pre-registration as I. Inbound plan only.
+#   K: schema stripped, no injector, extractor_repair -- the natural-violation arm's genuine-
+#      extractor cell (the counterpart to I's tolerant_repair): whether the single-pass extractor
+#      recovers naturally self-fenced content well enough to pass full-schema validation, with no
+#      injected fault. Added 2026-08-08 per docs/preregistration-extractor-natural-cells.md
+#      (committed BEFORE this change). Inbound plan only.
+#   L: real schema, no injector, extractor_repair -- the schema-active counterpart to K (mirrors
+#      how J is to I): the extractor's idle-on-conforming-content behavior under the schema that
+#      already measured 0/10 natural violations twice (cells C/D). Same pre-registration as K.
+#      Inbound plan only.
 #
 # Mechanics:
 #   - Each cell is invoked separately (one `--matrix-cell X --repeat N` call per cell) against
@@ -776,7 +785,7 @@ def _run_measurement_mode(args) -> int:
 #     which engine actually ran the cell.
 # --------------------------------------------------------------------------------------
 
-_MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F", "G", "H", "I", "J")
+_MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F", "G", "H", "I", "J", "K", "L")
 
 _MATRIX_CELL_CONFIGS: dict[str, dict] = {
     "A": {"strip_response_schema": True, "inject_generation_fault": True, "tolerant_repair": True},
@@ -802,10 +811,19 @@ _MATRIX_CELL_CONFIGS: dict[str, dict] = {
         "strip_response_schema": True, "inject_generation_fault": False,
         "tolerant_repair": False, "extractor_repair": False,
     },
+    "K": {
+        "strip_response_schema": True, "inject_generation_fault": False,
+        "tolerant_repair": False, "extractor_repair": True,
+    },
+    "L": {
+        "strip_response_schema": False, "inject_generation_fault": False,
+        "tolerant_repair": False, "extractor_repair": True,
+    },
 }
 
 _MATRIX_DEFAULT_REPS: dict[str, int] = {
     "A": 10, "B": 10, "C": 10, "D": 10, "control": 3, "E": 10, "F": 10, "G": 10, "H": 10, "I": 10, "J": 10,
+    "K": 10, "L": 10,
 }
 
 _MATRIX_DIR = _RESULTS_DIR / "integrity-matrix"
@@ -1302,7 +1320,7 @@ def _run_matrix_cell_mode(args) -> int:
 
     platform = build_platform(
         provider=args.provider, erp_transport=transport, audit_path=audit_path,
-        record_model_calls=True, **config,
+        record_model_calls=True, measurement_mode=True, **config,
     )
     print(f"[run_plans] matrix cell={cell} reps={reps} config={config} erp={erp_display}")
 
@@ -1402,13 +1420,15 @@ def main() -> int:
             "integrity-matrix mode: runs the not-yet-recorded reps of one matrix cell against a "
             "per-cell isolated ERP SQLite (var/erp/matrix-<cell>.sqlite), appending to "
             "results/integrity-matrix/integrity_matrix.jsonl and (re)writing that cell's block of "
-            "results/integrity-matrix/integrity_matrix_report.json. A/B/C/D/E/F/G/H/I/J vary "
+            "results/integrity-matrix/integrity_matrix_report.json. A/B/C/D/E/F/G/H/I/J/K/L vary "
             "strip_response_schema / inject_generation_fault / tolerant_repair / extractor_repair "
             "(see infrastructure/configurations.py); 'control' is cell D restricted to "
             "schedule-appointment only (no generation step); G/H add the genuine extractor repairer "
             "(docs/preregistration-extractor-repair-cells.md); I/J are the natural-violation arm, "
-            "no injector (docs/preregistration-natural-violation-cells.md). "
-            f"Requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for A/B/C/D/E/F/G/H/I/J, "
+            "no injector (docs/preregistration-natural-violation-cells.md); K/L are the same "
+            "natural-violation arm with the genuine extractor repairer instead of tolerant_repair "
+            "(docs/preregistration-extractor-natural-cells.md). "
+            f"Requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for A/B/C/D/E/F/G/H/I/J/K/L, "
             f"{_MATRIX_DEFAULT_REPS['control']} for control). Already-recorded (cell, rep) pairs "
             "are skipped -- safe to stop and resume."
         ),
@@ -1449,7 +1469,7 @@ def main() -> int:
         if args.repeat is None:
             parser.error(
                 f"--matrix-cell requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for "
-                f"A/B/C/D/E/F/G/H/I/J, {_MATRIX_DEFAULT_REPS['control']} for control)"
+                f"A/B/C/D/E/F/G/H/I/J/K/L, {_MATRIX_DEFAULT_REPS['control']} for control)"
             )
         if args.erp_url or args.serve_erp:
             parser.error(

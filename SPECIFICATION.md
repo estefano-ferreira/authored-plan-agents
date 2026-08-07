@@ -195,7 +195,11 @@ of § 4, principle 3, distinguishable in the trail.
 only executable criteria today are the reference implementation's own tests —
 including a strict anti-vacuity suite that commits each violation on purpose
 and requires the enforcement to catch it — and they are coupled to that
-implementation's language and structure. A mature specification needs
+implementation's language and structure. That anti-vacuity suite now
+includes § 5.1 probes alongside the seven numbered constraints: production
+composition rejects repair or fault decorators on the write path, and
+unvalidated content cannot persist through it — so § 5.1 is enforced, and
+probed, at composition time, not left to a docstring warning. A mature specification needs
 portable conformance cases (given-this-plan, expect-rejection-at-load;
 given-this-tool-declaration, expect-rejection-at-registration; …). That work
 is acknowledged and not done.

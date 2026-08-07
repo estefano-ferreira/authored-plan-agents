@@ -1,4 +1,5 @@
-"""Independent adversarial check that the 7 restrictions in DESIGN.md are actually enforced, not vacuous.
+"""Independent adversarial check that the 7 restrictions in DESIGN.md, plus SPECIFICATION.md's § 5.1
+(output-contract enforcement on the write path), are actually enforced, not vacuous.
 
 `tests/test_restrictions.py` was written by the same agent that wrote the code under test, so a test
 there that merely asserts "the code behaves as the code was written" proves nothing about whether the
@@ -8,6 +9,12 @@ outcome happened). Since the platform is supposed to block every one of these, e
 `@pytest.mark.xfail(strict=True, ...)`: the assertion that the violation succeeded is expected to FAIL
 (the platform actually raises/rejects before that point), which pytest reports as XFAIL — expected
 failure, restriction intact.
+
+Two of the nine probes below (§ 5.1) target `build_platform`'s `measurement_mode` gate rather than one
+of DESIGN.md's 7 numbered restrictions: repair-before-check must be structurally impossible in
+production composition, and unvalidated content must never persist on the write path. Each carries a
+companion, non-xfail test proving the flag path itself still works (anti-vacuity of the anti-vacuity) —
+without it, an xfail caused by an unrelated construction failure would look identical to enforcement.
 
 With `strict=True`, if a violation is NOT blocked, the "assert it was permitted" line actually passes,
 the test as a whole PASSES, and pytest reports it as XPASS — which strict xfail promotes to a hard
@@ -217,3 +224,68 @@ def test_restriction_7_unmatched_intent_is_improvised_into_completion(platform):
     result = platform.orchestrator.handle({"intent": "totally unrelated nonsense", "payload": {}})
     # If reached, the orchestrator ran some plan/step for an intent that matches nothing in the catalog.
     assert result.status == "completed"
+
+
+# 8. SPECIFICATION 5.1 ("repair-before-check is structurally impossible on business writes"):
+#    production composition (measurement_mode left at its default, False) must refuse outright to
+#    wire a repair decorator onto the model client -- not merely warn about it in a docstring.
+#    Attempt to build a platform with tolerant_repair=True and no measurement_mode, and assert the
+#    platform was built (the violation succeeding).
+@pytest.mark.xfail(
+    strict=True,
+    reason="SPECIFICATION 5.1: production composition must reject repair decorators on the write path",
+)
+def test_restriction_5_1_production_composition_accepts_repair_decorator(tmp_path):
+    # Expected blocker: ValueError raised inside build_platform (tolerant_repair=True, measurement_mode
+    # left False) -- checked before any other collaborator is assembled, so construction never reaches
+    # the "platform was built" line below.
+    erp_app_module.reset()
+    transport = httpx.ASGITransport(app=erp_app_module.app)
+    built = build_platform(
+        provider="local", erp_transport=transport, audit_path=tmp_path / "audit.jsonl", tolerant_repair=True,
+    )
+    # If reached, a repair decorator was wired into a production composition -- restriction breached.
+    assert built is not None
+    erp_app_module.reset()
+
+
+# Companion to the probe above -- deliberately NOT xfail. Proves the xfail above is blocked by the
+# measurement_mode gate specifically (the identical construction succeeds once measurement_mode=True
+# is passed), not by some unrelated construction failure that would make the probe above vacuous in
+# the other direction (an xfail for the wrong reason looks identical to an xfail for the right one).
+def test_restriction_5_1_measurement_mode_allows_repair_decorator(tmp_path):
+    erp_app_module.reset()
+    transport = httpx.ASGITransport(app=erp_app_module.app)
+    built = build_platform(
+        provider="local", erp_transport=transport, audit_path=tmp_path / "audit.jsonl",
+        tolerant_repair=True, measurement_mode=True,
+    )
+    assert built is not None
+    assert built.repair_client is not None
+    erp_app_module.reset()
+
+
+# 9. SPECIFICATION 5.1 ("nothing unvalidated is ever persisted"): commit the violation end to end.
+#    A measurement-mode platform on the local provider with the schema stripped and the generation
+#    response corrupted (fenced), no repair decorator wired -- exactly the strict guard alone
+#    against the failure class it exists to catch (integrity-matrix cell "B", see
+#    infrastructure/configurations.py). Run the inbound email-to-ERP plan once and assert at least
+#    one service-request row was created (the violation succeeding).
+@pytest.mark.xfail(strict=True, reason="SPECIFICATION 5.1: nothing unvalidated persists on the write path")
+def test_restriction_5_1_unvalidated_content_persists_on_write_path(tmp_path):
+    # Expected blocker: OutputContractViolation raised inside read_and_reply.py's
+    # _complete_with_retry -- GenerationFaultInjectionClient corrupts BOTH the first attempt and the
+    # identical retry the same way, so the "acknowledge" step never returns, "register" (the
+    # SYSTEM_OF_RECORD write) never runs, and no service_requests row is ever created.
+    erp_app_module.reset()
+    transport = httpx.ASGITransport(app=erp_app_module.app)
+    built = build_platform(
+        provider="local", erp_transport=transport, audit_path=tmp_path / "audit.jsonl",
+        inject_generation_fault=True, strip_response_schema=True, measurement_mode=True,
+    )
+
+    _result = built.orchestrator.handle({"plan": "inbound-email-to-erp", "payload": {"email_id": "email-5.1-probe"}})
+
+    # If reached, unvalidated content survived the strict guard and was persisted into the ERP.
+    assert len(erp_app_module._records) >= 1
+    erp_app_module.reset()
