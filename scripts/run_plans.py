@@ -69,6 +69,8 @@ for path in (_REPO_ROOT / "src", _REPO_ROOT):
         sys.path.insert(0, str(path))
 
 import httpx  # noqa: E402
+from sqlalchemy import create_engine, text  # noqa: E402
+from sqlalchemy.engine import make_url  # noqa: E402
 
 from core.identity import Principal  # noqa: E402
 from infrastructure.configurations import build_platform  # noqa: E402
@@ -726,6 +728,19 @@ def _run_measurement_mode(args) -> int:
 #     `var/erp/matrix-<cell>-<slug>.sqlite`, `audit-matrix-<cell>-<slug>-<ts>.jsonl` -- landing
 #     beside the baseline evidence rather than resuming into or overwriting it. The baseline model
 #     itself is unaffected: its paths stay exactly as they always were.
+#   - Postgres ERP (optional, env `MATRIX_ERP_DATABASE_URL`): unset -- everything above is
+#     unchanged (per-cell SQLite, as always). Set to a server URL (e.g.
+#     `postgresql+psycopg://erp:erp@127.0.0.1:5433/erp`, matching the `postgres-erp` compose
+#     service): each (cell, model) pair gets isolated onto its own *database* on that server
+#     instead of its own SQLite file -- `matrix_<cell>` plus `_<model-slug>` for any non-baseline
+#     model, sanitized to `[a-z0-9_]` (see `_matrix_pg_db_name`) -- created fresh (DROP DATABASE IF
+#     EXISTS + CREATE DATABASE) at the same "cell has zero recorded reps" moment the SQLite branch
+#     deletes its file, and never dropped again once reps are on record. Every evidence path
+#     additionally gains a `-pg` suffix layered onto the scheme above (see `_matrix_evidence_paths`),
+#     so Postgres-backed evidence always lands beside, never over, SQLite-backed evidence for the
+#     same (cell, model). After a cell's reps complete, its live Postgres tables are exported into a
+#     SQLite snapshot at `var/erp/matrix-<cell>[-slug]-pg.sqlite` (see `_matrix_export_pg_snapshot`)
+#     so the tracked-evidence format stays uniform regardless of which engine actually ran the cell.
 # --------------------------------------------------------------------------------------
 
 _MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F")
@@ -768,6 +783,14 @@ _MATRIX_PROVIDER_MODEL_ENV: dict[str, tuple[str | None, str]] = {
     "openai": ("OPENAI_MODEL", "gpt-4o-mini"),
     "gemini": ("GEMINI_MODEL", _MATRIX_BASELINE_MODEL),
     "meta": ("META_MODEL", "muse-spark-1.2"),
+    # No default: which family (Llama, Qwen, Claude, ...) answers via OpenRouter is itself an
+    # experimental variable this repository pre-registers per experiment -- see
+    # OpenRouterModelClient.__init__ and _matrix_effective_model_id below, which turns an
+    # unresolved (empty-string) model into a loud SystemExit rather than letting a matrix run
+    # silently proceed without knowing its own model for evidence-path purposes.
+    "openrouter": ("OPENROUTER_MODEL", ""),
+    # Same no-default rule as openrouter, for the same reason -- see GroqModelClient.__init__.
+    "groq": ("GROQ_MODEL", ""),
 }
 
 
@@ -778,31 +801,149 @@ def _matrix_effective_model_id(provider: str | None) -> str:
     module-level default)."""
     provider = provider or os.environ.get("AI_PROVIDER", "local")
     env_var, default = _MATRIX_PROVIDER_MODEL_ENV[provider]
-    return os.environ.get(env_var, default) if env_var else default
+    resolved = os.environ.get(env_var, default) if env_var else default
+    if not resolved:
+        raise SystemExit(
+            f"[run_plans] matrix mode cannot resolve a model id for provider={provider!r}: "
+            f"set env {env_var} first. Matrix runs must know the model up front (it drives "
+            "evidence file paths); an unset OpenRouter model, in particular, is never defaulted "
+            "-- see OpenRouterModelClient.__init__."
+        )
+    return resolved
 
 
 def _matrix_model_slug(model_id: str) -> str:
     return re.sub(r"[^a-z0-9.-]+", "-", model_id.lower())
 
 
-def _matrix_evidence_paths(model_id: str) -> dict:
+def _matrix_evidence_paths(model_id: str, pg: bool = False) -> dict:
     """The JSONL/report paths this run's evidence should land at, plus the slug (or None) used to
     derive them. `model_id == _MATRIX_BASELINE_MODEL`: unchanged baseline paths -- full backward
     compatibility. Any other `model_id`: every path suffixed `-{slug}`, landing beside the
-    baseline evidence rather than overwriting or resuming into it."""
+    baseline evidence rather than overwriting or resuming into it. `pg=True` (Postgres ERP active
+    -- env `MATRIX_ERP_DATABASE_URL`, see the "Postgres ERP" mechanics bullet above) layers a
+    further `-pg` suffix onto whichever of the two path schemes above applies, so Postgres-backed
+    evidence never resumes into or overwrites SQLite-backed evidence for the same model. Default
+    `pg=False`: byte-identical to before this parameter existed."""
     if model_id == _MATRIX_BASELINE_MODEL:
-        return {"jsonl": _MATRIX_JSONL_PATH, "report": _MATRIX_REPORT_PATH, "slug": None}
-    slug = _matrix_model_slug(model_id)
-    return {
-        "jsonl": _MATRIX_DIR / f"integrity_matrix-{slug}.jsonl",
-        "report": _MATRIX_DIR / f"integrity_matrix_report-{slug}.json",
-        "slug": slug,
-    }
+        jsonl, report, slug = _MATRIX_JSONL_PATH, _MATRIX_REPORT_PATH, None
+    else:
+        slug = _matrix_model_slug(model_id)
+        jsonl = _MATRIX_DIR / f"integrity_matrix-{slug}.jsonl"
+        report = _MATRIX_DIR / f"integrity_matrix_report-{slug}.json"
+    if pg:
+        jsonl = jsonl.with_name(f"{jsonl.stem}-pg{jsonl.suffix}")
+        report = report.with_name(f"{report.stem}-pg{report.suffix}")
+    return {"jsonl": jsonl, "report": report, "slug": slug}
 
 
-def _matrix_erp_path(cell: str, slug: str | None = None) -> Path:
+def _matrix_erp_path(cell: str, slug: str | None = None, pg: bool = False) -> Path:
     suffix = f"-{slug}" if slug else ""
+    suffix += "-pg" if pg else ""
     return _MATRIX_ERP_DIR / f"matrix-{cell}{suffix}.sqlite"
+
+
+# ---- Postgres ERP helpers (optional, env MATRIX_ERP_DATABASE_URL) ---------------------
+# Only reached when that env var is set; see the "Postgres ERP" mechanics bullet above for the
+# scheme these implement (per-(cell, model) database isolation, freshness timing, snapshot export).
+
+_MATRIX_PG_DB_NAME_RE = re.compile(r"[^a-z0-9_]+")
+
+
+def _matrix_erp_database_url() -> str | None:
+    """`MATRIX_ERP_DATABASE_URL`, or `None` when unset/empty -- the single switch between the
+    SQLite-per-cell behavior (unset, default) and the Postgres-per-cell-database behavior (set,
+    e.g. `postgresql+psycopg://erp:erp@127.0.0.1:5433/erp` against the compose `postgres-erp`
+    service)."""
+    return os.environ.get("MATRIX_ERP_DATABASE_URL") or None
+
+
+def _matrix_pg_db_name(cell: str, slug: str | None) -> str:
+    """Per-(cell, model) Postgres database name: `matrix_<cell>`, plus `_<slug>` for any
+    non-baseline model (mirrors the SQLite path's per-model suffixing) -- e.g. cell "A" + slug
+    "gpt-4o-mini" -> "matrix_a_gpt_4o_mini". Sanitized to `[a-z0-9_]`, the safe subset of Postgres
+    identifier characters that never needs quoting or escaping."""
+    raw = f"matrix_{cell}" + (f"_{slug}" if slug else "")
+    return _MATRIX_PG_DB_NAME_RE.sub("_", raw.lower())
+
+
+def _matrix_pg_url_display(url: str) -> str:
+    """`url` with its password masked -- safe to print or store in a report."""
+    return make_url(url).render_as_string(hide_password=True)
+
+
+def _matrix_pg_cell_url(base_url: str, db_name: str) -> str:
+    """`base_url` (as given in `MATRIX_ERP_DATABASE_URL`) with its database swapped for
+    `db_name` -- the per-cell isolated Postgres URL handed to `create_app`."""
+    return make_url(base_url).set(database=db_name).render_as_string(hide_password=False)
+
+
+def _matrix_pg_ensure_fresh_database(base_url: str, db_name: str) -> None:
+    """DROP DATABASE IF EXISTS + CREATE DATABASE `db_name`, against the server named by
+    `base_url`, over an autocommit connection (CREATE/DROP DATABASE cannot run inside a
+    transaction block). Mirrors the SQLite branch's "delete only when the cell has zero recorded
+    reps" freshness rule -- callers must only invoke this the first time a (cell, model) pair has
+    zero recorded reps; once at least one rep is on record for that database, this must never run
+    again for it (see `_run_matrix_cell_mode`)."""
+    engine = create_engine(base_url, isolation_level="AUTOCOMMIT")
+    try:
+        with engine.connect() as conn:
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{db_name}"'))
+            conn.execute(text(f'CREATE DATABASE "{db_name}"'))
+    finally:
+        engine.dispose()
+
+
+def _matrix_export_pg_snapshot(pg_url: str, snapshot_path: Path) -> None:
+    """Exports this cell's live Postgres ERP tables (`service_requests`, `appointments` -- see
+    `erp_service/models.py`) into a fresh SQLite snapshot file at `snapshot_path`: stdlib
+    `sqlite3` only, same column names, every row, no SQLAlchemy on the write side. Keeps the
+    tracked-evidence format uniform with every SQLite-backed cell (same `_inspect_matrix_erp`
+    sqlite3 branch, same reader scripts) even when the live ERP for this run was Postgres."""
+    engine = create_engine(pg_url)
+    try:
+        with engine.connect() as conn:
+            service_request_rows = conn.execute(text(
+                "SELECT id, record_id, customer_email, request_type, summary, status, created_at "
+                "FROM service_requests ORDER BY id"
+            )).fetchall()
+            appointment_rows = conn.execute(text(
+                "SELECT id, appointment_id, customer_id, slot, status, previous_appointment_id, "
+                "created_at FROM appointments ORDER BY id"
+            )).fetchall()
+    finally:
+        engine.dispose()
+
+    def _row(values) -> tuple:
+        # created_at comes back as a tz-aware datetime; stringify it (sqlite3 has no native
+        # datetime binding) the same way json.dump(..., default=str) would elsewhere in this file.
+        return tuple(v.isoformat() if hasattr(v, "isoformat") else v for v in values)
+
+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+    if snapshot_path.exists():
+        snapshot_path.unlink()
+    snap_conn = sqlite3.connect(snapshot_path.as_posix())
+    try:
+        snap_conn.execute(
+            "CREATE TABLE service_requests (id INTEGER PRIMARY KEY, record_id TEXT, "
+            "customer_email TEXT, request_type TEXT, summary TEXT, status TEXT, created_at TEXT)"
+        )
+        snap_conn.execute(
+            "CREATE TABLE appointments (id INTEGER PRIMARY KEY, appointment_id TEXT, "
+            "customer_id TEXT, slot TEXT, status TEXT, previous_appointment_id TEXT, "
+            "created_at TEXT)"
+        )
+        snap_conn.executemany(
+            "INSERT INTO service_requests VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [_row(row) for row in service_request_rows],
+        )
+        snap_conn.executemany(
+            "INSERT INTO appointments VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [_row(row) for row in appointment_rows],
+        )
+        snap_conn.commit()
+    finally:
+        snap_conn.close()
 
 
 def _matrix_request(cell: str, rep_index: int) -> dict:
@@ -899,13 +1040,36 @@ def _is_garbage_summary(summary: str) -> bool:
     return False
 
 
-def _inspect_matrix_erp(cell: str, db_path: Path | None = None) -> dict:
-    """Direct sqlite3 (stdlib) inspection of this cell's ERP database -- no ASGI/HTTP call, no
-    SQLAlchemy: opened read-only, queried once, closed. "control" only ever books appointments
-    (its request never reaches the generation step this matrix studies, so no `service_requests`
-    row is ever possible), so it reports `appointments` row counts instead and leaves the
-    summary-garbage fields as None (not applicable, not zero). `db_path` defaults to the
-    unsuffixed (baseline) per-cell path when not given."""
+def _inspect_matrix_erp(cell: str, db_path: Path | None = None, pg_url: str | None = None) -> dict:
+    """Inspects this cell's ERP database -- engine-agnostic. `pg_url` given (Postgres ERP active):
+    queries that live database directly over SQLAlchemy (`create_engine` + `text` SELECTs), `db_path`
+    is ignored. Otherwise: direct sqlite3 (stdlib) inspection of `db_path` -- no ASGI/HTTP call, no
+    SQLAlchemy: opened read-only, queried once, closed. Either way, "control" only ever books
+    appointments (its request never reaches the generation step this matrix studies, so no
+    `service_requests` row is ever possible), so it reports `appointments` row counts instead and
+    leaves the summary-garbage fields as None (not applicable, not zero). `db_path` defaults to the
+    unsuffixed (baseline) per-cell path when not given and `pg_url` is None."""
+    if pg_url is not None:
+        engine = create_engine(pg_url)
+        try:
+            with engine.connect() as conn:
+                if cell == "control":
+                    rows_created = conn.execute(text("SELECT COUNT(*) FROM appointments")).scalar_one()
+                    return {
+                        "db_path": _matrix_pg_url_display(pg_url), "exists": True, "table": "appointments",
+                        "rows_created": rows_created, "rows_valid_summary": None, "rows_garbage": None,
+                    }
+                summaries = [row[0] or "" for row in conn.execute(text("SELECT summary FROM service_requests"))]
+                garbage = sum(1 for summary in summaries if _is_garbage_summary(summary))
+                return {
+                    "db_path": _matrix_pg_url_display(pg_url), "exists": True, "table": "service_requests",
+                    "rows_created": len(summaries),
+                    "rows_valid_summary": len(summaries) - garbage,
+                    "rows_garbage": garbage,
+                }
+        finally:
+            engine.dispose()
+
     db_path = db_path if db_path is not None else _matrix_erp_path(cell)
     if not db_path.exists():
         return {"db_path": db_path.relative_to(_REPO_ROOT).as_posix(), "exists": False}
@@ -968,15 +1132,17 @@ def _load_matrix_report(report_path: Path = _MATRIX_REPORT_PATH) -> dict:
 
 
 def _write_matrix_cell_report(
-    cell: str, records: list[dict], report_path: Path = _MATRIX_REPORT_PATH, erp_path: Path | None = None,
+    cell: str, records: list[dict], report_path: Path = _MATRIX_REPORT_PATH,
+    erp_path: Path | None = None, pg_url: str | None = None,
 ) -> dict:
     """Merges this cell's aggregate + ERP inspection into `integrity_matrix_report.json` (or, for
     a suffixed `report_path`, that model's own report file), preserving whatever other cells'
     blocks are already there (cells are run one invocation at a time, in any order -- this must
     never clobber siblings). `erp_path` defaults to the unsuffixed (baseline) per-cell path when
-    not given."""
+    not given. `pg_url` given (Postgres ERP active): inspects that live database instead of any
+    SQLite file -- see `_inspect_matrix_erp`."""
     report = _load_matrix_report(report_path)
-    cell_report = {"aggregate": _aggregate_matrix_cell(records), "erp": _inspect_matrix_erp(cell, erp_path)}
+    cell_report = {"aggregate": _aggregate_matrix_cell(records), "erp": _inspect_matrix_erp(cell, erp_path, pg_url)}
     report[cell] = cell_report
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as fh:
@@ -987,31 +1153,53 @@ def _write_matrix_cell_report(
 def _run_matrix_cell_mode(args) -> int:
     """Runs the not-yet-recorded reps of one integrity-matrix cell, then (re)writes that cell's
     block of `results/integrity-matrix/integrity_matrix_report.json`. See the "Integrity matrix mode" section
-    above for the full mechanics (resume, per-cell ERP isolation, LangSmith)."""
+    above for the full mechanics (resume, per-cell ERP isolation, LangSmith, Postgres ERP)."""
     cell = args.matrix_cell
     reps = args.repeat
     config = _MATRIX_CELL_CONFIGS[cell]
 
     model_id = _matrix_effective_model_id(args.provider)
-    evidence = _matrix_evidence_paths(model_id)
+    pg_base_url = _matrix_erp_database_url()
+    evidence = _matrix_evidence_paths(model_id, pg=pg_base_url is not None)
     jsonl_path, report_path, slug = evidence["jsonl"], evidence["report"], evidence["slug"]
-    erp_path = _matrix_erp_path(cell, slug)
-    print(
-        f"[run_plans] matrix model={model_id} evidence: jsonl={jsonl_path} "
-        f"report={report_path} erp={erp_path}"
-    )
 
     all_records = _load_matrix_records(jsonl_path)
     cell_records = [r for r in all_records if r.get("cell") == cell]
     done_reps = {r["rep"] for r in cell_records}
+    is_first_run = not cell_records
 
-    if not cell_records:
-        # First execution ever recorded for this cell: start its ERP database from scratch. Once
-        # at least one rep is on record, the file is resume state -- never touched here again.
-        erp_path.parent.mkdir(parents=True, exist_ok=True)
-        if erp_path.exists():
-            erp_path.unlink()
+    erp_path = pg_db_name = pg_cell_url = snapshot_path = None
+    if pg_base_url is not None:
+        pg_db_name = _matrix_pg_db_name(cell, slug)
+        pg_cell_url = _matrix_pg_cell_url(pg_base_url, pg_db_name)
+        snapshot_path = _matrix_erp_path(cell, slug, pg=True)
+        erp_database_url = pg_cell_url
+        erp_engine = "postgres"
+        erp_display = f"db={pg_db_name} url={_matrix_pg_url_display(pg_cell_url)}"
+        if is_first_run:
+            # First execution ever recorded for this (cell, model): start its Postgres database
+            # from scratch. Once at least one rep is on record, the database is resume state --
+            # never dropped by this script again.
+            _matrix_pg_ensure_fresh_database(pg_base_url, pg_db_name)
     else:
+        erp_path = _matrix_erp_path(cell, slug)
+        erp_database_url = f"sqlite:///{erp_path.as_posix()}"
+        erp_engine = "sqlite"
+        erp_display = str(erp_path)
+        if is_first_run:
+            # First execution ever recorded for this cell: start its ERP database from scratch.
+            # Once at least one rep is on record, the file is resume state -- never touched here
+            # again.
+            erp_path.parent.mkdir(parents=True, exist_ok=True)
+            if erp_path.exists():
+                erp_path.unlink()
+
+    print(
+        f"[run_plans] matrix model={model_id} erp_engine={erp_engine} evidence: jsonl={jsonl_path} "
+        f"report={report_path} erp={erp_display}"
+    )
+
+    if not is_first_run:
         pending = [r for r in range(1, reps + 1) if r not in done_reps]
         if pending:
             print(
@@ -1023,18 +1211,19 @@ def _run_matrix_cell_mode(args) -> int:
 
     from erp_service.api import create_app as create_erp_app
 
-    erp_app_inprocess = create_erp_app(f"sqlite:///{erp_path.as_posix()}")
+    erp_app_inprocess = create_erp_app(erp_database_url)
     transport = httpx.ASGITransport(app=erp_app_inprocess)
 
     run_tag = datetime.now().strftime("%Y%m%d-%H%M%S")
     audit_suffix = f"-{slug}" if slug else ""
+    audit_suffix += "-pg" if pg_base_url is not None else ""
     audit_path = _VAR_DIR / f"audit-matrix-{cell}{audit_suffix}-{run_tag}.jsonl"
 
     platform = build_platform(
         provider=args.provider, erp_transport=transport, audit_path=audit_path,
         record_model_calls=True, **config,
     )
-    print(f"[run_plans] matrix cell={cell} reps={reps} config={config} erp={erp_path}")
+    print(f"[run_plans] matrix cell={cell} reps={reps} config={config} erp={erp_display}")
 
     global_index = 0
     new_reps = 0
@@ -1050,7 +1239,12 @@ def _run_matrix_cell_mode(args) -> int:
     platform.connectors["rest"].close()
 
     cell_records = [r for r in _load_matrix_records(jsonl_path) if r.get("cell") == cell]
-    _write_matrix_cell_report(cell, cell_records, report_path, erp_path)
+    if pg_base_url is not None:
+        _write_matrix_cell_report(cell, cell_records, report_path, pg_url=pg_cell_url)
+        _matrix_export_pg_snapshot(pg_cell_url, snapshot_path)
+        print(f"[run_plans] exported Postgres ERP snapshot to {snapshot_path}")
+    else:
+        _write_matrix_cell_report(cell, cell_records, report_path, erp_path)
     print(
         f"[run_plans] matrix cell={cell}: {new_reps} new rep(s) run this invocation, "
         f"{len(cell_records)}/{reps} total recorded; wrote {report_path}"
@@ -1083,8 +1277,10 @@ def _run_matrix_report_only(model_id: str | None = None) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--provider", choices=["local", "anthropic", "openai", "gemini", "meta"], default=None,
-                         help="model provider (default: env AI_PROVIDER or 'local')")
+    parser.add_argument(
+        "--provider", choices=["local", "anthropic", "openai", "gemini", "meta", "openrouter", "groq"], default=None,
+        help="model provider (default: env AI_PROVIDER or 'local')",
+    )
     parser.add_argument(
         "--erp", choices=["http", "inprocess"], default="http",
         help=(

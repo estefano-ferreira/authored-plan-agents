@@ -14,6 +14,32 @@ services:
       timeout: 5s
       retries: 10
 
+  # ERP's own Postgres, for integrity-matrix runs that want a real RDBMS as the system of
+  # record instead of per-cell SQLite files (see scripts/run_plans.py's MATRIX_ERP_DATABASE_URL).
+  # Deliberately a SEPARATE service from postgres-platform, never shared: the pattern's isolation
+  # rule is that the platform's store may never be the business system's store, and vice versa --
+  # collapsing them into one Postgres instance would silently violate that rule even if every
+  # other wire (HTTP-only reachability, no shared volume) stayed intact. Plain postgres:16
+  # (pgvector is a platform/knowledge-base need, not an ERP one).
+  postgres-erp:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=erp
+      - POSTGRES_PASSWORD=erp
+      - POSTGRES_DB=erp
+    volumes:
+      - erp-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp -d erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      # Published for local matrix runs (scripts/run_plans.py invoked from the host, not from
+      # inside compose) -- not wired into the "erp"/"aici" services' environment here; that is a
+      # later, explicit step.
+      - "5433:5432"
+
   # Real internal business system (SQLAlchemy + SQLite). Reachable ONLY over HTTP -- its own
   # storage volume is never shared with the "aici" service.
   erp:
@@ -53,3 +79,4 @@ services:
 
 volumes:
   platform-pgdata:
+  erp-pgdata:
