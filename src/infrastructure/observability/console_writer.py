@@ -14,6 +14,15 @@ PRICING_USD_PER_MILLION_TOKENS: dict[str, dict[str, float]] = {
     # published until real list rates replace these zeros.
     "muse-spark-1.2": {"input": 0.0, "output": 0.0},
     "local-deterministic": {"input": 0.0, "output": 0.0},
+    # OpenRouter and Groq have no entries here by design: both front many underlying model
+    # families (Llama, Qwen, Claude, OpenAI's open-weights models, ...) under caller-chosen ids
+    # (see OpenRouterModelClient and GroqModelClient, neither of which has a default model), and
+    # each family's real list rate must be entered per pre-registration amendment for the specific
+    # model that experiment names -- never assumed from another provider's table, and never
+    # assumed to be the same across the two providers even for the same model id. Until an entry
+    # exists for a given OpenRouter/Groq model id, `_cost_usd`'s `.get(model, {"input": 0.0,
+    # "output": 0.0})` fallback records its cost as $0, and that $0 figure MUST NOT be published
+    # as a real cost.
 }
 _CACHE_READ_DISCOUNT = 0.10
 
