@@ -37,10 +37,10 @@ Two modes:
   the primary variable under measurement. Per-execution and aggregate metrics (tokens, cost,
   latency, selection distribution, Output Contract violations) are printed to the console and
   written to `results/runs/run-<YYYYMMDD-HHMMSS>.json`.
-- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control,E,F}`, requires `--repeat`): one
-  experiment, same codebase, only `build_platform()` flags vary per cell (see
+- **Integrity matrix mode** (`--matrix-cell {A,B,C,D,control,E,F,G,H,I,J}`, requires `--repeat`):
+  one experiment, same codebase, only `build_platform()` flags vary per cell (see
   `infrastructure/configurations.py`'s `strip_response_schema`/`inject_generation_fault`/
-  `tolerant_repair`). Each invocation runs one cell's not-yet-recorded reps against that cell's
+  `tolerant_repair`/`extractor_repair`). Each invocation runs one cell's not-yet-recorded reps against that cell's
   own isolated ERP SQLite (`var/erp/matrix-<cell>.sqlite`), appends to
   `results/integrity-matrix/integrity_matrix.jsonl`, and (re)writes that cell's block of
   `results/integrity-matrix/integrity_matrix_report.json` (aggregates + a direct sqlite3 inspection of the ERP
@@ -700,6 +700,21 @@ def _run_measurement_mode(args) -> int:
 #      against the strict guard; the injector re-fences the retry too, so this cell verifies
 #      the guard's coded behavior (typed failure, nothing persisted) under real-model
 #      conditions. Same pre-registration as E. Inbound plan only.
+#   G: real schema + inject_generation_fault + extractor_repair -- the same post-decoding
+#      corruption as E, but repaired by the genuine extractor (ExtractorRepairClient, single-pass
+#      markdown fence removal) instead of the absorbing fallback. Added 2026-08-07 per
+#      docs/preregistration-extractor-repair-cells.md (committed BEFORE this change). Inbound
+#      plan only.
+#   H: schema stripped + inject_generation_fault + extractor_repair -- same as G but with
+#      enforcement off, so the content under the injector's fence is unconstrained; genuinely
+#      open (see the pre-registration's determination fact 3). Inbound plan only.
+#   I: schema stripped, no injector, tolerant_repair -- the design's natural-violation arm
+#      (no decorator fixes the violation rate; it is purely the model's prompt-only behavior)
+#      against the absorbing repairer. Added 2026-08-07 per
+#      docs/preregistration-natural-violation-cells.md (committed BEFORE this change). Inbound
+#      plan only.
+#   J: schema stripped, no injector, no repair -- the same natural-violation arm against the
+#      strict guard alone. Same pre-registration as I. Inbound plan only.
 #
 # Mechanics:
 #   - Each cell is invoked separately (one `--matrix-cell X --repeat N` call per cell) against
@@ -761,7 +776,7 @@ def _run_measurement_mode(args) -> int:
 #     which engine actually ran the cell.
 # --------------------------------------------------------------------------------------
 
-_MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F")
+_MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F", "G", "H", "I", "J")
 
 _MATRIX_CELL_CONFIGS: dict[str, dict] = {
     "A": {"strip_response_schema": True, "inject_generation_fault": True, "tolerant_repair": True},
@@ -771,9 +786,27 @@ _MATRIX_CELL_CONFIGS: dict[str, dict] = {
     "control": {"strip_response_schema": False, "inject_generation_fault": False, "tolerant_repair": False},
     "E": {"strip_response_schema": False, "inject_generation_fault": True, "tolerant_repair": True},
     "F": {"strip_response_schema": False, "inject_generation_fault": True, "tolerant_repair": False},
+    "G": {
+        "strip_response_schema": False, "inject_generation_fault": True,
+        "tolerant_repair": False, "extractor_repair": True,
+    },
+    "H": {
+        "strip_response_schema": True, "inject_generation_fault": True,
+        "tolerant_repair": False, "extractor_repair": True,
+    },
+    "I": {
+        "strip_response_schema": True, "inject_generation_fault": False,
+        "tolerant_repair": True, "extractor_repair": False,
+    },
+    "J": {
+        "strip_response_schema": True, "inject_generation_fault": False,
+        "tolerant_repair": False, "extractor_repair": False,
+    },
 }
 
-_MATRIX_DEFAULT_REPS: dict[str, int] = {"A": 10, "B": 10, "C": 10, "D": 10, "control": 3, "E": 10, "F": 10}
+_MATRIX_DEFAULT_REPS: dict[str, int] = {
+    "A": 10, "B": 10, "C": 10, "D": 10, "control": 3, "E": 10, "F": 10, "G": 10, "H": 10, "I": 10, "J": 10,
+}
 
 _MATRIX_DIR = _RESULTS_DIR / "integrity-matrix"
 _MATRIX_JSONL_PATH = _MATRIX_DIR / "integrity_matrix.jsonl"
@@ -1369,10 +1402,13 @@ def main() -> int:
             "integrity-matrix mode: runs the not-yet-recorded reps of one matrix cell against a "
             "per-cell isolated ERP SQLite (var/erp/matrix-<cell>.sqlite), appending to "
             "results/integrity-matrix/integrity_matrix.jsonl and (re)writing that cell's block of "
-            "results/integrity-matrix/integrity_matrix_report.json. A/B/C/D vary strip_response_schema / "
-            "inject_generation_fault / tolerant_repair (see infrastructure/configurations.py); "
-            "'control' is cell D restricted to schedule-appointment only (no generation step). "
-            f"Requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for A/B/C/D, "
+            "results/integrity-matrix/integrity_matrix_report.json. A/B/C/D/E/F/G/H/I/J vary "
+            "strip_response_schema / inject_generation_fault / tolerant_repair / extractor_repair "
+            "(see infrastructure/configurations.py); 'control' is cell D restricted to "
+            "schedule-appointment only (no generation step); G/H add the genuine extractor repairer "
+            "(docs/preregistration-extractor-repair-cells.md); I/J are the natural-violation arm, "
+            "no injector (docs/preregistration-natural-violation-cells.md). "
+            f"Requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for A/B/C/D/E/F/G/H/I/J, "
             f"{_MATRIX_DEFAULT_REPS['control']} for control). Already-recorded (cell, rep) pairs "
             "are skipped -- safe to stop and resume."
         ),
@@ -1413,7 +1449,7 @@ def main() -> int:
         if args.repeat is None:
             parser.error(
                 f"--matrix-cell requires --repeat (typical: {_MATRIX_DEFAULT_REPS['A']} for "
-                f"A/B/C/D, {_MATRIX_DEFAULT_REPS['control']} for control)"
+                f"A/B/C/D/E/F/G/H/I/J, {_MATRIX_DEFAULT_REPS['control']} for control)"
             )
         if args.erp_url or args.serve_erp:
             parser.error(

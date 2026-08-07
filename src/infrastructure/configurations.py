@@ -24,6 +24,7 @@ from infrastructure.observability.console_writer import (
     ConsoleObservabilityWriter,
 )
 from infrastructure.observability.langsmith_writer import LangSmithObservabilityWriter
+from infrastructure.providers.extractor_repair_client import ExtractorRepairClient
 from infrastructure.providers.fault_injection_client import GenerationFaultInjectionClient
 from infrastructure.providers.local_client import LocalModelClient
 from infrastructure.providers.recording_client import RecordingModelClient
@@ -58,11 +59,12 @@ class Platform:
     audit: IAuditWriter
     plans: dict[str, ExecutionPlan]
     model_log: list
-    # The `TolerantRepairClient` instance actually wired in (see `build_platform`'s
-    # `tolerant_repair` param), or None when `tolerant_repair=False` -- exposed so callers (the
-    # integrity-matrix runner) can read `.repairs` for post-hoc counting without reaching into
-    # the `model` decorator chain themselves.
-    repair_client: object | None
+    # Whichever repair instrument was wired in (see `build_platform`'s `tolerant_repair` /
+    # `extractor_repair` params -- mutually exclusive, so at most one applies): a
+    # `TolerantRepairClient`, an `ExtractorRepairClient`, or None when neither flag is True --
+    # exposed so callers (the integrity-matrix runner) can read `.repairs` for post-hoc counting
+    # without reaching into the `model` decorator chain themselves.
+    repair_client: TolerantRepairClient | ExtractorRepairClient | None
 
 
 def _build_model(provider: str) -> IModelClient:
@@ -107,6 +109,7 @@ def build_platform(
     inject_generation_fault: bool = False,
     strip_response_schema: bool = False,
     tolerant_repair: bool = False,
+    extractor_repair: bool = False,
 ) -> Platform:
     """Composition root: assembles orchestrator + registries + runtime + guardrails + connectors + stores.
 
@@ -142,6 +145,15 @@ def build_platform(
     the historical tolerant fallback removed from `read_and_reply.py`, so the capability's strict
     guard then accepts it. The wired instance (or None) is exposed as `Platform.repair_client` so
     callers can read `.repairs` for post-hoc counting.
+    `extractor_repair`: measurement instrumentation only (see
+    `infrastructure/providers/extractor_repair_client.py`; NEVER set True in production) -- when
+    True, wraps the model client in an `ExtractorRepairClient` that intercepts non-conforming
+    `purpose=="generation"` RESPONSES and, if `content` matches a single markdown fence envelope,
+    replaces it with the fenced-out inner text (one pass, no recursion) -- the practitioner
+    "code fence removal" repair strategy, deliberately narrower than `tolerant_repair`'s absorbing
+    fallback. Mutually exclusive with `tolerant_repair` (`ValueError` if both are True: only one
+    repair instrument can be wired at a time). The wired instance (or None) is exposed as
+    `Platform.repair_client`, same field `tolerant_repair` uses.
 
     Wiring order (all four instrumentation flags together, integrity-matrix cell "A"):
     `Recorder(TolerantRepair(FaultInjection(SchemaStrip(base))))` -- i.e. a REQUEST flows outside
@@ -152,6 +164,9 @@ def build_platform(
     capability's own parser saw -- post-injection, post-repair -- never the underlying provider's
     original, unmodified output.
     """
+    if tolerant_repair and extractor_repair:
+        raise ValueError("tolerant_repair and extractor_repair are mutually exclusive repair instruments")
+
     provider = provider or os.environ.get("AI_PROVIDER", "local")
     model = _build_model(provider)
     # Instrumentation wiring order -- see the docstring above ("Wiring order"): request flows
@@ -161,9 +176,12 @@ def build_platform(
         model = SchemaStrippingClient(model)
     if inject_generation_fault:
         model = GenerationFaultInjectionClient(model)
-    repair_client: TolerantRepairClient | None = None
+    repair_client: TolerantRepairClient | ExtractorRepairClient | None = None
     if tolerant_repair:
         repair_client = TolerantRepairClient(model)
+        model = repair_client
+    elif extractor_repair:
+        repair_client = ExtractorRepairClient(model)
         model = repair_client
     model_log: list = []
     if record_model_calls:
