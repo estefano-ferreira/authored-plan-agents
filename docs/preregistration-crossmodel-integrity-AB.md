@@ -52,6 +52,24 @@ under the same registered branches; each model's evidence lands in its
 own model-suffixed files, read separately — no composite number across
 models (the registered Branch C discipline applies per family).
 
+**2026-08-06 — third cross-model arm added: `openai/gpt-oss-120b` via
+Groq, before any run.** Role: **open-weights family diversity** —
+OpenAI's open-weights model served by a fourth provider, a family
+distinct from everything measured so far (Gemini flash baseline, OpenAI
+hosted mini, the unrun Anthropic frontier arm). Chosen on availability
+and price, never on eval performance: adapter and key already present;
+list rates $0.15 / $0.60 per 1M tokens as recorded 2026-08-06 from
+public pricing pages (to be confirmed against the account console if
+cost figures ever exceed cents; the runner's cache-read discount
+constant, 10%, differs from Groq's own 50% cached-input pricing — moot
+while recorded cache reads are zero, and `verify_costs.py`'s exact
+recomputation exposes any nonzero cache immediately). Same registered
+branches, per-family reading, model-suffixed evidence (slug
+`openai-gpt-oss-120b`). Interpretive baselines from the E/F round and
+the `gpt-4o-mini` arm apply: the repair emulation absorbs rather than
+extracts, and selection-format divergence is a Branch C selection
+finding, never composited into the boundary axis.
+
 ## Question
 
 On the boundary-behavior axis of the integrity matrix (NOTES.md §

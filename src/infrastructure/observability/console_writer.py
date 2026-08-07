@@ -13,6 +13,11 @@ PRICING_USD_PER_MILLION_TOKENS: dict[str, dict[str, float]] = {
     # and not yet entered; cost figures for this model are recorded as $0 and MUST NOT be
     # published until real list rates replace these zeros.
     "muse-spark-1.2": {"input": 0.0, "output": 0.0},
+    # Groq-served, rates as recorded 2026-08-06 from public pricing pages (pre-registration
+    # amendment in docs/preregistration-crossmodel-integrity-AB.md). Caveat on cache: Groq's own
+    # cached-input discount is 50%, not this module's 10% constant -- moot while recorded cache
+    # reads are zero (all runs to date), and verify_costs.py exposes any nonzero cache exactly.
+    "openai/gpt-oss-120b": {"input": 0.15, "output": 0.60},
     "local-deterministic": {"input": 0.0, "output": 0.0},
     # OpenRouter and Groq have no entries here by design: both front many underlying model
     # families (Llama, Qwen, Claude, OpenAI's open-weights models, ...) under caller-chosen ids
