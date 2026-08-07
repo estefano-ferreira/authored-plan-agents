@@ -8,7 +8,7 @@ authors:
     given-names: "Estefano"
     email: "estefano.senhor@gmail.com"
 date-released: "2026-08-07"
-version: "0.5.0"
+version: "0.6.0"
 doi: "10.5281/zenodo.21831454"
 identifiers:
   - type: doi
@@ -37,7 +37,11 @@ abstract: >
   corrupted state -- demonstrated across four model configurations (including
   an open-weights arm with full boundary samples), two system-of-record
   engines (SQLite, PostgreSQL), two decoding conditions and two
-  boundary-validation strengths. Two of the study's own expectations
+  boundary-validation strengths; a further pre-registered pair of
+  natural-violation cells replicates the originating incident under
+  tracked evidence (natural rate 10/10 with counters at zero), and a
+  genuine-extractor arm shows the guard's unique purchase is typed
+  visibility, not recovery superiority. Two of the study's own expectations
   were corrected by pre-registered measurement:
   id-only selection-format robustness is a model-family property, not a task
   property; and the ambiguity floor in LLM plan selection is attributable to

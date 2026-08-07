@@ -38,7 +38,10 @@ production with **no attacker in the chain**](https://www.cyera.com/research/age
   is orthogonal to authorization.
 - **Schema validation catches form, not meaning.** The garbage rows entered
   through the business API and satisfied it; syntax *repair* is precisely what
-  concealed the violation. Repair fixes syntax, not semantics.
+  concealed the violation. Repair fixes syntax, not semantics — though a
+  genuine extractor can recover the content where an absorbing fallback
+  corrupts it, the platform's own integrity counters stay equally blind
+  either way (cell G, see Key results below).
 - **Testing doesn't catch it.** The model is non-deterministic: the failing
   output shape appears in production, not in your fixtures — and both the
   agent's report and the platform's telemetry can read clean while the
@@ -123,6 +126,8 @@ spot-check and the measured family arm are discussed in
 | **Integrity matrix 2×2** — decoding constraint × boundary policy, single controlled condition (same codebase, same model, fault injected where the schema is stripped) | With a real schema both boundary policies are clean (the repair axis has nothing to do). Without it, the boundary alone decides: tolerant repair → `completed` 10/10 with **10 garbage rows and audit counters reading zero**; strict guard → `failed_clean` 10/10, **zero rows persisted** | [`NOTES.md`](NOTES.md) § Integrity matrix — controlled reproduction, `results/integrity-matrix/integrity_matrix*`, per-cell DB snapshots `results/integrity-matrix/matrix-*.sqlite` (cell A's garbage rows are directly inspectable) |
 | **Schema+fault cells E/F** — pre-registered follow-up completing the matrix's fault arm: fault injected downstream of an *active* schema, so the fence wraps valid JSON | The tolerant cell `completed` 10/10, persisting **10 fenced blobs with contract counters at zero** — telemetry blindness under an active schema, and a verification that the historical absorbing fallback persists garbage independently of the decoding condition; the strict cell `failed_clean` 10/10, zero rows — refusing content that was valid under the fence, unchanged. The registered contrary expectation ("fence-stripping repair recovers the valid content") is corrected by a dated erratum in the pre-registration: the repair never strips fences, it absorbs non-JSON content wholesale, so the outcome was determinable from the code before the run | [`docs/preregistration-schema-fault-cells.md`](docs/preregistration-schema-fault-cells.md) (committed before the runner change; dated erratum 2026-08-07), `results/integrity-matrix/integrity_matrix*`, `matrix-{E,F}.sqlite` |
 | **Full-schema boundary arm** (cells C/D/E/F, pre-registered, first under the what-the-code-already-determines rule) | Boundary strengthened from decode-shape to full validation of the declared schema (exact key set, string types, `request_type` enum). C/D: zero full-schema-only rejections (10/10 clean each, byte-equivalent, idle cost still zero). E: telemetry blindness unchanged under full validation — the absorbed payload is schema-valid by construction (verification of a code-determined outcome, third observed instance of Proposition 1). F: 10/10 typed failures, zero rows (verification). "Position, not strength" is now measured, not only argued — and replicated on PostgreSQL (pre-registered Branch A, full transfer, live-Postgres ground truth), closing the C–F engine-coverage gap | [`docs/preregistration-boundary-schema-validation.md`](docs/preregistration-boundary-schema-validation.md), [`docs/preregistration-fullschema-postgres.md`](docs/preregistration-fullschema-postgres.md), `integrity_matrix-fullschema{,-pg}.jsonl`, `matrix-{C,D,E,F}-fullschema{,-pg}.sqlite` |
+| **Genuine-extractor cells** (G/H, pre-registered, answering the v0.5.0 review's M1) | With a real fence-stripping extractor instead of the absorbing fallback, repair-before-check **did** recover valid content: cell G `completed` 10/10, counters 0/0/0, **all ten rows valid** — the "alternative to refusal was corruption" reading becomes repairer-specific; what the strict guard uniquely buys is typed visibility, not recovery superiority. Cell H (no schema) `failed_clean` 8/10 (2 `completed`) — the model self-fences on top of the injector's fence, and a single-pass extractor only ever strips one layer | [`docs/preregistration-extractor-repair-cells.md`](docs/preregistration-extractor-repair-cells.md), `results/integrity-matrix/integrity_matrix*`, `matrix-{G,H}.sqlite` |
+| **Natural-violation cells** (I/J, pre-registered, the design's longest-standing gap) | The originating incident, replicated under tracked evidence: natural rate **10/10** in both cells; cell I `completed` 10/10, counters zero, **10 garbage rows** — the fourth observed instance of Proposition 1, and the first with no injector anywhere. Cell J `failed_clean` 9/10 (1 `completed`) — one natural retry recovered, unlike the injector cells where the retry is doomed by construction | [`docs/preregistration-natural-violation-cells.md`](docs/preregistration-natural-violation-cells.md), `results/integrity-matrix/integrity_matrix*`, `matrix-{I,J}.sqlite` |
 | **Cross-model family arm** (`gpt-4o-mini`, cells A/B, pre-registered) | Boundary reading transfers on every rep that reaches the boundary: tolerant 6/6 `completed` + fenced garbage + counters at zero (telemetry blindness, third family); strict 1/1 typed failure, **zero rows in all 10 strict reps regardless of failure locus**. 13/20 reps diverged upstream on selection format — the study's first id-only violations, reported separately (never composited) and correcting "naturally robust" to a family property | `results/integrity-matrix/integrity_matrix-gpt-4o-mini.jsonl`, `matrix-{A,B}-gpt-4o-mini.sqlite`, NOTES § Cross-model family arm |
 | **Open-weights arm** (`gpt-oss-120b` via Groq, cells A/B, pre-registered) | Full Branch A transfer with a **full boundary sample**: every rep reached the boundary in both cells (id-only selection held in this family) — A: 10/10 garbage + counters at zero; B: 10/10 typed failures, zero rows. Resolves the mini arm's n=1 caveat by measurement | `integrity_matrix-openai-gpt-oss-120b.jsonl`, `matrix-{A,B}-openai-gpt-oss-120b.sqlite` |
 | **Postgres system-of-record arm** (cells A/B, baseline model, pre-registered) | The readings are **engine-portable**: same blindness signature persisted into PostgreSQL with real constraints validating (A: 10 garbage, counters zero), same zero persistence under the guard (B). A SQLite artifact is ruled out; the self-built-ERP circularity stays open and declared | [`docs/preregistration-postgres-sor.md`](docs/preregistration-postgres-sor.md), `integrity_matrix-pg.jsonl`, `matrix-{A,B}-pg.sqlite` |
@@ -199,9 +204,10 @@ default run (a deterministic local model client and stub connectors stand in).
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 
-# Expected: "27 passed, 7 xfailed" — 27 tests (7 restrictions + dependency
+# Expected: "35 passed, 7 xfailed" — 35 tests (7 restrictions + dependency
 # direction + persistence + e2e + the 9 full-schema boundary-validation
-# unit tests) plus 7 strict-xfail probes that try to
+# unit tests + the 8 ExtractorRepairClient unit tests) plus 7 strict-xfail
+# probes that try to
 # violate each restriction on purpose (an XPASS would mean an unenforced rule)
 pytest tests/ -q
 
@@ -331,7 +337,14 @@ the boundary to full validation of the declared schema and re-ran cells
 C/D/E/F: C/D confirmed zero full-schema-only rejections and zero idle
 cost, and E reproduced telemetry blindness under full validation — a
 verification of a code-determined outcome, not a discovery, since the
-absorbed payload is schema-valid by construction. Still queued: the frontier-tier arm
+absorbed payload is schema-valid by construction. A further pre-registered
+round on 2026-08-07 added the genuine-extractor cells G/H (answering the
+v0.5.0 review's M1: a real fence-stripping extractor recovers valid
+content where the absorbing fallback corrupted it, narrowing the strict
+guard's economic case to typed visibility rather than recovery
+superiority) and closed the design's longest-standing gap with the
+natural-violation cells I/J (natural rate 10/10 in both, replicating the
+originating incident under tracked evidence). Still queued: the frontier-tier arm
 (`claude-sonnet-5`, amendment recorded, key not yet provisioned), the
 ambiguity-detection experiment, and full selection curves on a second
 model. The measurement history — including the falsified predictions —
@@ -345,14 +358,19 @@ Archived at Zenodo — concept DOI
 [`10.5281/zenodo.21831454`](https://doi.org/10.5281/zenodo.21831454)
 (all versions) · last archived version (v0.4.0):
 [`10.5281/zenodo.21831455`](https://doi.org/10.5281/zenodo.21831455).
-Version DOIs for v0.4.1 (erratum release) and v0.5.0 (full-schema
-boundary arm) are pending Zenodo archival; until minted, cite the
-concept DOI for the current version.
+Version DOIs for v0.4.1 (erratum release), v0.5.0 (full-schema
+boundary arm) and v0.6.0 (extractor and natural-violation cells) are
+pending Zenodo archival; until minted, cite the concept DOI for the
+current version.
 Machine-readable citation in [`CITATION.cff`](CITATION.cff).
+The measurement paper's LaTeX source and compiled PDF live in
+`docs/paper/` — the tracked PDF is compiled with Tectonic 0.15.0
+(XeTeX engine; the source also builds under pdflatex) and every
+regeneration is verified by content probes before commit.
 
 > Senhor Ferreira, E. (2026). *Authored-Plan Agents: Reference
 > Implementation and Measurement Study of an Architectural Pattern for
-> LLM Agent Platforms* (v0.5.0). Zenodo.
+> LLM Agent Platforms* (v0.6.0). Zenodo.
 > https://doi.org/10.5281/zenodo.21831454
 
 ## License

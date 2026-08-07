@@ -1,5 +1,5 @@
 % !TEX program = pdflatex
-% Draft extracted from the repository evidence at tag v0.5.0.
+% Draft extracted from the repository evidence at tag v0.6.0.
 % Every number in this file traces to a tracked artifact under results/ or to
 % NOTES.md; do not edit a number here without editing its source first.
 %
@@ -49,7 +49,9 @@
 % CONSISTENCY CHECKLIST -- rerun this whole list whenever evidence or
 % cell counts change; every past propagation failure was one of these:
 %   [ ] cell count identical in: abstract, Contribution (1), S3 design
-%       admission, Table 1, S6; "four-cell" appears only as history
+%       admission, Table 1, S6; the matrix now spans ten cells plus the
+%       control arm (A-F, G-J); "four-cell" and "six-cell" remain only as
+%       history, naming the original comparison
 %   [ ] record/cost counts in the Price basis match verify_costs.py's
 %       current output (run it; do not restate from memory)
 %   [ ] S3 claims about what has/hasn't been tested do not contradict
@@ -91,7 +93,7 @@ A Controlled Measurement of Output-Contract Enforcement}
 \,\textperiodcentered\,
 \url{https://github.com/estefano-ferreira/authored-plan-agents}}
 
-\date{Draft --- extracted from repository state \texttt{v0.5.0}, 2026-08-07}
+\date{Draft --- extracted from repository state \texttt{v0.6.0}, 2026-08-07}
 
 \begin{document}
 \maketitle
@@ -109,7 +111,11 @@ main comparison on one model. Pre-registered follow-up arms replicate
 cells A and B across two further model configurations and a second
 system-of-record engine, and re-run the schema cells with the boundary
 strengthened to full-schema validation (the blindness signature is
-unchanged) --- all reported in the limitations. Ground truth is
+unchanged); a further two pairs of pre-registered cells added a genuine
+fence-stripping extractor as a third repair policy and measured the
+no-schema arm's natural, uninjected violation rate, replicating the
+originating incident under tracked evidence (natural rate 10/10, counters
+at zero) --- all reported in the limitations. Ground truth is
 read directly from the persisted database of an external system of
 record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
@@ -132,7 +138,9 @@ of silent corruption --- a trade a naturally occurring provider
 schema-dialect mismatch exercised for us. The implication is
 deliberately narrow: constrained decoding is the suppression mechanism;
 the architectural boundary is what keeps the channel closed when that
-simpler mechanism silently breaks. All evidence is version-controlled
+simpler mechanism silently breaks --- and, measured against a competent
+repairer rather than an absorbing one, what it uniquely buys is typed
+visibility, not recovery superiority. All evidence is version-controlled
 and inspectable.
 \end{abstract}
 
@@ -188,12 +196,14 @@ whose ground truth is not the agent's report, not the platform's
 telemetry, but rows in the business database.
 
 \paragraph{Contributions.}
-(1)~A controlled comparison of six boundary configurations --- decoding
-enforcement crossed with boundary repair policy, a fault injector in the
-unconstrained column and (pre-registered) downstream of the active
-schema, and a shared control arm --- with ground truth read
-from a persisted external system of record. The design is not a complete
-factorial (\S\ref{sec:design}). State-grounded scoring itself is
+(1)~A controlled comparison of ten boundary configurations --- decoding
+enforcement crossed with fault source (injected, natural) and three
+boundary repair policies (absorbing, strict, extracting), plus a shared
+control arm, accumulated as pre-registered cells over an originally
+non-factorial four-cell design --- with ground truth read
+from a persisted external system of record. The grid is complete for
+the absorbing and strict policies; the extractor column carries
+injected-fault cells only (\S\ref{sec:design}). State-grounded scoring itself is
 established practice --- deterministic evaluation against the persisted
 environment is how STATE-Bench scores state-mutating
 tasks~\cite{statebench2026} and what GroundEval provides as an
@@ -294,17 +304,39 @@ configuration do with it? The injector also re-fences the retry attempt,
 so recovery in cell \cellB{} is impossible by construction; the guard's
 failure path, not its recovery path, is what \cellB{} measures.
 
-Stated plainly: because the injector runs only in the no-schema cells,
-\textbf{the design is not a complete factorial} --- the fault arm
-co-varies with the decoding axis. Cells \cellC{}/\cellD{} measure the
-schema configuration under \emph{natural} conditions only; within the
-original four cells, no configuration subjected active decoding
-enforcement to a forced violation --- the pre-registered follow-up
-cells E/F later did exactly that (fault injected \emph{downstream} of
-the active schema; results in \S\ref{sec:limits}). The findings are
-worded accordingly (F3 claims invisibility of the
-repair axis and zero idle cost, not that decoding ``holds under
-attack'').
+Stated plainly: because the injector originally ran only in the no-schema
+cells, \textbf{the original four-cell design was not a complete
+factorial} --- the fault arm co-varied with the decoding axis. Cells
+\cellC{}/\cellD{} measured the schema configuration under \emph{natural}
+conditions only; within the original four cells, no configuration
+subjected active decoding enforcement to a forced violation. Successive
+pre-registered cells have since closed that gap: E/F injected the fault
+\emph{downstream} of the active schema, and G/H repeated that injection
+under a genuine extractor rather than the absorbing fallback; I/J then
+measured the no-schema arm's \emph{natural}, uninjected violation rate
+under each boundary policy (all in \S\ref{sec:limits}) --- together
+completing the decoding-constraint $\times$ fault-source grid for the
+absorbing and strict boundary policies. The extractor column remains
+populated only under injected faults; the findings are worded
+accordingly (F3 claims invisibility of the repair axis and zero idle
+cost, not that decoding ``holds under attack'').
+
+\paragraph{A third boundary policy: the genuine extractor.} Two further
+pre-registered cells (G and H;
+\texttt{docs/preregistration-extractor-repair-cells.md}, committed
+before the instrument existed) added a genuine fence-stripping
+extractor, \texttt{ExtractorRepairClient}, as a third value on the
+boundary-policy axis alongside the absorbing fallback and the strict
+guard: for a generation response matching a single markdown fence
+envelope (optional language tag), one pass, no recursion, it replaces
+the content with the captured inner text and records one repair;
+anything that does not match --- bare JSON, prose, a double-fenced
+envelope's outer layer once stripped --- passes through unchanged, with
+no absorption and no field-stuffing. Cells I and J
+(\texttt{docs/preregistration-natural-violation-cells.md}, committed
+before the runner change) close the design's other remaining gap: the
+no-schema arm's natural, uninjected violation rate against the absorbing
+and strict policies. Results for both pairs are in \S\ref{sec:limits}.
 
 \paragraph{Cells and control.} Ten repetitions per cell of the two-agent
 email-to-ERP plan (the only plan with a generation step), each against a
@@ -330,11 +362,12 @@ from the provider's own \texttt{usage\_metadata}
 thought tokens where the model reports them,
 \texttt{cached\_content\_token\_count}), not from an estimator. Cached
 input is billed at 10\% of the input rate in the runner's formula; in
-these runs cached tokens were zero --- verified by recomputing all 203
+these runs cached tokens were zero --- verified by recomputing all 243
 recorded per-execution costs (the six-cell comparison, the control arm,
 and the follow-up arms at their own list rates: \texttt{gpt-4o-mini}
 and Groq-served \texttt{gpt-oss-120b}, both \$0.15 / \$0.60 per
-million as recorded; the Postgres and full-schema arms on the baseline
+million as recorded; the Postgres arm, the full-schema arms, and the
+extractor and natural-violation cells G/H/I/J all on the baseline
 model's rates)
 from their token counts alone, which
 reproduces every recorded figure exactly
@@ -372,6 +405,15 @@ E & schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
 & 10 & 10 & \textbf{0} & \$0.00245 \\
 F & schema + fault + strict & \statusfailedclean{} 10/10 &
 10/10/10 & 0 & \textbf{0} & --- & \$0.00384 \\
+\midrule
+G & schema + fault + extractor & \statuscompleted{} 10/10 & 0/0/0 & 10 &
+10 & 10 & \$0.00248 \\
+H & no schema + fault + extractor & \statusfailedclean{} 8/10,
+\statuscompleted{} 2 & 9/9/8 & 19 & 2 & 2 & \$0.00492 \\
+I & no schema, natural, tolerant & \statuscompleted{} 10/10 & 0/0/0 & 10
+& 10 & \textbf{0} & \$0.00296 \\
+J & no schema, natural, strict & \statusfailedclean{} 9/10,
+\statuscompleted{} 1 & 10/10/9 & 0 & 1 & 1 & \$0.00500 \\
 \bottomrule
 \end{tabular}
 \caption{The integrity matrix. ``Rows'' are records created in the
@@ -379,9 +421,20 @@ external ERP database; ``Valid'' counts rows whose persisted
 \texttt{summary} is clean one-line text (verified by direct SQL
 inspection). Cell \cellA{}'s ten rows each carry a double-fenced JSON blob
 in the business field while every counter the platform exposes reads
-zero. Below the rule: the pre-registered follow-up cells E and F
+zero. Below the first rule: the pre-registered follow-up cells E and F
 (\S\ref{sec:limits}), run after the original comparison --- E reproduces
-\cellA{}'s signature with the decoding constraint active upstream.
+\cellA{}'s signature with the decoding constraint active upstream. Below
+the second rule: the genuine-extractor pair G/H and the natural-violation
+pair I/J (both \S\ref{sec:limits}) --- G recovers valid content under the
+same injected fence that corrupted E, with the counters just as blind;
+H's eight typed refusals are a double-fenced envelope defeating a
+single-pass extractor; cell I's ten rows carry single-fenced JSON blobs
+produced by purely \emph{natural} violations, no injector anywhere.
+Model calls per repetition are structural rather than tabulated: every
+\statuscompleted{} repetition makes the plan's fixed selection calls
+plus one generation call, and the strict cells' \statusfailedclean{}
+repetitions add exactly one retry generation call --- the entire source
+of F4's ratios.
 Latency means are omitted: they are contaminated by free-tier
 429-backoff stalls (worst case 111\,s) and carry no signal about the
 axes.}
@@ -510,10 +563,16 @@ state.
 
 \paragraph{Proposition 1 (Sufficient condition).} Given a violation
 that reaches persistence, any absorption step positioned upstream of
-the check that feeds those observers suffices: the check never sees the
+the check that feeds those observers, \emph{and whose own telemetry
+reports its operation as success}, suffices: the check never sees the
 violation, so the counters it feeds cannot record it --- and the
 absorption step's own counter reads as successes, not violations. The
-condition is mechanism-agnostic: it holds for any absorption step, not
+success-reporting clause is not incidental: an absorption step that
+classified its own interventions as violations would feed an observer
+that reads unhealthy, breaking Definition~1's premise by construction
+--- but success-reporting is precisely what repair semantics mean, and
+every repairer measured here carries it. With that scope, the condition
+is mechanism-agnostic: it holds for any such absorption step, not
 only the absorbing fallback measured here (the measured narrowing above
 stands).
 
@@ -529,9 +588,19 @@ instance was measured under a further pre-registered arm
 performing full validation of the declared schema --- the absorbed
 payload is schema-valid by construction, so no boundary-side validation
 strength can reject it; this outcome was determined by the code before
-the run and is reported as a verification. The condition is positional,
-indifferent to what sits upstream of the absorption and to how strong
-the downstream check is.
+the run and is reported as a verification. A fourth instance was
+measured under the natural-violation cells (\S\ref{sec:limits}): cell I
+reproduces the same signature --- counters at zero, ten repairs, ten
+corrupted rows --- with \emph{no injector anywhere in the pipeline}; the
+violations are entirely natural, making cell I the first instance this
+study produced without a fault injector. The condition is positional,
+indifferent to what sits upstream of the absorption, to how strong the
+downstream check is, and to whether the violation was forced or occurred
+on its own. Instance counting, fixed here: an \emph{instance} is a
+distinct (decoding condition, boundary strength) configuration
+exhibiting the signature --- four so far; engine replications of these
+instances (\S\ref{sec:limits}) are counted as replications, not further
+instances.
 
 \paragraph{F3 --- with the schema, no violation occurred and the repair
 axis is invisible.} Cells \cellC{} and \cellD{} are byte-equivalent in
@@ -542,7 +611,11 @@ cells never faced a forced violation (\S\ref{sec:design}). The direct
 evidence that decoding-level enforcement suppresses \emph{natural}
 violations is the earlier before/after round on the same pipeline: 10/10
 violations under prompt-only control $\rightarrow$ 0/10 with the schema,
-at $-18\%$ cost per completed task. What \cellC{}/\cellD{} add is the
+at $-18\%$ cost per completed task. Cells I and J (\S\ref{sec:limits})
+now measure the same no-schema natural rate under tracked evidence at
+this date --- 10/10 and 10/10 (20/20 first attempts) --- replacing
+reliance on that earlier round's surviving aggregates with a directly
+inspectable record. What \cellC{}/\cellD{} add is the
 guard's price sheet: under the enforced-decoding configuration the guard
 has literally nothing to do, and its idle cost --- extra model calls,
 extra tokens --- is zero. The pre-registered full-schema arm
@@ -554,7 +627,9 @@ under the strengthened check, with no additional model calls.
 \cellB{} spent 1.92$\times$ \cellA{}'s output tokens (2636 vs.\ 1376)
 and 1.68$\times$ its cost (\$0.00509 vs.\ \$0.00304 per 10 reps): the
 retry doubles the generation call and both attempts fault by
-construction. That is the entire price of knowing.
+construction. That is the entire price of knowing. The natural-violation
+cells reproduce the same ratio without any injector: J spent
+1.69$\times$ I's cost (\$0.00500 vs.\ \$0.00296 per 10 reps).
 
 \paragraph{F5 --- the control arm isolates the generation step.} The
 no-generation plan completed 3/3 with clean persisted state under the
@@ -642,11 +717,13 @@ re-fences the retry, so its outcome is deterministic by construction).
 The counterfactual ``tolerance would have recovered it'' was therefore
 never open to begin with: it was settled by the instrument's
 construction and confirmed, not falsified, by the run --- the
-alternative to refusal was not recovery; it was corruption. The design
-is \emph{still} not a complete factorial: the
-no-schema/no-fault arm (natural violations under each boundary policy)
-has never run as a cell --- the incident round covers only its tolerant
-half.
+alternative to refusal was not recovery; it was corruption. The
+no-schema/no-fault arm --- natural violations under each boundary
+policy, the design's longest-standing admitted gap --- has since run as
+cells I and J, reported in their own paragraph below (natural rate
+10/10 in both cells); the one factorial gap that remains is the
+extractor policy under natural, uninjected violations, which has not
+run.
 
 \paragraph{The full-schema boundary arm.} The v0.4.0 review asked the
 strong form of the boundary question: does the positional result survive
@@ -683,6 +760,103 @@ F 10/10 typed failures with zero rows --- closing a scope gap this
 paper had carried silently: cells C--F had never run against the second
 engine.
 
+\paragraph{The genuine-extractor cells.} The v0.5.0 external review (M1)
+observed that this study had measured only an \emph{absorbing} repairer
+--- the historical fallback that stuffs the raw response into the
+contract's fields --- while the practitioner literature's default repair
+is \emph{extraction} (markdown fence removal). Two cells, pre-registered
+under the same discipline
+(\texttt{docs/preregistration-extractor-repair-cells.md}, committed
+before the instrument existed), completed the repair-policy axis with a
+genuine extractor, \texttt{ExtractorRepairClient} (single-pass markdown
+fence removal, no absorption, no field-stuffing). Determination, fixed
+before any number: cell G is determined conditional on decoding
+conformity --- under an active schema the provider returns schema-valid
+JSON (measured 0/10 natural violations at both validation strengths in
+\cellC{}/\cellD{}), the injector adds one fence, and a single-pass
+extractor matches it by construction, so the recovered content passes
+full validation; cell H is genuinely open, because without the schema
+the content under the fence is unconstrained and depends on whether the
+model itself self-fences. Results confirmed the determined branch and
+scored the open one. \textbf{Cell G}: \statuscompleted{} 10/10, contract
+counters 0/0/0, 10 repairs, ten rows, all ten valid. \textbf{Cell H}:
+\statusfailedclean{} 8/10 (2 \statuscompleted{}), contract counters
+9/9/8, 19 repairs, two rows, both valid. The mechanics behind H are
+code-coherent: in 8 of 10 repetitions the model self-fenced its own
+response (implied self-fencing rate 9/10 on first attempts) on top of
+the injector's fence, producing a double-fenced envelope a single-pass
+extractor cannot fully unwrap on either attempt (16 of H's 19 repairs);
+one repetition recovered on retry (2 repairs) and one recovered on the
+first attempt (1 repair). The registered prediction (\statusfailedclean{}
+$\ge$ 8/10) held exactly at the threshold. The committed framing
+consequence (Branch A) is reported in the terms it was pre-registered
+in: the economics of refusal-versus-repair is \emph{repairer-specific}
+--- the absorbing fallback corrupted cell \cellA{}/E's content, the
+genuine extractor recovered cell G's, and the contract counters were
+blind in both. What the strict guard buys is therefore not superiority
+over any repair; it is typed visibility. A correct extractor beats both
+the absorber and the guard on availability in cell G, while leaving the
+counters exactly as blind as the absorber does.
+
+\paragraph{The natural-violation cells.} The design's longest-standing
+admitted gap --- the no-schema/no-fault arm, the model's natural
+violation behavior under each boundary policy, never run as a matrix
+cell --- closed under the same pre-registration discipline
+(\texttt{docs/preregistration-natural-violation-cells.md}, committed
+before the runner change): cells I (no schema, no injector, tolerant)
+and J (no schema, no injector, strict), 10 repetitions each, no new
+instrument, only configuration. The natural violation rate measured
+10/10 in both cells. \textbf{Cell I}: \statuscompleted{} 10/10, contract
+counters 0/0/0, 10 repairs, ten rows, \textbf{zero} valid --- the fourth
+observed instance of Proposition~1, and the first produced with no
+injector anywhere in the pipeline. \textbf{Cell J}: \statusfailedclean{}
+9/10 (1 \statuscompleted{}), contract counters 10/10/9, zero repairs, one
+row, valid. Nine of J's ten repetitions ended in a typed refusal after
+the retry also violated; the tenth recovered --- the model returned bare
+JSON on the second, identical call. That nuance matters: under an
+injector the retry is doomed by construction (the injector re-fences
+every attempt, cells \cellB{}/F/H); under a natural violation nothing
+forces the second attempt to repeat the first, and here, once, it did
+not. The combined first-attempt violation rate across I and J is 20/20,
+replicating the originating incident round's 10/10 under tracked,
+inspectable evidence rather than the lost baseline's surviving
+aggregates --- the loss itself (below) stays disclosed, not retracted.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Arm & Varies & Cells & Reading \\
+\midrule
+\texttt{gpt-4o-mini} & model family & \cellA{}/\cellB{} &
+transfer on every boundary-reaching rep; 13/20 diverge upstream \\
+\texttt{gpt-oss-120b} & family (open weights) & \cellA{}/\cellB{} &
+full transfer, full boundary samples \\
+\texttt{-pg} & SOR engine & \cellA{}/\cellB{} &
+full transfer (replication) \\
+\texttt{fullschema} & boundary strength & \cellC{}--F &
+P1/P2 confirmed; blindness unchanged (verification) \\
+\texttt{fullschema-pg} & engine, at full strength & \cellC{}--F &
+full transfer (replication) \\
+\midrule
+extractor cells & repair mechanism & G/H & G recovers valid content with
+counters blind (verification); H 8/10 refused, double fence defeats
+single pass \\
+natural cells & fault source --- none & I/J & natural rate 10/10;
+blindness instance four; one natural retry recovery \\
+\bottomrule
+\end{tabular}
+\caption{The pre-registered arms and follow-up cells at a glance.
+``Reading'' compresses the paragraphs above; every arm row's evidence is
+the arm-suffixed file set in \texttt{results/integrity-matrix/} and its
+pre-registration under \texttt{docs/}; the extractor and natural rows
+are baseline-namespace cells (G/H/I/J, no evidence suffix), each with its
+own pre-registration. Instances vs.\ replications per the counting rule
+fixed in \S\ref{sec:results}.}
+\label{tab:arms}
+\end{table}
+
 \paragraph{One violation class.} The injected fault (markdown re-fencing)
 is the class the original incident exhibited. Tolerant repair in the wild
 absorbs other classes (truncation, wrong fields, schema-valid-but-wrong
@@ -695,7 +869,10 @@ in F3 rests on a baseline whose raw per-execution file was deleted by a
 cleanup step before the repository was under version control. Its
 aggregates survive in the repository's study log, and the corrected
 round's raw file is tracked; the 10/10 figure is therefore reproducible
-from surviving aggregates, not from raw records. The repository discloses
+from surviving aggregates, not from raw records. The natural-violation
+cells I and J (above) now provide tracked, inspectable evidence for the
+same phenomenon at this date, so no current claim in this paper rests on
+the surviving aggregates alone. The repository discloses
 this loss, and so does this paper.
 
 \paragraph{Model scope --- one model in the main comparison, arms
@@ -863,7 +1040,17 @@ related-work mapping (``the telemetry-blindness result (F2) has no
 counterpart there'') are search-
 and time-bound as of 2026-08-06, over a literature that does not index by these axes; during
 this study's own review rounds, an adjacent paper that predated one of
-our searches was found only by a later, independent pass. Absence
+our searches was found only by a later, independent pass. Two further
+conditions are declared at the same level. References
+\cite{statebench2026} and \cite{errorhiding} function as pointers, not
+evidence --- a vendor blog post quoted at sentence level and an
+encyclopedic anti-pattern entry --- and no absence claim in this paper
+rests on either. And this study's measurements, analysis and internal
+review are the work of a single author; the errors its 2026-08-07
+erratum corrects were surfaced by review external to the project, not
+by its internal process --- the determination rule adopted that day
+(\S\ref{sec:limits}) is the structural mitigation, not a substitute for
+independent replication. Absence
 findings mean ``not found by a stated search at a stated date'', never
 ``does not exist''.
 
@@ -875,15 +1062,23 @@ violation reaches it --- forced by an injector in the unconstrained
 cells, naturally occurring in the incident and the dialect accident that
 bracket them.
 In every round we measured, decoding-level enforcement suppressed all
-natural violations --- and a strict architectural guard behind it costs
-nothing while that remains true. What the guard buys is the difference between
+natural violations --- a claim now measured on both sides of the
+contrast: with the schema stripped and no injector, cells I and J found
+the natural violation rate at 10/10, the same rate the schema suppresses
+to 0/10 wherever it is active --- and a strict architectural guard
+behind it costs nothing while that remains true. What the guard buys is the difference between
 the two remaining worlds: when the decoding constraint silently breaks
 --- a dialect mismatch, a misconfiguration, a provider change --- a
 tolerant pipeline persists garbage while reporting success and zeroing
 its own counters --- the telemetry blindness of \S\ref{sec:results} ---
 while a strict boundary fails loudly, typed, with nothing
 persisted. In the combination we measured --- absorption ahead of a
-format check --- repair-before-check did not repair; it concealed. What
+format check --- repair-before-check did not repair; it concealed. With
+a genuine extractor in the same position (cell G), repair-before-check
+\emph{did} repair --- and the counters stayed equally blind: the
+concealment is positional, the recovery is repairer-specific, and what
+the strict guard uniquely buys is typed visibility, not superiority over
+every possible repair. What
 generalizes is the position, not the repair: any absorption upstream of
 a check blinds the counters that check feeds (Figure~\ref{fig:order}),
 and that positional lesson is what travels beyond this stack. The
@@ -914,8 +1109,9 @@ platform-side telemetry
 must not be treated as integrity evidence --- audit has to read the
 system of record, because the configuration in which every instrument
 agrees and is wrong is demonstrated, named, and cheap to produce --- this
-requirement rests on the three demonstrated instances: cell \cellA{},
-cell E, and cell E re-run under full-schema boundary validation
+requirement rests on the four demonstrated instances: cell \cellA{},
+cell E, cell E re-run under full-schema boundary validation, and cell I
+under purely natural violations with no injector anywhere
 (\S\ref{sec:limits}). Third, repair-before-check must be made
 structurally impossible on
 business writes --- the mechanism is positional, so no policy applied
@@ -929,14 +1125,23 @@ probes; its specification and test suite are in the repository for any
 platform that wants to adopt the requirements without adopting the
 implementation.
 
-\paragraph{Data availability.} Repository tag \texttt{v0.5.0}:
-implementation, restriction-enforcing test suite (27 passed, 7
-strict-xfail anti-vacuity probes), and tracked evidence under
+\paragraph{Data availability.} Repository tag \texttt{v0.6.0}:
+implementation, restriction-enforcing test suite (35 passed, 7
+strict-xfail anti-vacuity probes --- the extractor unit tests for
+\texttt{ExtractorRepairClient} account for the growth since v0.5.0's 27),
+and tracked evidence under
 \texttt{results/integrity-matrix/} (checkpointed JSONL, consolidated
 report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite}
 plus the model- and engine-suffixed arm snapshots
 (\texttt{-gpt-4o-mini}, \texttt{-openai-gpt-oss-120b}, \texttt{-pg}),
-audit trails), the full-schema boundary arm's own snapshots
+audit trails), the genuine-extractor and natural-violation cells' own
+snapshots (\texttt{matrix-\{G,H,I,J\}.sqlite} and their audit trails,
+all in the baseline namespace, appended to the same
+\texttt{integrity\_matrix.jsonl} and consolidated report; evidence of
+the pre-registrations in
+\texttt{docs/preregistration-extractor-repair-cells.md} and
+\texttt{docs/preregistration-natural-violation-cells.md}), the
+full-schema boundary arm's own snapshots
 (\texttt{matrix-\{C,D,E,F\}-fullschema.sqlite} and the
 \texttt{-fullschema} JSONL, report and audit trails, evidence of the
 arm pre-registered in

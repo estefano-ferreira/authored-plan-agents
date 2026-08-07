@@ -1007,6 +1007,137 @@ pre-registration itself: the boundary code runs only on the generation
 step, which the no-generation plan never reaches, so the control cell
 is unaffected by construction and was not repeated under this arm.
 
+## Extractor and natural-violation cells G–J (2026-08-07)
+
+**Questions.** Two gaps the v0.5.0 review round and the paper's own
+limitations left named but unrun. (1) M1 (external review): this study
+had measured only an *absorbing* repairer (`TolerantRepairClient`) —
+what does a genuine fence-stripping extractor do in the same position?
+(2) The design's longest-standing admitted gap: the no-schema/no-fault
+arm — the model's *natural* violation behavior under each boundary
+policy — had never run as a matrix cell; the pre-matrix incident round
+covered only its tolerant half, and that round's raw file is lost
+(aggregates only, see § Structured output correction).
+
+**Pre-registrations, both committed before their instrument or cells
+existed.** `docs/preregistration-extractor-repair-cells.md` (cells G/H,
+committed before `ExtractorRepairClient` existed) and
+`docs/preregistration-natural-violation-cells.md` (cells I/J, committed
+before the runner change — pure configuration addition, no new
+instrument). Both carry a "what the code already determines" section
+written before any prediction, per the discipline adopted in the
+2026-08-07 erratum.
+
+**Instrument (cells G/H only).** `ExtractorRepairClient`
+(`src/infrastructure/providers/extractor_repair_client.py`) mirrors the
+practitioner "code fence removal" strategy and nothing else: for
+`purpose == "generation"` responses whose content matches a single
+markdown fence envelope (optional language tag,
+`^\s*```[a-zA-Z]*\n(.*)\n```\s*$`, single pass, no recursion), it
+replaces the content with the captured inner text and records one
+repair; anything else — bare JSON, prose, a double-fenced envelope's
+outer layer once stripped — passes through unchanged. No JSON parsing,
+no absorption, no field-stuffing: deliberately narrower than
+`TolerantRepairClient`. Cells I/J needed no new instrument — only the
+existing `strip_response_schema` / `inject_generation_fault` /
+`tolerant_repair` flags, with the injector left off.
+
+**Cells, 10 reps each, `gemini-3.1-flash-lite`, baseline evidence
+namespace (no suffix — new cells, not a re-run).**
+
+| | configuration | status | contract v/r/f | repairs | ERP rows | valid | garbage | cost/10 reps |
+|---|---|---|---|---|---|---|---|---|
+| **G** | schema + fault + extractor | `completed` 10/10 | 0/0/0 | 10 | 10 | 10 | 0 | $0.002476 |
+| **H** | no schema + fault + extractor | `failed_clean` 8/10, `completed` 2 | 9/9/8 | 19 | 2 | 2 | 0 | $0.004915 |
+| **I** | no schema, no injector, tolerant | `completed` 10/10 | 0/0/0 | 10 | 10 | **0** | **10** | $0.002955 |
+| **J** | no schema, no injector, strict | `failed_clean` 9/10, `completed` 1 | 10/10/9 | 0 | 1 | 1 | 0 | $0.005003 |
+
+(tokens_out: G 1002, H 2518, I 1321, J 2566 — per-execution figures are
+in the tracked JSONL, not restated beyond what distinguishes the cells.)
+
+**Readings, per the registered branches.**
+
+- **Cell G — Branch A materialized.** `completed` 10/10, contract
+  counters 0/0/0, 10 repairs, all ten rows valid — determined
+  conditional on decoding conformity (the schema is active, the
+  injector adds one fence, a single-pass extractor removes exactly that
+  layer, the recovered content passes full validation) and reported as
+  a **verification**, per the pre-registration's own framing: this is
+  the branch that forces the study to publish the strongest honest
+  version of M1's objection against its own headline economics. The
+  registered consequence, stated in the pre-registration's own words:
+  the sentence "the alternative to refusal was not recovery; it was
+  corruption" becomes *repairer-specific* — true for the absorbing
+  fallback, false for a genuine extractor under an injected single
+  fence. Telemetry blindness is *not* weakened (P2 holds — the counters
+  read zero in G exactly as in every absorbing-repair cell) but the
+  *economic* case for strict-over-repair narrows to: what the guard buys
+  is not superiority over any repair, it is typed visibility; a correct
+  extractor beats both on availability while keeping the counters
+  equally blind.
+- **Cell H — Branch C, reported as measured.** `failed_clean` 8/10 (2
+  `completed`), contract counters 9/9/8, 19 repairs, 2 rows (both
+  valid). The registered P1 (`failed_clean` ≥ 8/10) held **exactly at
+  the threshold**. Mechanics, all code-coherent: 8 repetitions
+  double-fenced on *both* attempts — the model self-fences its own
+  response (implied self-fencing rate 9/10 on first attempts, matching
+  the historical 10/10 under a different round), the injector adds a
+  second layer, a single-pass extractor strips exactly one layer, the
+  guard refuses the still-fenced remainder on both the first attempt
+  and the identical retry — 2 repairs × 8 repetitions = 16; one
+  repetition recovered on retry (2 repairs: first attempt double-fenced
+  and stripped once, extractor-reduced content still failed, retry's
+  response was single-fenced and fully recovered); one repetition
+  recovered on the first attempt (1 repair, single-fenced from the
+  start). **16 + 2 + 1 = 19**, the recorded repair count exactly.
+- **Cell I — natural rate 10/10, Branch A, fourth instance of
+  Proposition 1.** `completed` 10/10, contract counters 0/0/0, 10
+  repairs, ten rows, **zero** valid — single-fenced JSON blobs by
+  direct SQL, produced with **no injector anywhere in the pipeline**.
+  This is the incident round's originating shape, replicated under
+  tracked evidence at this date: the lost baseline's surviving
+  aggregates (10/10 fenced, § Real-model findings) are no longer the
+  only record of this phenomenon. Per the paper's instance-counting
+  rule (a distinct (decoding condition, boundary strength) configuration
+  exhibiting the blindness signature), cell I is the **fourth** observed
+  instance, and the first produced by purely natural violations.
+- **Cell J — natural rate 10/10, Branch A, one natural retry
+  recovery.** `failed_clean` 9/10 (1 `completed`), contract counters
+  10/10/9, zero repairs, one row (valid). Natural first-attempt
+  violations: 10/10 — matching I's rate exactly. Nine repetitions ended
+  typed-failed after the retry also violated; the tenth recovered on
+  retry: the model returned bare JSON on the second, identical call.
+  The honest nuance, stated per the pre-registration's own framing:
+  under the injector (cells B/F/H) the retry is doomed by construction,
+  because the injector re-fences every attempt including the retry;
+  under a *natural* violation nothing forces the second attempt to
+  repeat the first's envelope, and here, once, it did not.
+
+**Combined natural first-attempt violation rate across I and J: 20/20.**
+This replicates the originating incident round's 10/10 under tracked,
+inspectable evidence, retiring the study's reliance on the lost
+baseline's surviving aggregates for this specific claim — the loss
+itself stays disclosed (§ Structured output correction), not retracted.
+
+**Factorial coverage after these cells.** The (decoding × fault-source)
+grid is now complete for the absorbing and strict boundary policies:
+A/B, C/D (natural, schema), E/F (injected, schema), I/J (natural,
+no-schema) all measured; the original admission "the fault arm
+co-varies with the decoding axis" (§ Experimental design) is resolved.
+The extractor policy column carries only injected-fault cells (G/H) —
+**extractor-under-natural-violations remains the one unmeasured cell in
+the whole design.**
+
+**Evidence** (tracked under `results/integrity-matrix/`, baseline
+namespace — no evidence suffix): appended to `integrity_matrix.jsonl`
+and `integrity_matrix_report.json`, snapshots `matrix-{G,H,I,J}.sqlite`,
+audit trails `audit-matrix-{G,H,I,J}-<ts>.jsonl`. `verify_costs.py`:
+**243/243** recorded costs reproduced exactly. Test suite: **35 passed,
+7 xfailed** (the extractor unit tests for `ExtractorRepairClient` —
+single fence with/without language tag, pass-through for bare JSON,
+double-fenced content and prose, repair counting — account for the
+growth from 27).
+
 ## Cross-model family arm — gpt-4o-mini, cells A and B (2026-08-06)
 
 The family-diversity arm of the pre-registered cross-model run
