@@ -728,19 +728,37 @@ def _run_measurement_mode(args) -> int:
 #     `var/erp/matrix-<cell>-<slug>.sqlite`, `audit-matrix-<cell>-<slug>-<ts>.jsonl` -- landing
 #     beside the baseline evidence rather than resuming into or overwriting it. The baseline model
 #     itself is unaffected: its paths stay exactly as they always were.
+#   - Evidence suffix (optional, env `MATRIX_EVIDENCE_SUFFIX`): unset/empty -- everything above is
+#     unchanged (see `_matrix_evidence_suffix`, which returns `None` in that case). Set to a
+#     non-empty string (e.g. "fullschema"): sanitized to a filesystem-safe slug (lowercased,
+#     `[a-z0-9_-]` only) and layered onto every evidence path from `_matrix_evidence_paths` --
+#     jsonl, report, per-cell SQLite path (`_matrix_erp_path`), Postgres database name
+#     (`_matrix_pg_db_name`), and the audit trail -- exactly like the model slug and the `-pg`
+#     suffix below are, so a suffixed run's records land beside, never over, whatever evidence
+#     already exists for the same (cell, model). This is the generic mechanism a distinct
+#     experimental arm (e.g. a strengthened boundary check re-run against the same model and
+#     cells) uses to get its own evidence namespace without being special-cased into the runner --
+#     see docs/preregistration-boundary-schema-validation.md for its first use, with suffix
+#     "fullschema". Honored by `--matrix-report-only` too (`_run_matrix_report_only`).
+#   - Layering order when more than one of the above applies: model slug first, then the evidence
+#     suffix, then Postgres `-pg` last -- e.g. non-baseline model + evidence suffix + Postgres:
+#     `integrity_matrix-<model-slug>-<evidence-suffix>-pg.jsonl`. Baseline model with neither the
+#     evidence suffix nor Postgres set: byte-identical to the original, suffix-free paths.
 #   - Postgres ERP (optional, env `MATRIX_ERP_DATABASE_URL`): unset -- everything above is
 #     unchanged (per-cell SQLite, as always). Set to a server URL (e.g.
 #     `postgresql+psycopg://erp:erp@127.0.0.1:5433/erp`, matching the `postgres-erp` compose
-#     service): each (cell, model) pair gets isolated onto its own *database* on that server
-#     instead of its own SQLite file -- `matrix_<cell>` plus `_<model-slug>` for any non-baseline
-#     model, sanitized to `[a-z0-9_]` (see `_matrix_pg_db_name`) -- created fresh (DROP DATABASE IF
-#     EXISTS + CREATE DATABASE) at the same "cell has zero recorded reps" moment the SQLite branch
-#     deletes its file, and never dropped again once reps are on record. Every evidence path
-#     additionally gains a `-pg` suffix layered onto the scheme above (see `_matrix_evidence_paths`),
-#     so Postgres-backed evidence always lands beside, never over, SQLite-backed evidence for the
-#     same (cell, model). After a cell's reps complete, its live Postgres tables are exported into a
-#     SQLite snapshot at `var/erp/matrix-<cell>[-slug]-pg.sqlite` (see `_matrix_export_pg_snapshot`)
-#     so the tracked-evidence format stays uniform regardless of which engine actually ran the cell.
+#     service): each (cell, model[, evidence suffix]) triple gets isolated onto its own *database*
+#     on that server instead of its own SQLite file -- `matrix_<cell>` plus `_<model-slug>` for any
+#     non-baseline model plus `_<evidence-suffix>` when set, sanitized to `[a-z0-9_]` (see
+#     `_matrix_pg_db_name`) -- created fresh (DROP DATABASE IF EXISTS + CREATE DATABASE) at the
+#     same "cell has zero recorded reps" moment the SQLite branch deletes its file, and never
+#     dropped again once reps are on record. Every evidence path additionally gains a `-pg` suffix
+#     layered onto the scheme above (see `_matrix_evidence_paths`), so Postgres-backed evidence
+#     always lands beside, never over, SQLite-backed evidence for the same (cell, model[, evidence
+#     suffix]). After a cell's reps complete, its live Postgres tables are exported into a SQLite
+#     snapshot at `var/erp/matrix-<cell>[-slug][-evidence-suffix]-pg.sqlite` (see
+#     `_matrix_export_pg_snapshot`) so the tracked-evidence format stays uniform regardless of
+#     which engine actually ran the cell.
 # --------------------------------------------------------------------------------------
 
 _MATRIX_CELLS = ("A", "B", "C", "D", "control", "E", "F")
@@ -816,29 +834,54 @@ def _matrix_model_slug(model_id: str) -> str:
     return re.sub(r"[^a-z0-9.-]+", "-", model_id.lower())
 
 
-def _matrix_evidence_paths(model_id: str, pg: bool = False) -> dict:
+_MATRIX_EVIDENCE_SUFFIX_RE = re.compile(r"[^a-z0-9_-]+")
+
+
+def _matrix_evidence_suffix() -> str | None:
+    """`MATRIX_EVIDENCE_SUFFIX`, lowercased and sanitized to `[a-z0-9_-]` (runs of any other
+    character collapsed to `-`, then stripped from the ends), or `None` when unset, empty, or
+    sanitized down to nothing -- mirrors `_matrix_erp_database_url`'s "None when unset/empty"
+    style. The single switch for the generic evidence-suffix mechanism (see the "Evidence suffix"
+    mechanics bullet above): layered onto every evidence path by `_matrix_evidence_paths`, exactly
+    like a non-baseline model slug or the Postgres `-pg` suffix already are."""
+    raw = os.environ.get("MATRIX_EVIDENCE_SUFFIX", "").strip().lower()
+    if not raw:
+        return None
+    slug = _MATRIX_EVIDENCE_SUFFIX_RE.sub("-", raw).strip("-")
+    return slug or None
+
+
+def _matrix_evidence_paths(model_id: str, pg: bool = False, evidence_suffix: str | None = None) -> dict:
     """The JSONL/report paths this run's evidence should land at, plus the slug (or None) used to
     derive them. `model_id == _MATRIX_BASELINE_MODEL`: unchanged baseline paths -- full backward
     compatibility. Any other `model_id`: every path suffixed `-{slug}`, landing beside the
-    baseline evidence rather than overwriting or resuming into it. `pg=True` (Postgres ERP active
-    -- env `MATRIX_ERP_DATABASE_URL`, see the "Postgres ERP" mechanics bullet above) layers a
-    further `-pg` suffix onto whichever of the two path schemes above applies, so Postgres-backed
-    evidence never resumes into or overwrites SQLite-backed evidence for the same model. Default
-    `pg=False`: byte-identical to before this parameter existed."""
+    baseline evidence rather than overwriting or resuming into it. `evidence_suffix` given (env
+    `MATRIX_EVIDENCE_SUFFIX`, see `_matrix_evidence_suffix` and the "Evidence suffix" mechanics
+    bullet above) layers a further `-{evidence_suffix}` suffix onto whichever of the two path
+    schemes above applies. `pg=True` (Postgres ERP active -- env `MATRIX_ERP_DATABASE_URL`, see
+    the "Postgres ERP" mechanics bullet above) layers a final `-pg` suffix on top of that. Layering
+    order: model slug, then evidence suffix, then `-pg` -- matching the "Layering order" mechanics
+    bullet above. So Postgres-backed and/or suffixed evidence never resumes into or overwrites
+    evidence for the same model without that suffix. Default `pg=False, evidence_suffix=None`:
+    byte-identical to before either parameter existed."""
     if model_id == _MATRIX_BASELINE_MODEL:
         jsonl, report, slug = _MATRIX_JSONL_PATH, _MATRIX_REPORT_PATH, None
     else:
         slug = _matrix_model_slug(model_id)
         jsonl = _MATRIX_DIR / f"integrity_matrix-{slug}.jsonl"
         report = _MATRIX_DIR / f"integrity_matrix_report-{slug}.json"
+    if evidence_suffix:
+        jsonl = jsonl.with_name(f"{jsonl.stem}-{evidence_suffix}{jsonl.suffix}")
+        report = report.with_name(f"{report.stem}-{evidence_suffix}{report.suffix}")
     if pg:
         jsonl = jsonl.with_name(f"{jsonl.stem}-pg{jsonl.suffix}")
         report = report.with_name(f"{report.stem}-pg{report.suffix}")
     return {"jsonl": jsonl, "report": report, "slug": slug}
 
 
-def _matrix_erp_path(cell: str, slug: str | None = None, pg: bool = False) -> Path:
+def _matrix_erp_path(cell: str, slug: str | None = None, pg: bool = False, evidence_suffix: str | None = None) -> Path:
     suffix = f"-{slug}" if slug else ""
+    suffix += f"-{evidence_suffix}" if evidence_suffix else ""
     suffix += "-pg" if pg else ""
     return _MATRIX_ERP_DIR / f"matrix-{cell}{suffix}.sqlite"
 
@@ -858,12 +901,15 @@ def _matrix_erp_database_url() -> str | None:
     return os.environ.get("MATRIX_ERP_DATABASE_URL") or None
 
 
-def _matrix_pg_db_name(cell: str, slug: str | None) -> str:
-    """Per-(cell, model) Postgres database name: `matrix_<cell>`, plus `_<slug>` for any
-    non-baseline model (mirrors the SQLite path's per-model suffixing) -- e.g. cell "A" + slug
-    "gpt-4o-mini" -> "matrix_a_gpt_4o_mini". Sanitized to `[a-z0-9_]`, the safe subset of Postgres
-    identifier characters that never needs quoting or escaping."""
-    raw = f"matrix_{cell}" + (f"_{slug}" if slug else "")
+def _matrix_pg_db_name(cell: str, slug: str | None, evidence_suffix: str | None = None) -> str:
+    """Per-(cell, model[, evidence suffix]) Postgres database name: `matrix_<cell>`, plus
+    `_<slug>` for any non-baseline model (mirrors the SQLite path's per-model suffixing), plus
+    `_<evidence_suffix>` when the generic evidence-suffix mechanism is active (env
+    `MATRIX_EVIDENCE_SUFFIX`, see `_matrix_evidence_suffix` -- mirrors the model slug's
+    suffixing, applied after it) -- e.g. cell "A" + slug "gpt-4o-mini" + evidence_suffix
+    "fullschema" -> "matrix_a_gpt_4o_mini_fullschema". Sanitized to `[a-z0-9_]`, the safe subset
+    of Postgres identifier characters that never needs quoting or escaping."""
+    raw = f"matrix_{cell}" + (f"_{slug}" if slug else "") + (f"_{evidence_suffix}" if evidence_suffix else "")
     return _MATRIX_PG_DB_NAME_RE.sub("_", raw.lower())
 
 
@@ -1160,7 +1206,8 @@ def _run_matrix_cell_mode(args) -> int:
 
     model_id = _matrix_effective_model_id(args.provider)
     pg_base_url = _matrix_erp_database_url()
-    evidence = _matrix_evidence_paths(model_id, pg=pg_base_url is not None)
+    evidence_suffix = _matrix_evidence_suffix()
+    evidence = _matrix_evidence_paths(model_id, pg=pg_base_url is not None, evidence_suffix=evidence_suffix)
     jsonl_path, report_path, slug = evidence["jsonl"], evidence["report"], evidence["slug"]
 
     all_records = _load_matrix_records(jsonl_path)
@@ -1170,9 +1217,9 @@ def _run_matrix_cell_mode(args) -> int:
 
     erp_path = pg_db_name = pg_cell_url = snapshot_path = None
     if pg_base_url is not None:
-        pg_db_name = _matrix_pg_db_name(cell, slug)
+        pg_db_name = _matrix_pg_db_name(cell, slug, evidence_suffix)
         pg_cell_url = _matrix_pg_cell_url(pg_base_url, pg_db_name)
-        snapshot_path = _matrix_erp_path(cell, slug, pg=True)
+        snapshot_path = _matrix_erp_path(cell, slug, pg=True, evidence_suffix=evidence_suffix)
         erp_database_url = pg_cell_url
         erp_engine = "postgres"
         erp_display = f"db={pg_db_name} url={_matrix_pg_url_display(pg_cell_url)}"
@@ -1182,7 +1229,7 @@ def _run_matrix_cell_mode(args) -> int:
             # never dropped by this script again.
             _matrix_pg_ensure_fresh_database(pg_base_url, pg_db_name)
     else:
-        erp_path = _matrix_erp_path(cell, slug)
+        erp_path = _matrix_erp_path(cell, slug, evidence_suffix=evidence_suffix)
         erp_database_url = f"sqlite:///{erp_path.as_posix()}"
         erp_engine = "sqlite"
         erp_display = str(erp_path)
@@ -1216,6 +1263,7 @@ def _run_matrix_cell_mode(args) -> int:
 
     run_tag = datetime.now().strftime("%Y%m%d-%H%M%S")
     audit_suffix = f"-{slug}" if slug else ""
+    audit_suffix += f"-{evidence_suffix}" if evidence_suffix else ""
     audit_suffix += "-pg" if pg_base_url is not None else ""
     audit_path = _VAR_DIR / f"audit-matrix-{cell}{audit_suffix}-{run_tag}.jsonl"
 
@@ -1258,8 +1306,11 @@ def _run_matrix_report_only(model_id: str | None = None) -> int:
     cell's ERP SQLite file, for every cell with at least one recorded rep. No model calls, no ERP
     calls, no Platform built at all. `model_id` is `None` (default -- baseline paths, unchanged
     behavior) unless `--matrix-model` was given, in which case it recomposes that model's own
-    suffixed report from its own suffixed JSONL instead."""
-    evidence = _matrix_evidence_paths(model_id or _MATRIX_BASELINE_MODEL)
+    suffixed report from its own suffixed JSONL instead. Also honors the generic evidence-suffix
+    mechanism (env `MATRIX_EVIDENCE_SUFFIX`, see `_matrix_evidence_suffix`): when set, recomposes
+    the suffixed report from the suffixed JSONL instead, same as `_run_matrix_cell_mode` does."""
+    evidence_suffix = _matrix_evidence_suffix()
+    evidence = _matrix_evidence_paths(model_id or _MATRIX_BASELINE_MODEL, evidence_suffix=evidence_suffix)
     jsonl_path, report_path, slug = evidence["jsonl"], evidence["report"], evidence["slug"]
 
     records = _load_matrix_records(jsonl_path)
@@ -1269,7 +1320,9 @@ def _run_matrix_report_only(model_id: str | None = None) -> int:
     cells = sorted({r["cell"] for r in records})
     for cell in cells:
         cell_records = [r for r in records if r["cell"] == cell]
-        _write_matrix_cell_report(cell, cell_records, report_path, _matrix_erp_path(cell, slug))
+        _write_matrix_cell_report(
+            cell, cell_records, report_path, _matrix_erp_path(cell, slug, evidence_suffix=evidence_suffix)
+        )
         print(f"[run_plans] recomposed report for cell={cell} ({len(cell_records)} record(s))")
     print(f"[run_plans] wrote {report_path}")
     return 0

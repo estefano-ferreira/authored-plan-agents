@@ -10,7 +10,11 @@ stripping, no tolerant fallback). A violation is retried exactly once against th
 schema (`retry_once_then_fail`); a second violation raises `OutputContractViolation` and nothing is
 persisted downstream -- see NOTES.md "Real-model findings" for the measurement that motivated this
 (100% of real-model generations came back valid-JSON-in-markdown-fences, silently absorbed by the
-old tolerant parser into truncated ERP `summary` rows).
+old tolerant parser into truncated ERP `summary` rows). Upgraded 2026-08-07, per
+`docs/preregistration-boundary-schema-validation.md`: the boundary now validates the complete
+declared `_RESPONSE_SCHEMA` -- object shape, exact key set (`additionalProperties: false`), string
+types for all three values, and the `request_type` enum -- not just decode-shape (`json.loads`,
+dict, required keys present).
 """
 import json
 
@@ -80,9 +84,9 @@ def interpret_and_draft(ctx, payload: dict) -> dict:
 
     `ctx` is the ToolContext (has `.model`, `.audit` and `.context_builder`); `payload` is the full
     step payload, including `results['read']` with the email read by the previous step. Generation
-    is constrained by `_RESPONSE_SCHEMA` and parsed strictly (`_parse_strict`); a violation is
-    retried once against the identical prompt and schema before raising `OutputContractViolation`
-    (see module docstring).
+    is constrained by `_RESPONSE_SCHEMA` and parsed against the complete declared schema
+    (`_parse_strict`); a violation is retried once against the identical prompt and schema before
+    raising `OutputContractViolation` (see module docstring).
     """
     email = payload.get("results", {}).get("read", {})
     if payload.get("mode") == "correction":
@@ -141,17 +145,44 @@ def _audit_output_contract(ctx, detail: dict) -> None:
 
 
 def _parse_strict(content: str) -> dict:
-    """Strict decode-level parse: `json.loads` only -- no markdown-fence stripping, no tolerant
-    fallback. Raises ValueError (treated by the caller as an output-contract violation) if the
-    content is not valid JSON, is not an object, or is missing any of `_RESPONSE_SCHEMA`'s
-    required keys."""
+    """Full validation of the declared `_RESPONSE_SCHEMA`: decode, object shape, exact key set,
+    string types, enum -- no markdown-fence stripping, no tolerant fallback. Every check is
+    derived from `_RESPONSE_SCHEMA` itself (no duplicated literals). Raises ValueError (treated by
+    the caller as an output-contract violation), checked in order:
+
+    1. `content` is not valid JSON;
+    2. the decoded value is not a JSON object (dict);
+    3. a required key (`_RESPONSE_SCHEMA["required"]`) is missing;
+    4. a key not declared in `_RESPONSE_SCHEMA["properties"]` is present (enforces
+       `additionalProperties: false`);
+    5. a declared key's value is not a `str`;
+    6. `request_type`'s value is outside `_RESPONSE_SCHEMA["properties"]["request_type"]["enum"]`.
+    """
     try:
         data = json.loads(content)
     except (ValueError, TypeError) as exc:
         raise ValueError(f"not valid JSON: {exc}") from exc
     if not isinstance(data, dict):
         raise ValueError("parsed content is not a JSON object")
-    missing = [key for key in _RESPONSE_SCHEMA["required"] if key not in data]
+
+    properties = _RESPONSE_SCHEMA["properties"]
+    required = _RESPONSE_SCHEMA["required"]
+
+    missing = [key for key in required if key not in data]
     if missing:
         raise ValueError(f"missing required keys: {missing}")
+
+    unexpected = [key for key in data if key not in properties]
+    if unexpected:
+        raise ValueError(f"unexpected keys: {unexpected}")
+
+    for key in properties:
+        value = data[key]
+        if not isinstance(value, str):
+            raise ValueError(f"key {key} is not a string: {type(value)}")
+
+    enum = properties["request_type"]["enum"]
+    if data["request_type"] not in enum:
+        raise ValueError(f"request_type not in enum: {data['request_type']!r}")
+
     return data

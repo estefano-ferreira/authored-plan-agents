@@ -14,12 +14,12 @@ markdown-fences, silently absorbed into truncated ERP `summary` rows).
 This decorator wraps any `IModelClient` and, for `purpose == "generation"` calls only,
 re-implements exactly that substitution at the RESPONSE boundary. It does NOT touch the strict
 parser in `ai/` (which still runs, unmodified, downstream, on whatever content it receives) -- it
-just hands that parser a replacement `content` string that its `json.loads`-only check will
-always accept (all three of the strict guard's required keys are present by construction). The
-result is that the strict guard "sees" a conforming response and lets the tolerant fallback's
-garbage ride through it exactly as it did before the guard existed -- this is the whole point:
-proving that the guard, on its own, cannot tell a byte-faithful replica of the historical fallback
-from a genuinely well-formed generation.
+just hands that parser a replacement `content` string that passes even FULL validation of the
+declared schema by construction: `request_type` is an enum member, both other values are strings,
+and exactly the three declared keys are present. The result is that the strict guard "sees" a
+conforming response and lets the tolerant fallback's garbage ride through it exactly as it did
+before the guard existed -- this is the whole point: proving that the guard, on its own, cannot
+tell a byte-faithful replica of the historical fallback from a genuinely well-formed generation.
 
 Used by the integrity matrix (scripts/run_plans.py --matrix-cell) to build the "guard would have
 accepted the old fallback's garbage" cells (A and C) on demand. Measurement-only tooling: NEVER
