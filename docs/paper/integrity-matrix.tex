@@ -32,6 +32,10 @@
 %       responses into downstream fields. Author list (Wei Wu, sole
 %       author) confirmed on the arXiv abstract page in two independent
 %       fetches. Citation upgraded accordingly.
+%   - AgentTelemetry [10]: numbers verified across OpenReview/ACM
+%       metadata (two sources); author attribution (K. C. Balusu) from
+%       search metadata only -- ACM page bot-walled, dblp truncated
+%       before the benchmark track. Confidence noted, 2026-08-07.
 %   - Verified by direct fetch, 2026-08-06: Microsoft's STATE-Bench blog
 %       post -- the deterministic-scorer sentence quoted in Related work
 %       is verbatim. GroundEval cited at title level (title verified on
@@ -806,9 +810,10 @@ model-call logs, inspectable from a fresh clone.
 follow from the measurements, stated as requirements the findings
 support rather than as a new architecture. First, an output-contract
 guard on the business write path is an architectural requirement, not an
-optimization: its measured idle cost is zero and its per-violation price
-is one model call, so omitting it buys nothing and forfeits the only
-loud-failure path this study observed. Second, platform-side telemetry
+optimization: its idle cost was measured at zero in the tested
+configuration (a bounded observation, \S\ref{sec:limits}) and its
+per-violation price is one model call, so omitting it saves nothing
+measurable and forfeits the only loud-failure path this study observed. Second, platform-side telemetry
 must not be treated as integrity evidence --- audit has to read the
 system of record, because the configuration in which every instrument
 agrees and is wrong is demonstrated, named, and cheap to produce.
@@ -889,8 +894,9 @@ agent evaluation.
 \newblock arXiv:2606.22737, 2026.
 
 \bibitem{agenttelemetry2026}
-{AgentTelemetry}: A fault detection benchmark and toolkit for {LLM}
-agent observability.
+K.~C. Balusu.
+\newblock {AgentTelemetry}: A fault detection benchmark and toolkit for
+{LLM} agent observability.
 \newblock In {\em Proceedings of the 3rd ACM International Conference on
 AI-Powered Software}, 2026.
 
