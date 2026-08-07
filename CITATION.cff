@@ -7,8 +7,9 @@ authors:
   - family-names: "Senhor Ferreira"
     given-names: "Estefano"
     email: "estefano.senhor@gmail.com"
-date-released: "2026-08-06"
+date-released: "2026-08-07"
 version: "0.4.0"
+repository-code: "https://github.com/estefano-ferreira/authored-plan-agents"
 keywords:
   - LLM agents
   - agent orchestration
@@ -21,22 +22,24 @@ keywords:
 abstract: >
   Reference implementation of an architectural pattern for LLM agent platforms
   in which non-determinism is confined to selection and generation, never to
-  sequence, with a restriction-enforcing test suite and four rounds of
-  real-model measurement over a persisted external system of record. Central
-  measured finding: telemetry blindness -- every platform-side observer
-  reports success while the business database holds corrupted state --
-  demonstrated across four model configurations (including an open-weights
-  arm with full boundary samples), two system-of-record engines (SQLite,
-  PostgreSQL) and two decoding conditions,
-  including a pre-registered follow-up whose opposite prediction the data
-  falsified (fence-stripping repair absorbs rather than extracts). Decoding-
-  level structured output suppressed every natural violation measured
-  (bounded observations, not elimination claims); the architectural output-
-  contract guard is what keeps the channel closed when that mechanism
-  silently breaks, at zero measured idle cost. Selection at catalog scale:
-  ambiguity behaves as a floor across the measured range rather than a
-  catalog-size slope (small cells; qualitative reading), out-of-catalog
-  refusal showed zero errors on its probes with stated bounds, and the
-  id-only selection contract's robustness proved to be a model-family
-  property, not a task property. Every absence claim is search- and
-  time-bound; falsified predictions are part of the record.
+  sequence, with a restriction-enforcing test suite and successive rounds of
+  pre-registered real-model measurement over a persisted external system of
+  record. Central measured finding: telemetry blindness -- every
+  platform-side observer reports success while the business database holds
+  corrupted state -- demonstrated across four model configurations (including
+  an open-weights arm with full boundary samples), two system-of-record
+  engines (SQLite, PostgreSQL) and two decoding conditions. Three of the
+  study's own expectations were corrected by pre-registered measurement:
+  fence-stripping repair absorbs rather than recovers valid content; id-only
+  selection-format robustness is a model-family property, not a task
+  property; and the ambiguity floor in LLM plan selection is attributable to
+  the model, not the evaluation set (a paired embedding baseline scores
+  27/28 on the same ambiguous intents, narrowing the LLM selection layer's
+  measured justification to typed out-of-catalog refusal). Decoding-level
+  structured output suppressed every natural violation measured (bounded
+  observations, not elimination claims); the architectural output-contract
+  guard is what keeps the channel closed when that mechanism silently
+  breaks, at zero measured idle cost and one extra model call per violation.
+  Every recorded cost re-derives exactly from token counts and the committed
+  pricing table; every absence claim is search- and time-bound; falsified
+  predictions are part of the record.
