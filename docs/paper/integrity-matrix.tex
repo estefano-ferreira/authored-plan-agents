@@ -32,6 +32,12 @@
 %       responses into downstream fields. Author list (Wei Wu, sole
 %       author) confirmed on the arXiv abstract page in two independent
 %       fetches. Citation upgraded accordingly.
+%   - Verified by direct fetch, 2026-08-06: Microsoft's STATE-Bench blog
+%       post -- the deterministic-scorer sentence quoted in Related work
+%       is verbatim. GroundEval cited at title level (title verified on
+%       arXiv listing; full text unread -- claims kept to the title).
+%       "Error hiding" cited as the encyclopedic anti-pattern entry, no
+%       verbatim quotes.
 %
 % CONSISTENCY CHECKLIST -- rerun this whole list whenever evidence or
 % cell counts change; every past propagation failure was one of these:
@@ -176,9 +182,15 @@ enforcement crossed with boundary repair policy, a fault injector in the
 unconstrained column and (pre-registered) downstream of the active
 schema, and a shared control arm --- with ground truth read
 from a persisted external system of record. The design is not a complete
-factorial (\S\ref{sec:design}); what this measurement adds is the
-database-grounded reading: outcomes judged against rows in the business
-store rather than against agent reports or platform telemetry.
+factorial (\S\ref{sec:design}). State-grounded scoring itself is
+established practice --- deterministic evaluation against the persisted
+environment is how STATE-Bench scores state-mutating
+tasks~\cite{statebench2026} and what GroundEval provides as an
+LLM-judge replacement~\cite{groundeval2026}; what this comparison adds
+is the \emph{question} asked of that ground truth: not whether the
+agent reached the correct final state, but what each boundary policy
+did to the \emph{content} of the records it persisted --- a mechanism
+ablation reading record quality row by row, priced on both sides.
 (2)~The measured finding that \emph{tolerant repair conceals rather than
 repairs}, and specifically that it blinds the platform's own integrity
 counters --- the audit trail records zero violations in the cell that
@@ -677,6 +689,19 @@ transaction committed, content wrong. The analogy is claimed for the
 gap only: nothing in this paper provides atomicity, isolation, or
 durability.
 
+\paragraph{State-grounded evaluation.} Judging agents against persisted
+state rather than their own reports is established: STATE-Bench's
+deterministic scorer ``compares the final environment state to ground
+truth'' for state-mutating tasks over a pre-populated database of
+business artifacts~\cite{statebench2026}, and GroundEval is, by its own
+title, a deterministic replacement for LLM-as-judge in stateful agent
+evaluation~\cite{groundeval2026}. Both ask whether the agent reached
+the correct state --- task scoring. This paper asks a different question
+of the same ground truth: what each boundary policy did to the content
+of the records it persisted. The source of truth is shared inheritance;
+the mechanism ablation over record quality is what this measurement
+adds.
+
 \paragraph{Gray failure and differential observability.} The systems
 literature named the observability structure underneath our finding in
 2017: a system experiences \emph{gray failure} ``when at least one app
@@ -706,6 +731,19 @@ is absorbed upstream and every observer honestly reads success.
 Otherwise, the
 difference is method --- taxonomy drawn from a production runtime
 there, controlled measurement of one mechanism here.
+
+\paragraph{Error hiding.} The absorption step is family-adjacent to the
+classic error-hiding (error-swallowing) anti-pattern --- catching a
+failure and continuing without recording it~\cite{errorhiding} --- and
+the practitioner literature already states that anti-pattern's
+observational consequence on the availability axis: an API that answers
+200 for failures keeps availability dashboards green. The distinction
+Proposition~1 rests on is one level deeper: in error hiding an error
+occurs and is swallowed; in the measured absorption \emph{no error
+occurs at the absorbing step} --- the repair succeeds by its own
+contract and its counter records successes. Telemetry blindness
+requires no swallowed exception anywhere in the pipeline; this is the
+same no-fabrication move drawn against fail-plausible above.
 
 \paragraph{Durable execution.} Temporal-style runtimes and the agent
 checkpointers built on them guarantee that an \emph{execution} completes,
@@ -773,7 +811,7 @@ round, \texttt{run-20260727-215811.json}). One caveat carried from
 pre-versioning cleanup; its aggregates survive in the repository's study
 log.
 
-\begin{thebibliography}{9}
+\begin{thebibliography}{12}
 
 \bibitem{haerder1983}
 T.~H\"arder and A.~Reuter.
@@ -814,6 +852,20 @@ J.~Rhodes and G.~Kang.
 \newblock Proof of execution: Runtime verification for governed {AI}
 agent actions.
 \newblock arXiv:2607.05397, 2026.
+
+\bibitem{statebench2026}
+Microsoft.
+\newblock Introducing {STATE-Bench}: A benchmark for {AI} agent memory.
+\newblock Microsoft Open Source Blog, 2026-05-19. Accessed 2026-08-06.
+
+\bibitem{groundeval2026}
+{GroundEval}: A deterministic replacement for {LLM}-as-judge in stateful
+agent evaluation.
+\newblock arXiv:2606.22737, 2026.
+
+\bibitem{errorhiding}
+Error hiding.
+\newblock Wikipedia. Accessed 2026-08-06.
 
 \bibitem{huang2017}
 P.~Huang, C.~Guo, L.~Zhou, J.~R. Lorch, Y.~Dang, M.~Chintalapati, and
