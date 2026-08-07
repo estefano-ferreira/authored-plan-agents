@@ -15,6 +15,9 @@ identifiers:
     value: "10.5281/zenodo.21831454"
     description: "Concept DOI (cites all versions)"
   - type: doi
+    value: "10.5281/zenodo.21842518"
+    description: "Version DOI (v0.6.1)"
+  - type: doi
     value: "10.5281/zenodo.21831455"
     description: "Version DOI (v0.4.0)"
 repository-code: "https://github.com/estefano-ferreira/authored-plan-agents"

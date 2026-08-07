@@ -356,13 +356,13 @@ is in [`NOTES.md`](NOTES.md).
 
 Archived at Zenodo — concept DOI
 [`10.5281/zenodo.21831454`](https://doi.org/10.5281/zenodo.21831454)
-(all versions) · last archived version (v0.4.0):
-[`10.5281/zenodo.21831455`](https://doi.org/10.5281/zenodo.21831455).
-Version DOIs for v0.4.1 (erratum release), v0.5.0 (full-schema
-boundary arm) v0.6.0 (extractor and natural-violation cells) and v0.6.1 (typography
-and rounding calibrations; the corrected compiled PDF) are
-pending Zenodo archival; until minted, cite the concept DOI for the
-current version.
+(all versions) · this version (v0.6.1):
+[`10.5281/zenodo.21842518`](https://doi.org/10.5281/zenodo.21842518) ·
+v0.4.0: [`10.5281/zenodo.21831455`](https://doi.org/10.5281/zenodo.21831455).
+The intermediate tags (v0.4.1 erratum release, v0.5.0 full-schema
+boundary arm, v0.6.0 extractor and natural-violation cells) are git
+releases without their own Zenodo deposits: their content and history
+are contained in the v0.6.1 archive and the repository.
 Machine-readable citation in [`CITATION.cff`](CITATION.cff).
 The measurement paper's LaTeX source and compiled PDF live in
 `docs/paper/` — the tracked PDF is compiled with Tectonic 0.15.0
@@ -372,7 +372,7 @@ regeneration is verified by content probes before commit.
 > Senhor Ferreira, E. (2026). *Authored-Plan Agents: Reference
 > Implementation and Measurement Study of an Architectural Pattern for
 > LLM Agent Platforms* (v0.6.1). Zenodo.
-> https://doi.org/10.5281/zenodo.21831454
+> https://doi.org/10.5281/zenodo.21842518
 
 ## License
 
