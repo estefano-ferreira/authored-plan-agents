@@ -8,7 +8,7 @@ authors:
     given-names: "Estefano"
     email: "estefano.senhor@gmail.com"
 date-released: "2026-08-06"
-version: "0.3.0"
+version: "0.4.0"
 keywords:
   - LLM agents
   - agent orchestration
@@ -25,7 +25,9 @@ abstract: >
   real-model measurement over a persisted external system of record. Central
   measured finding: telemetry blindness -- every platform-side observer
   reports success while the business database holds corrupted state --
-  demonstrated in three model families and under two decoding conditions,
+  demonstrated across four model configurations (including an open-weights
+  arm with full boundary samples), two system-of-record engines (SQLite,
+  PostgreSQL) and two decoding conditions,
   including a pre-registered follow-up whose opposite prediction the data
   falsified (fence-stripping repair absorbs rather than extracts). Decoding-
   level structured output suppressed every natural violation measured

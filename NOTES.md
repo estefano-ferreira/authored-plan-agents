@@ -926,6 +926,57 @@ boundary axis, never composited. Restriction 7 held under the stress:
 all 13 upstream failures were typed `failed_clean`, zero improvisation,
 zero persistence.
 
+## Open-weights arm — `gpt-oss-120b` via Groq, cells A and B (2026-08-06)
+
+Third cross-model arm (amendment of the same date in
+`docs/preregistration-crossmodel-integrity-AB.md`; rates $0.15/$0.60 per
+1M recorded there). Evidence: `integrity_matrix-openai-gpt-oss-120b.jsonl`
++ report + tracked snapshots; all costs recompute exactly
+(`verify_costs.py`: 123/123 across every evidence file).
+
+| | status | boundary reached | outcome | ERP rows |
+|---|---|---|---|---|
+| **A** | `completed` 10/10 | 10/10 | garbage persisted, counters 0/0/0, repairs 10 | 10 (0 valid) |
+| **B** | `failed_clean` 10/10 | **10/10** (contract 10/10/10) | typed failure per rep | **0** |
+
+**Branch A, full transfer — and the mini arm's asymmetry resolved by
+measurement, not words.** Unlike `gpt-4o-mini`, every repetition reached
+the generation boundary in both cells: the id-only selection protocol
+held in this family (0 selection-format violations), so the strict cell's
+boundary sample is **10/10** — the full-sample boundary transfer the
+family arm could not provide. Telemetry blindness reproduces with the
+full cell-A signature (single-fenced blobs this time — garbage *shape*
+varies by model, as the amendment's interpretive note anticipated; the
+axis reading does not). Selection-format robustness is now measured
+present in three configurations (Gemini family, `gpt-oss-120b`) and
+absent in one (`gpt-4o-mini`) — reinforcing the family-property
+correction, in both directions.
+
+## Postgres system-of-record arm — cells A and B (2026-08-06)
+
+Pre-registered in `docs/preregistration-postgres-sor.md` (including its
+honesty note: the runner's generic Postgres support predates the
+document; question and branches were fixed before any number). Baseline
+model held fixed — the engine is the only variable. Evidence:
+`integrity_matrix-pg.jsonl` + report + snapshot SQLite exports
+(`matrix-{A,B}-pg.sqlite` — ground truth read live from Postgres, then
+exported to the uniform tracked format).
+
+| | status | outcome | ERP rows (PostgreSQL) |
+|---|---|---|---|
+| **A** | `completed` 10/10 | garbage persisted, counters 0/0/0, repairs 10 | 10 (0 valid) |
+| **B** | `failed_clean` 10/10 | contract 10/10/10, typed failures | **0** |
+
+**Branch A: the readings are engine-portable.** The same blindness
+signature persisted into a PostgreSQL database with real declared
+constraints validating, and the strict guard held zero persistence — a
+SQLite artifact is ruled out as the explanation. The claim stays exactly
+as registered: the *engine* varied, the *owner* did not; the self-built
+system-of-record circularity remains open and declared. Forensic detail:
+the Postgres cell-A blobs are double-fenced (the injector re-fenced an
+already-fenced response, as in the original cell A), the `gpt-oss-120b`
+ones single-fenced — model-dependent shape, engine-independent reading.
+
 ## Open questions for the study
 
 - Does plan-level compensation stay manageable at 5+ steps, or does reverse-order

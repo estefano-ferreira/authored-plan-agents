@@ -1,5 +1,5 @@
 % !TEX program = pdflatex
-% Draft extracted from the repository evidence at tag v0.3.0.
+% Draft extracted from the repository evidence at tag v0.4.0.
 % Every number in this file traces to a tracked artifact under results/ or to
 % NOTES.md; do not edit a number here without editing its source first.
 %
@@ -78,7 +78,7 @@ A Controlled Measurement of Output-Contract Enforcement}
 \,\textperiodcentered\,
 \url{https://github.com/estefano-ferreira/authored-plan-agents}}
 
-\date{Draft --- extracted from repository state \texttt{v0.3.0}, 2026-08-06}
+\date{Draft --- extracted from repository state \texttt{v0.4.0}, 2026-08-06}
 
 \begin{document}
 \maketitle
@@ -92,8 +92,9 @@ comparison (plus a control arm) --- \emph{decoding constraint}
 retry-once-then-fail output-contract guard), a fault injector forcing
 format violations in the unconstrained cells and, in two pre-registered
 follow-up cells, downstream of the active schema --- on one codebase and
-one model (a pre-registered cross-model arm, reported separately in the
-limitations, reruns two cells in a second model family), with ground
+one model (pre-registered follow-up arms, reported in the limitations,
+rerun two cells across further model configurations and a second
+system-of-record engine), with ground
 truth read directly from the persisted SQLite of
 an external system of record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
@@ -293,10 +294,12 @@ from the provider's own \texttt{usage\_metadata}
 thought tokens where the model reports them,
 \texttt{cached\_content\_token\_count}), not from an estimator. Cached
 input is billed at 10\% of the input rate in the runner's formula; in
-these runs cached tokens were zero --- verified by recomputing all 83
+these runs cached tokens were zero --- verified by recomputing all 123
 recorded per-execution costs (the six-cell comparison, the control arm,
-and the cross-model arm at its own list rates: \texttt{gpt-4o-mini},
-\$0.15 / \$0.60 per million) from their token counts alone, which
+and the follow-up arms at their own list rates: \texttt{gpt-4o-mini}
+and Groq-served \texttt{gpt-oss-120b}, both \$0.15 / \$0.60 per
+million as recorded; the Postgres arm on the baseline model's rates)
+from their token counts alone, which
 reproduces every recorded figure exactly
 (\texttt{scripts/verify\_costs.py} in the repository). All runs executed inside
 free-tier quota, so the figures are list-price equivalents, not amounts
@@ -613,13 +616,25 @@ answers a sentence instead of the bare id) --- a per-family selection
 result reported separately per the pre-registration, and itself a
 falsification of this study's earlier reading that the id-only
 selection contract is ``naturally robust'' as a property of the task.
+A further pre-registered arm (Groq-served \texttt{gpt-oss-120b},
+open-weights) then provided what the mini arm could not: \emph{every}
+repetition reached the boundary in both cells (the id-only protocol
+held in this configuration), giving full boundary samples --- tolerant:
+10/10 garbage persisted with counters at zero; strict: 10/10 typed
+failures, zero rows. The mini arm's sample-of-one caveat is thereby
+resolved by measurement in a different configuration, not withdrawn.
 The frontier-tier arm (\texttt{claude-sonnet-5}, amendment recorded) has
 not run.
 
 \paragraph{Self-built system of record.} The ERP is a mock written by the
 same author, with two invariants designed to be checkable. The pattern's
 guarantee delegates wholesale to the system of record's competence; this
-study cannot measure an incompetent one. Relatedly, the platform's
+study cannot measure an incompetent one. A pre-registered engine arm
+reran cells \cellA{}/\cellB{} with the same ERP on PostgreSQL (baseline
+model held fixed) and reproduced both readings exactly --- the results
+are engine-portable and a SQLite artifact is ruled out --- but the
+circularity itself is untouched: the engine varied, the owner did not.
+Relatedly, the platform's
 registration-time checks validate \emph{coherence of declared} tool
 metadata, not the truth of the declarations.
 
@@ -742,11 +757,13 @@ evidence for every sentence above is a version-controlled artifact:
 per-cell database snapshots, append-only audit trails, and raw
 model-call logs, inspectable from a fresh clone.
 
-\paragraph{Data availability.} Repository tag \texttt{v0.3.0}:
+\paragraph{Data availability.} Repository tag \texttt{v0.4.0}:
 implementation, restriction-enforcing test suite (18 passed, 7
 strict-xfail anti-vacuity probes), and tracked evidence under
 \texttt{results/integrity-matrix/} (checkpointed JSONL, consolidated
-report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite},
+report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite}
+plus the model- and engine-suffixed arm snapshots
+(\texttt{-gpt-4o-mini}, \texttt{-openai-gpt-oss-120b}, \texttt{-pg}),
 audit trails) and \texttt{results/runs/} (the naturally occurring
 dialect-failure round, \texttt{run-20260727-215429.json}; the corrected
 round, \texttt{run-20260727-215811.json}). One caveat carried from
