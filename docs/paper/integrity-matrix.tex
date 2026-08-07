@@ -25,11 +25,28 @@
 %       observer/reactor part of the system, app external (S3.1); author
 %       list verified from the paper's first page.
 %   - Verified by direct fetch of the FULL TEXT, 2026-08-06: arXiv
-%       2606.14589 (Wei Wu, silent-failure taxonomy) -- the body uses
+%       2606.14589 (silent-failure taxonomy) -- the body uses
 %       gray-failure / differential-observability vocabulary, cites
 %       Huang et al. 2017 as its reference [1], and class C ("error
 %       swallowing and dilution") covers absorption of malformed
-%       responses into downstream fields. Citation upgraded accordingly.
+%       responses into downstream fields. Author list (Wei Wu, sole
+%       author) confirmed on the arXiv abstract page in two independent
+%       fetches. Citation upgraded accordingly.
+%
+% CONSISTENCY CHECKLIST -- rerun this whole list whenever evidence or
+% cell counts change; every past propagation failure was one of these:
+%   [ ] cell count identical in: abstract, Contribution (1), S3 design
+%       admission, Table 1, S6; "four-cell" appears only as history
+%   [ ] record/cost counts in the Price basis match verify_costs.py's
+%       current output (run it; do not restate from memory)
+%   [ ] S3 claims about what has/hasn't been tested do not contradict
+%       S6's measured results
+%   [ ] \date and Data availability tag == the tag that actually
+%       contains every number the paper reports
+%   [ ] model scope: "one model" statements carry the cross-model
+%       exception where the arm has run
+%   [ ] tau^2-bench renders unbroken (source already \mbox'd -- this is
+%       a PDF-regeneration check, not a source edit)
 
 \documentclass[11pt]{article}
 
@@ -75,7 +92,9 @@ comparison (plus a control arm) --- \emph{decoding constraint}
 retry-once-then-fail output-contract guard), a fault injector forcing
 format violations in the unconstrained cells and, in two pre-registered
 follow-up cells, downstream of the active schema --- on one codebase and
-one model, with ground truth read directly from the persisted SQLite of
+one model (a pre-registered cross-model arm, reported separately in the
+limitations, reruns two cells in a second model family), with ground
+truth read directly from the persisted SQLite of
 an external system of record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
 positioned before the contract check, the tolerant configuration
@@ -151,9 +170,10 @@ whose ground truth is not the agent's report, not the platform's
 telemetry, but rows in the business database.
 
 \paragraph{Contributions.}
-(1)~A controlled comparison of four boundary configurations --- decoding
+(1)~A controlled comparison of six boundary configurations --- decoding
 enforcement crossed with boundary repair policy, a fault injector in the
-unconstrained column, and a shared control arm --- with ground truth read
+unconstrained column and (pre-registered) downstream of the active
+schema, and a shared control arm --- with ground truth read
 from a persisted external system of record. The design is not a complete
 factorial (\S\ref{sec:design}); what this measurement adds is the
 database-grounded reading: outcomes judged against rows in the business
@@ -240,11 +260,14 @@ failure path, not its recovery path, is what \cellB{} measures.
 Stated plainly: because the injector runs only in the no-schema cells,
 \textbf{the design is not a complete factorial} --- the fault arm
 co-varies with the decoding axis. Cells \cellC{}/\cellD{} measure the
-schema configuration under \emph{natural} conditions only; no cell in
-this matrix subjects active decoding enforcement to a forced violation.
-The findings are worded accordingly (F3 claims invisibility of the
+schema configuration under \emph{natural} conditions only; within the
+original four cells, no configuration subjected active decoding
+enforcement to a forced violation --- the pre-registered follow-up
+cells E/F later did exactly that (fault injected \emph{downstream} of
+the active schema; results in \S\ref{sec:limits}). The findings are
+worded accordingly (F3 claims invisibility of the
 repair axis and zero idle cost, not that decoding ``holds under
-attack''), and the missing cells are discussed in \S\ref{sec:limits}.
+attack'').
 
 \paragraph{Cells and control.} Ten repetitions per cell of the two-agent
 email-to-ERP plan (the only plan with a generation step), each against a
@@ -270,8 +293,10 @@ from the provider's own \texttt{usage\_metadata}
 thought tokens where the model reports them,
 \texttt{cached\_content\_token\_count}), not from an estimator. Cached
 input is billed at 10\% of the input rate in the runner's formula; in
-these runs cached tokens were zero --- verified by recomputing all 43
-recorded per-execution costs from their token counts alone, which
+these runs cached tokens were zero --- verified by recomputing all 83
+recorded per-execution costs (the six-cell comparison, the control arm,
+and the cross-model arm at its own list rates: \texttt{gpt-4o-mini},
+\$0.15 / \$0.60 per million) from their token counts alone, which
 reproduces every recorded figure exactly
 (\texttt{scripts/verify\_costs.py} in the repository). All runs executed inside
 free-tier quota, so the figures are list-price equivalents, not amounts
