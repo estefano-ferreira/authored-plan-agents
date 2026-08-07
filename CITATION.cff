@@ -36,14 +36,18 @@ abstract: >
   platform-side observer reports success while the business database holds
   corrupted state -- demonstrated across four model configurations (including
   an open-weights arm with full boundary samples), two system-of-record
-  engines (SQLite, PostgreSQL) and two decoding conditions. Three of the
+  engines (SQLite, PostgreSQL) and two decoding conditions. Two of the
   study's own expectations were corrected by pre-registered measurement:
-  fence-stripping repair absorbs rather than recovers valid content; id-only
-  selection-format robustness is a model-family property, not a task
+  id-only selection-format robustness is a model-family property, not a task
   property; and the ambiguity floor in LLM plan selection is attributable to
   the model, not the evaluation set (a paired embedding baseline scores
   27/28 on the same ambiguous intents, narrowing the LLM selection layer's
-  measured justification to typed out-of-catalog refusal). Decoding-level
+  measured justification to typed out-of-catalog refusal). A separate
+  pre-registered follow-up on the schema+fault cells verified that the
+  historical absorbing fallback persists garbage independently of the
+  decoding condition; its registered contrary expectation is corrected by a
+  dated erratum, since that outcome was determinable from the instrument's
+  code before the run. Decoding-level
   structured output suppressed every natural violation measured (bounded
   observations, not elimination claims); the architectural output-contract
   guard is what keeps the channel closed when that mechanism silently

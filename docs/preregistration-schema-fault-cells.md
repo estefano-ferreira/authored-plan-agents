@@ -5,6 +5,34 @@ change or number exists. This document is committed before the experiment
 executes; any deviation from it must be recorded as a dated amendment above
 the registered text, never by editing it.
 
+## Erratum (2026-08-07, post-run)
+
+(a) The registered sentence below — "Cell E is the first cell of this matrix
+whose outcome the authors cannot predict from the code" — is wrong. Direct
+reading of `TolerantRepairClient` (`src/infrastructure/providers/tolerant_repair_client.py`)
+shows it never strips markdown fences: for any generation response that does
+not parse as a bare JSON object, it replaces the content with
+`{"request_type": "support", "summary": content[:200], "reply_body": content}`
+— the original text, fences included. Because the fault injector re-fences
+every generation response and this fallback absorbs every non-JSON response,
+cell E's outcome (absorption; ten garbage rows; contract counters at zero)
+was determined by roughly twenty lines of decorator code before the run.
+
+(b) Structural fact 2 below ("fence-stripping repair plausibly recovers
+*valid* content") therefore rested on a misdescription of the instrument:
+the repair does not strip fences at all.
+
+(c) Cell E is accordingly demoted from "falsified prediction" to
+"verification that the historical absorbing fallback persists garbage
+independently of the decoding condition." This does not touch the
+pre-registration's other content: F's determinism-by-construction (structural
+fact 1) and the overall design stand as registered.
+
+(d) Process correction adopted going forward: every future pre-registration
+gets a mandatory "what the code already determines" section, written before
+any prediction — only what survives that section may be registered as a
+prediction.
+
 ## Question
 
 The integrity matrix (NOTES.md § "Integrity matrix — controlled

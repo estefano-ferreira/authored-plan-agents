@@ -121,7 +121,7 @@ spot-check and the measured family arm are discussed in
 | Measurement | Result | Evidence |
 |---|---|---|
 | **Integrity matrix 2×2** — decoding constraint × boundary policy, single controlled condition (same codebase, same model, fault injected where the schema is stripped) | With a real schema both boundary policies are clean (the repair axis has nothing to do). Without it, the boundary alone decides: tolerant repair → `completed` 10/10 with **10 garbage rows and audit counters reading zero**; strict guard → `failed_clean` 10/10, **zero rows persisted** | [`NOTES.md`](NOTES.md) § Integrity matrix — controlled reproduction, `results/integrity-matrix/integrity_matrix*`, per-cell DB snapshots `results/integrity-matrix/matrix-*.sqlite` (cell A's garbage rows are directly inspectable) |
-| **Schema+fault cells E/F** — pre-registered follow-up completing the matrix's fault arm: fault injected downstream of an *active* schema, so the fence wraps valid JSON | The pre-registered prediction (fence-stripping repair recovers the valid content) was **falsified**: the tolerant cell `completed` 10/10 persisting **10 fenced blobs with contract counters at zero**; the strict cell `failed_clean` 10/10, zero rows — refusing content that was valid under the fence. Telemetry blindness reproduces with the schema active upstream; "tolerance would have recovered it" is measured false for this repair implementation | [`docs/preregistration-schema-fault-cells.md`](docs/preregistration-schema-fault-cells.md) (committed before the runner change), `results/integrity-matrix/integrity_matrix*`, `matrix-{E,F}.sqlite` |
+| **Schema+fault cells E/F** — pre-registered follow-up completing the matrix's fault arm: fault injected downstream of an *active* schema, so the fence wraps valid JSON | The tolerant cell `completed` 10/10, persisting **10 fenced blobs with contract counters at zero** — telemetry blindness under an active schema, and a verification that the historical absorbing fallback persists garbage independently of the decoding condition; the strict cell `failed_clean` 10/10, zero rows — refusing content that was valid under the fence, unchanged. The registered contrary expectation ("fence-stripping repair recovers the valid content") is corrected by a dated erratum in the pre-registration: the repair never strips fences, it absorbs non-JSON content wholesale, so the outcome was determinable from the code before the run | [`docs/preregistration-schema-fault-cells.md`](docs/preregistration-schema-fault-cells.md) (committed before the runner change; dated erratum 2026-08-07), `results/integrity-matrix/integrity_matrix*`, `matrix-{E,F}.sqlite` |
 | **Cross-model family arm** (`gpt-4o-mini`, cells A/B, pre-registered) | Boundary reading transfers on every rep that reaches the boundary: tolerant 6/6 `completed` + fenced garbage + counters at zero (telemetry blindness, third family); strict 1/1 typed failure, **zero rows in all 10 strict reps regardless of failure locus**. 13/20 reps diverged upstream on selection format — the study's first id-only violations, reported separately (never composited) and correcting "naturally robust" to a family property | `results/integrity-matrix/integrity_matrix-gpt-4o-mini.jsonl`, `matrix-{A,B}-gpt-4o-mini.sqlite`, NOTES § Cross-model family arm |
 | **Open-weights arm** (`gpt-oss-120b` via Groq, cells A/B, pre-registered) | Full Branch A transfer with a **full boundary sample**: every rep reached the boundary in both cells (id-only selection held in this family) — A: 10/10 garbage + counters at zero; B: 10/10 typed failures, zero rows. Resolves the mini arm's n=1 caveat by measurement | `integrity_matrix-openai-gpt-oss-120b.jsonl`, `matrix-{A,B}-openai-gpt-oss-120b.sqlite` |
 | **Postgres system-of-record arm** (cells A/B, baseline model, pre-registered) | The readings are **engine-portable**: same blindness signature persisted into PostgreSQL with real constraints validating (A: 10 garbage, counters zero), same zero persistence under the guard (B). A SQLite artifact is ruled out; the self-built-ERP circularity stays open and declared | [`docs/preregistration-postgres-sor.md`](docs/preregistration-postgres-sor.md), `integrity_matrix-pg.jsonl`, `matrix-{A,B}-pg.sqlite` |
@@ -189,7 +189,9 @@ compensation itself fails).
 
 ## Getting started
 
-Requires Python ≥ 3.14. No API keys are needed for the full test suite or the
+Requires Python ≥ 3.12 (the study's own venv ran 3.14; dependencies are
+pinned in `pyproject.toml` to the measured environment's exact versions).
+No API keys are needed for the full test suite or the
 default run (a deterministic local model client and stub connectors stand in).
 
 ```bash
@@ -304,9 +306,13 @@ per-execution records; every aggregate from it survives in the NOTES tables
 
 Working reference implementation; measurements current as of 2026-08-06.
 That day's rounds added, each pre-registered before its number existed:
-the **schema+fault cells E/F** (the pre-registered prediction — that
-fence-stripping repair would recover the valid content — was falsified:
-telemetry blindness reproduces with the schema active upstream) and the
+the **schema+fault cells E/F** (telemetry blindness reproduces with the
+schema active upstream — cell E verifies that the historical absorbing
+fallback persists garbage independently of the decoding condition; the
+registered contrary expectation, that fence-stripping repair would recover
+the valid content, is corrected by a dated 2026-08-07 erratum in the
+pre-registration — the repair never strips fences, it absorbs, so the
+outcome was determinable from the code before the run) and the
 **cross-model family arm** (`gpt-4o-mini`: the boundary reading transfers
 on every repetition that reaches the boundary; 13/20 repetitions diverged
 upstream on selection-response format — the study's first id-only

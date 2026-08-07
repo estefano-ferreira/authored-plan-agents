@@ -621,9 +621,10 @@ D=1, control=1, with a worst case of 111 s in C.
   generation) completed 3/3 with 3 appointments and zero service requests —
   the axes touch nothing else in the pipeline.
 - **Strict failure costs more per failure than tolerant "success".** B spent
-  ~2× A's output tokens ($0.00509 vs. $0.00304): the retry doubles the
-  generation call, and both attempts fault. The guard's price is one extra
-  model call per violation — the price of *knowing*.
+  1.92× A's output tokens (2,636 vs. 1,376) and 1.68× the cost ($0.00509 vs.
+  $0.00304): the retry doubles the generation call, and both attempts fault.
+  The guard's price is one extra model call per violation — the price of
+  *knowing*.
 
 **What it falsified or corrected.**
 
@@ -637,9 +638,10 @@ D=1, control=1, with a worst case of 111 s in C.
   proof that the status split was needed — and no other cell's reading moved.
 - Tolerant repair is not "repair". What the historical fallback (emulated here
   by an infra decorator, replicating the original round's behavior) actually
-  does is *conceal*: it strips fences well enough to satisfy the parser and
-  then persists whatever is left, reporting success. "Repaired" 10/10,
-  valid 0/10.
+  does is *conceal*: it does not strip fences at all — for any response that
+  fails to parse as a bare JSON object, it stuffs the original text, fences
+  and all, into the contract's fields (`summary` truncated to 200 chars,
+  `reply_body` verbatim), and reports success. "Repaired" 10/10, valid 0/10.
 
 **Quota reality (recorded as part of the evidence).** The 43 executions could
 not be produced in one sitting: the model's daily free-tier quota was exhausted
@@ -849,6 +851,19 @@ the cell-A signature intact under an *active* schema: contract counters
 0/0/0, ten "successful" repairs, ten corrupted business records. The
 counterfactual "tolerance would have recovered it" is measured false for
 this repair implementation, not conceded hypothetically.
+
+**Correction (2026-08-07, post-run code reading).** The paragraph above
+called this a falsified prediction; it was not. Direct reading of
+`TolerantRepairClient` shows the repair never strips fences — it absorbs by
+construction: any generation response that fails to parse as a bare JSON
+object is replaced wholesale with
+`{"request_type": "support", "summary": content[:200], "reply_body": content}`.
+With the injector re-fencing every response, cell E's outcome was determined
+by that decorator before the run, not discovered by it. The pre-registration
+(`docs/preregistration-schema-fault-cells.md`) now carries a dated erratum
+recording this. Cell E is accordingly demoted from falsified prediction to
+verification — the second observed instance of the paper's Proposition 1
+(below) stands unchanged.
 
 **What each cell adds.** E is the second observed instance of the paper's
 Proposition 1 under a different decoding condition — the blindness is

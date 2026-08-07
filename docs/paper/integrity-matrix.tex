@@ -36,6 +36,9 @@
 %       metadata (two sources); author attribution (K. C. Balusu) from
 %       search metadata only -- ACM page bot-walled, dblp truncated
 %       before the benchmark track. Confidence noted, 2026-08-07.
+%   - Ref [2] full author name (Laksh Advani) verified by direct fetch of
+%       the arXiv abstract page (2606.09863), 2026-08-07 -- corrects the
+%       initial-only "R. Advani" that had stood in the bibliography.
 %   - Verified by direct fetch, 2026-08-06: Microsoft's STATE-Bench blog
 %       post -- the deterministic-scorer sentence quoted in Related work
 %       is verbatim. GroundEval cited at title level (title verified on
@@ -114,8 +117,10 @@ every platform-side instrument --- status, contract counters, repair
 count --- read success or no violation; only the database showed the
 corruption. The signature reproduced unchanged with the schema active
 and the fault injected downstream of it --- a pre-registered follow-up
-whose opposite prediction (that fence-stripping repair would recover the
-valid content under the fence) the data falsified. Second, the guard's
+reported here as a verification, its registered contrary expectation
+having rested on a misreading of the instrument (the fallback absorbs,
+never strips), corrected by a dated erratum in the pre-registration.
+Second, the guard's
 price sheet: under enforced decoding
 both boundary policies were byte-equivalent and the guard's idle cost
 was zero (natural violations 0/10 --- a bounded observation, not an
@@ -223,11 +228,17 @@ no business entity. Ground truth for every cell is read from this
 database, never from platform state.
 \item \textbf{Output contract on the write path.} The \emph{boundary} is
 the single interface through which generated content becomes business
-state. Generated content that
-feeds a business write is validated against a declared schema at a
-boundary the generator cannot bypass; on violation, at most one retry,
-then a typed failure --- nothing unvalidated persists. This is the
-mechanism under test.
+state. The declared JSON Schema is enforced at the \emph{decoding}
+level (the provider-side \texttt{responseSchema}); the boundary itself
+applies a strict decode-shape check --- \texttt{json.loads}, a
+bare-JSON-object test, and presence of the contract's required keys,
+with no type, enum, format, or \texttt{additionalProperties}
+validation --- to the content that feeds a business write, at a point
+the generator cannot bypass; on violation, at most one retry, then a
+typed failure --- nothing unvalidated persists. Consequently, the
+paper's boundary result is about the \emph{position} of this check
+relative to absorption, not about the strength of its validation. This
+is the mechanism under test.
 \item \textbf{Unsampled audit.} Proposals, policy decisions, business
 validations, output-contract events and compensations are recorded
 append-only, as distinct kinds. The experiment measures, among other
@@ -248,9 +259,14 @@ schema (\texttt{responseSchema}) either passed through to the model
 provider, or stripped by an infrastructure decorator
 (\texttt{SchemaStrippingClient}). \emph{Boundary policy}: either a strict
 output-contract guard (\texttt{retry\_once\_then\_fail}) or a tolerant
-repair decorator (\texttt{TolerantRepairClient}) that strips markdown
-fences well enough to satisfy the parser and passes the result through ---
-an emulation, as an infrastructure decorator, of the historical fallback
+repair decorator (\texttt{TolerantRepairClient}) implementing an
+\emph{absorbing fallback}: for any generation response that does not
+parse as a bare JSON object, it discards nothing and strips nothing ---
+it stuffs the original text, fences included, into the contract's
+fields (\texttt{summary} set to the first 200 characters,
+\texttt{reply\_body} to the full text), producing a JSON object the
+downstream parser always accepts and passing the result through --- an
+emulation, as an infrastructure decorator, of the historical fallback
 behavior that produced the original incident. Construct validity requires
 one precision: the historical fallback lived \emph{inside the
 capability's parser} (after a parse failure it stuffed the fenced blob
@@ -370,15 +386,17 @@ axes.}
 \paragraph{F1 --- without the schema, the boundary alone separates the
 outcomes.} Same fault, same model, same pipeline: \cellA{} reports
 \statuscompleted{} 10/10 and persists 10 garbage business records;
-\cellB{} reports \statusfailedclean{} 10/10 and persists zero. One
-epistemic asymmetry must be stated: \cellB{}'s outcome is deterministic
-by construction (the injector re-fences the retry and the guard is coded
-to fail typed), so \cellB{} \emph{verifies}, under real-model conditions,
-that the strict policy does what its code says --- a designed contrast,
-not a discovery. The discovery is in \cellA{}, and it is emergent rather
-than programmed: the corrupted content does not merely evade the check
---- it reaches the business database while every platform-side
-instrument reads clean (F2).
+\cellB{} reports \statusfailedclean{} 10/10 and persists zero. Both
+outcomes are deterministic by construction, uniformly: the injector
+re-fences every response, \cellB{}'s guard is coded to fail typed on
+it, and \cellA{}'s absorbing fallback is coded to stuff the fenced text
+into the contract's fields regardless of content. \cellB{} \emph{verifies}, under
+real-model conditions, that the strict policy does what its code says;
+\cellA{} \emph{verifies} the same for the tolerant policy --- both are
+designed contrasts, not discoveries. What \cellA{} contributes is not an
+unprogrammed behavior but an end-to-end demonstration, on a real
+pipeline: the corrupted content reaches the business database while
+every platform-side instrument reads clean (F2).
 
 \paragraph{F2 --- tolerant repair conceals, and blinds the telemetry.}
 Cell \cellA{}'s contract counters read 0/0/0 because the repair runs
@@ -517,9 +535,10 @@ has literally nothing to do, and its idle cost --- extra model calls,
 extra tokens --- is zero.
 
 \paragraph{F4 --- the guard's price is one extra call per violation.}
-\cellB{} spent $\sim$2$\times$ \cellA{}'s output tokens (\$0.00509 vs.\
-\$0.00304 per 10 reps): the retry doubles the generation call and both
-attempts fault by construction. That is the entire price of knowing.
+\cellB{} spent 1.92$\times$ \cellA{}'s output tokens (2636 vs.\ 1376)
+and 1.68$\times$ its cost (\$0.00509 vs.\ \$0.00304 per 10 reps): the
+retry doubles the generation call and both attempts fault by
+construction. That is the entire price of knowing.
 
 \paragraph{F5 --- the control arm isolates the generation step.} The
 no-generation plan completed 3/3 with clean persisted state under the
@@ -579,24 +598,36 @@ only in the no-schema column (\S\ref{sec:design}). The two missing cells
 --- schema~+~injected fault, under each boundary policy --- were
 subsequently pre-registered (branches and the uncomfortable outcome fixed
 before any number existed) and run on the same model, 10 repetitions
-each. \textbf{The pre-registered prediction was falsified.} Because the
+each. The pre-registration recorded a contrary expectation: because the
 injector corrupts downstream of the provider, the injected fence wraps
 schema-valid JSON, and we predicted --- in the pre-registration, in
 review, and in an earlier version of this paragraph --- that
 fence-stripping repair would plausibly recover \emph{valid} content
-there. Measured: it does not extract; it absorbs. The tolerant cell
+there. The run's numbers contradicted that expectation. A post-run
+reading of \texttt{TolerantRepairClient}'s source showed, however, that
+the outcome was determined by the instrument before any number existed:
+the client never strips fences at all; for any response that does not
+parse as a bare JSON object it absorbs the original text --- fences
+included --- into the contract's fields. The pre-registration carries a
+dated erratum (2026-08-07,
+\texttt{docs/preregistration-schema-fault-cells.md}) recording this
+correction. The tolerant cell
 reported \statuscompleted{} 10/10 and persisted ten fenced blobs into
 the business field with contract counters at zero and ten repairs
 reported --- telemetry blindness reproduced under an \emph{active}
-decoding constraint, a second instance of Proposition~1 in a different
-decoding condition. The strict cell reported \statusfailedclean{} 10/10
+decoding constraint, a second observed instance of Proposition~1 in a
+different decoding condition; cell E is accordingly reported as a
+\emph{verification} that the historical fallback persists garbage
+independently of the decoding condition, not as a falsified prediction.
+The strict cell reported \statusfailedclean{} 10/10
 with zero rows, refusing content that was, under the fence, valid ---
 and remains the verification it was pre-declared to be (the injector
 re-fences the retry, so its outcome is deterministic by construction).
-The counterfactual ``tolerance would have recovered it'' is therefore
-measured false for this repair implementation, not conceded
-hypothetically: the alternative to refusal was not recovery; it was
-corruption. The design is \emph{still} not a complete factorial: the
+The counterfactual ``tolerance would have recovered it'' was therefore
+never open to begin with: it was settled by the instrument's
+construction and confirmed, not falsified, by the run --- the
+alternative to refusal was not recovery; it was corruption. The design
+is \emph{still} not a complete factorial: the
 no-schema/no-fault arm (natural violations under each boundary policy)
 has never run as a cell --- the incident round covers only its tolerant
 half.
@@ -808,18 +839,25 @@ model-call logs, inspectable from a fresh clone.
 
 \paragraph{Implications for platform design.} Three design consequences
 follow from the measurements, stated as requirements the findings
-support rather than as a new architecture. First, an output-contract
-guard on the business write path is an architectural requirement, not an
+support rather than as a new architecture, at three different levels of
+evidential support. First, an output-contract guard --- a decode-shape
+check at the boundary --- on the business write path is an
+architectural requirement, not an
 optimization: its idle cost was measured at zero in the tested
-configuration (a bounded observation, \S\ref{sec:limits}) and its
+configuration (a bounded observation, F3/F4, \S\ref{sec:limits}) and its
 per-violation price is one model call, so omitting it saves nothing
-measurable and forfeits the only loud-failure path this study observed. Second, platform-side telemetry
+measurable and forfeits the only loud-failure path this study observed
+--- this requirement rests on the measured price sheet alone. Second,
+platform-side telemetry
 must not be treated as integrity evidence --- audit has to read the
 system of record, because the configuration in which every instrument
-agrees and is wrong is demonstrated, named, and cheap to produce.
-Third, repair-before-check must be made structurally impossible on
+agrees and is wrong is demonstrated, named, and cheap to produce --- this
+requirement rests on the two demonstrated instances, cells \cellA{} and
+E. Third, repair-before-check must be made structurally impossible on
 business writes --- the mechanism is positional, so no policy applied
-after the absorption can recover the signal. The reference
+after the absorption can recover the signal --- this requirement rests
+on Proposition~1's structural argument, of which cells \cellA{} and E
+are observed instances rather than its proof. The reference
 implementation's pattern (Authored-Plan Agents) encodes these three as
 registration- and load-time restrictions with their own violation
 probes; its specification and test suite are in the repository for any
@@ -835,7 +873,11 @@ plus the model- and engine-suffixed arm snapshots
 (\texttt{-gpt-4o-mini}, \texttt{-openai-gpt-oss-120b}, \texttt{-pg}),
 audit trails) and \texttt{results/runs/} (the naturally occurring
 dialect-failure round, \texttt{run-20260727-215429.json}; the corrected
-round, \texttt{run-20260727-215811.json}). One caveat carried from
+round, \texttt{run-20260727-215811.json}). The Postgres arm's ground
+truth was read from the live PostgreSQL database by direct SQL and
+exported as the tracked \texttt{-pg} SQLite snapshots noted above ---
+the uniform format the reader scripts accept (see
+\texttt{docs/preregistration-postgres-sor.md}). One caveat carried from
 \S\ref{sec:limits}: the baseline round's raw file
 (\texttt{run-20260727-212338.json}) does not exist --- lost to a
 pre-versioning cleanup; its aggregates survive in the repository's study
@@ -849,7 +891,7 @@ T.~H\"arder and A.~Reuter.
 \newblock {\em ACM Computing Surveys}, 15(4):287--317, 1983.
 
 \bibitem{advani2026}
-R.~Advani.
+L.~Advani.
 \newblock From confident closing to silent failure: Characterizing false
 success in {LLM} agents.
 \newblock arXiv:2606.09863, 2026.
