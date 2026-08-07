@@ -12,8 +12,8 @@ gitignored; see "Provenance notes".
 | Directory | Contents | Produced by |
 |---|---|---|
 | `runs/` | `run-<YYYYMMDD-HHMMSS>.json` (per-execution metrics + aggregates, one file per measurement run) and `audit-run-<ts>.jsonl` (the complete audit trail of that run) | `scripts/run_plans.py --repeat N` |
-| `integrity-matrix/` | `integrity_matrix.jsonl` (one record per (cell, rep) — the raw data), `integrity_matrix_report.json` (per-cell aggregates + direct SQLite inspection), `audit-matrix-<cell>-<ts>.jsonl` (audit trails; cell C has **three** files because the run crossed a daily-quota boundary and was resumed twice), `matrix-{A,B,C,D,control}.sqlite` (**immutable post-run snapshots** of each cell's ERP database — cell A's 10 garbage rows are directly inspectable here) | `scripts/run_plans.py --matrix-cell X --repeat N` (via `scripts/resume_matrix.py`); snapshots copied from `var/erp/` after completion |
-| `selection-sweep/` | `selection_sweep.jsonl` (one record per (model, rep, N, intent) — checkpoint/resume granularity), `selection_sweep_report.json` (accuracy-vs-N curves per model) | `scripts/selection_sweep.py` |
+| `integrity-matrix/` | `integrity_matrix.jsonl` (one record per (cell, rep) — the raw data), `integrity_matrix_report.json` (per-cell aggregates + direct SQLite inspection), `audit-matrix-<cell>-<ts>.jsonl` (audit trails; cell C has **three** files because the run crossed a daily-quota boundary and was resumed twice), `matrix-{A,B,C,D,control,E,F}.sqlite` (**immutable post-run snapshots** of each cell's ERP database — cell A's 10 garbage rows are directly inspectable here). Pre-registered arms carry a suffix on the same formats: `integrity_matrix-<arm>.jsonl` / `integrity_matrix_report-<arm>.json` / `matrix-{A,B}-<arm>.sqlite` for arms `gpt-4o-mini`, `openai-gpt-oss-120b` and `pg` (the Postgres engine arm: ground truth read from the live PostgreSQL database by direct SQL, then exported to the uniform SQLite snapshot format — `docs/preregistration-postgres-sor.md`) | `scripts/run_plans.py --matrix-cell X --repeat N` (via `scripts/resume_matrix.py`); snapshots copied from `var/erp/` after completion |
+| `selection-sweep/` | `selection_sweep.jsonl` (one record per (model, rep, N, intent) — checkpoint/resume granularity), `selection_sweep_report.json` (accuracy-vs-N curves per model), `embedding_baseline.jsonl` / `embedding_baseline_calibration.json` / `embedding_baseline_report.json` (the pre-registered paired embedding baseline — `docs/preregistration-embedding-baseline.md`) | `scripts/selection_sweep.py`; `scripts/embedding_baseline.py` |
 
 ## Regenerating the reports (safe; reads JSONL + snapshots, no model calls)
 
@@ -24,10 +24,15 @@ python scripts/selection_sweep.py --report-only
 
 ## Reading the evidence
 
-- **Model:** every real-model record in this directory is
-  `gemini-3.1-flash-lite`, except the cross-model spot-check records inside
+- **Model:** the main comparison's real-model records are
+  `gemini-3.1-flash-lite`. Exceptions, each in its own suffixed or named
+  files: the cross-model spot-check records inside
   `selection-sweep/selection_sweep.jsonl` (`gemini-3.6-flash`,
-  `gemini-3-flash-preview`).
+  `gemini-3-flash-preview`), the pre-registered cross-model arms
+  (`integrity_matrix-gpt-4o-mini.jsonl`,
+  `integrity_matrix-openai-gpt-oss-120b.jsonl`), and the embedding
+  baseline's encoder records. The Postgres engine arm (`-pg`) stays on the
+  baseline model.
 - **The DB is the ground truth, not the status.** The integrity matrix's
   central finding is that statuses and even audit counters can read clean
   while the database holds garbage (cell A). When in doubt, open the SQLite
@@ -62,7 +67,9 @@ table in `src/infrastructure/observability/console_writer.py`
   `src/infrastructure/providers/gemini_client.py`, never estimated.
 - **Cached input is billed at 10% of the input rate** in the runner's formula
   (billable input = input − cached). **In the recorded evidence, cached
-  tokens are zero**: recomputing all 43 `integrity_matrix.jsonl` costs from
+  tokens are zero**: recomputing all 123 recorded per-execution costs (the
+  six-cell comparison and control in `integrity_matrix.jsonl` plus the
+  suffixed arm files, each at its model's recorded list rates) from
   their token counts alone reproduces every recorded figure exactly, and the
   earlier measurement rounds logged 0 cache-read tokens across all calls
   (NOTES § Real-model findings). The recomputation is executable:

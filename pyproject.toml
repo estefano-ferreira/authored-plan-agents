@@ -3,24 +3,24 @@ name = "agent-platform-reference"
 version = "0.1.0"
 description = "Reference implementation and measurement study of an architectural pattern for LLM agent platforms."
 authors = [{ name = "Estefano Senhor Ferreira", email = "estefano.senhor@gmail.com" }]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
-    "pyyaml",
-    "fastapi",
-    "httpx",
-    "uvicorn",
-    "mcp",
-    "anthropic",
-    "openai",
-    "google-genai",
-    "langsmith",
-    "sqlalchemy>=2.0",
-    "psycopg[binary]",
-    "pgvector",
+    "pyyaml==6.0.3",
+    "fastapi==0.140.7",
+    "httpx==0.28.1",
+    "uvicorn==0.51.0",
+    "mcp==1.28.1",
+    "anthropic==0.120.0",
+    "openai==2.48.0",
+    "google-genai==2.14.0",
+    "langsmith==0.10.10",
+    "sqlalchemy==2.0.51",
+    "psycopg[binary]==3.3.4",
+    "pgvector==0.5.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest==9.1.1"]
 
 [build-system]
 requires = ["setuptools"]

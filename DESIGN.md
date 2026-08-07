@@ -13,7 +13,9 @@ rules are extracted in [`SPECIFICATION.md`](SPECIFICATION.md) (draft): where
 both state the same rule, the specification carries the pattern-level wording
 and this file adds the binding to this implementation.
 
-Python: 3.14 (venv in `.venv`). Style: **synchronous** code (async→sync bridges
+Python: 3.14 in the study venv (`.venv`); declared floor is `>=3.12` — a
+static sweep found no 3.13+-only syntax or stdlib usage, and dependencies are
+pinned in `pyproject.toml`. Style: **synchronous** code (async→sync bridges
 live inside the connectors). No pydantic in `core` (pure stdlib: `dataclasses`,
 `enum`, `abc`, `typing`).
 
