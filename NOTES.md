@@ -885,6 +885,16 @@ repair-conceals warning remains prose-only in the practitioner literature
 found. Read-queue additions from the sweep: arXiv 2607.14167 (structured
 feedback vs.\ silent repair in agent loops), 2601.00481 (MAESTRO),
 2606.01365 (failure-aware observability).
+*(Update, same date, deep contribution audit: the structure — every
+standard observer healthy while the system is not — is now actively
+benchmarked at the TRACE layer by AgentTelemetry (ACM AIware 2026:
+14 fault types × 9 span kinds, FDR 0.429 → 1.000 with a complete
+taxonomy; no use of this study's term). Distinction recorded in the
+paper: span completeness fixes coverage; the absorbing step emits a
+successful span by contract, so only persisted-record content reveals
+the case. Audit's further read-queue: 2604.25359 (structured-output
+benchmark — the family-property genre), 2606.11217, 2605.07472 (HBEE),
+2606.19704 (pre-registration wave in agent research).)*
 
 ## Cross-model family arm — gpt-4o-mini, cells A and B (2026-08-06)
 
@@ -998,8 +1008,12 @@ paired analysis executable as `scripts/paired_selection_analysis.py`.
 the LLM rep-collapse rule (the three N=40 cross-rep flips sit exactly in
 the discordant set) — undecidable at the margin by the amendment's own
 definition; refusal stopped one discordant short of its catastrophic
-criterion. **The descriptive result nobody predicted: embeddings beat the
-LLM on ambiguous intents by 21.4 points (27/28).** The registered text
+criterion. **The descriptive result this study's own registered expectations did
+not predict: embeddings beat the LLM on ambiguous intents by 21.4
+points (27/28)** — in IR terms unsurprising in hindsight (embeddings
+matching zero-shot LLM classification is an established genre); the
+value is the paired attribution on the identical set, not the
+direction. The registered text
 pre-committed this comparison as evidence about the eval set versus the
 model — answered: **the ~75% ambiguity floor was substantially a property
 of the measured model, not of the intent set** (third
