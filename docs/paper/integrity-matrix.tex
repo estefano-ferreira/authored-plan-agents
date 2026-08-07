@@ -1,5 +1,9 @@
 % !TEX program = pdflatex
-% Draft extracted from the repository evidence at tag v0.6.0.
+% PROVENANCE CONVENTION: \date and this header name the COMMIT the PDF
+% was extracted from -- necessarily the parent of the commit that
+% carries the PDF, since a PDF cannot embed its own commit hash. Clone
+% the named commit and everything except this compilation matches.
+% Current extraction commit: ad7f2c0 (evidence complete at tag v0.6.0).
 % Every number in this file traces to a tracked artifact under results/ or to
 % NOTES.md; do not edit a number here without editing its source first.
 %
@@ -56,8 +60,9 @@
 %       current output (run it; do not restate from memory)
 %   [ ] S3 claims about what has/hasn't been tested do not contradict
 %       S6's measured results
-%   [ ] \date and Data availability tag == the tag that actually
-%       contains every number the paper reports
+%   [ ] \date names the compilation parent commit (see PROVENANCE
+%       CONVENTION above); Data availability names the tag whose
+%       evidence carries every number the paper reports
 %   [ ] model scope: "one model" statements carry the cross-model
 %       exception where the arm has run
 %   [ ] tau^2-bench renders unbroken (source already \mbox'd -- this is
@@ -93,29 +98,30 @@ A Controlled Measurement of Output-Contract Enforcement}
 \,\textperiodcentered\,
 \url{https://github.com/estefano-ferreira/authored-plan-agents}}
 
-\date{Draft --- extracted from repository state \texttt{v0.6.0}, 2026-08-07}
+\date{Draft --- extracted from repository commit \texttt{ad7f2c0},
+2026-08-07}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 LLM agents that write business state can report success while persisting
-corrupted records. We reproduce this failure as a controlled six-cell
-comparison (plus a control arm) --- \emph{decoding constraint}
+corrupted records. We reproduce this failure as a controlled ten-cell
+matrix (plus a control arm) --- \emph{decoding constraint}
 (provider-enforced response schema vs.\ schema stripped) crossed with
-\emph{boundary policy} (tolerant repair vs.\ a strict
-retry-once-then-fail output-contract guard), a fault injector forcing
-format violations in the unconstrained cells and, in two pre-registered
-follow-up cells, downstream of the active schema --- on one codebase, with the
-main comparison on one model. Pre-registered follow-up arms replicate
-cells A and B across two further model configurations and a second
-system-of-record engine, and re-run the schema cells with the boundary
-strengthened to full-schema validation (the blindness signature is
-unchanged); a further two pairs of pre-registered cells added a genuine
-fence-stripping extractor as a third repair policy and measured the
-no-schema arm's natural, uninjected violation rate, replicating the
-originating incident under tracked evidence (natural rate 10/10, counters
-at zero) --- all reported in the limitations. Ground truth is
+\emph{fault source} (an injector forcing format violations; the model's
+natural behavior) and three \emph{boundary repair policies} (an
+absorbing fallback, a genuine fence-stripping extractor, and a strict
+retry-once-then-fail output-contract guard) --- accumulated as
+pre-registered cells over an originally non-factorial four-cell
+comparison, on one codebase, with the main comparison on one model; the
+grid is complete for the absorbing and strict policies. Pre-registered
+arms additionally replicate the decisive cells across two further model
+configurations, a second system-of-record engine, and a boundary
+strengthened to full-schema validation --- the blindness signature is
+unchanged throughout --- and the natural-violation cells replicate the
+originating incident under tracked evidence (natural rate 10/10,
+counters at zero). Ground truth is
 read directly from the persisted database of an external system of
 record. Two findings
 carry the paper. First, \emph{telemetry blindness}: with repair
@@ -1125,7 +1131,10 @@ probes; its specification and test suite are in the repository for any
 platform that wants to adopt the requirements without adopting the
 implementation.
 
-\paragraph{Data availability.} Repository tag \texttt{v0.6.0}:
+\paragraph{Data availability.} Repository tag \texttt{v0.6.0} carries
+the complete evidence; the exact source state of this PDF is the commit
+named on the title page (its parent by construction --- a PDF cannot
+embed the hash of the commit that carries it). The tag provides:
 implementation, restriction-enforcing test suite (35 passed, 7
 strict-xfail anti-vacuity probes --- the extractor unit tests for
 \texttt{ExtractorRepairClient} account for the growth since v0.5.0's 27),
