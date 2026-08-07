@@ -81,7 +81,11 @@ def _build_model(provider: str) -> IModelClient:
         from infrastructure.providers.gemini_client import GeminiModelClient
 
         return GeminiModelClient()
-    raise ValueError(f"unknown provider: {provider!r} (expected: local|anthropic|openai|gemini)")
+    if provider == "meta":
+        from infrastructure.providers.meta_client import MetaModelClient
+
+        return MetaModelClient()
+    raise ValueError(f"unknown provider: {provider!r} (expected: local|anthropic|openai|gemini|meta)")
 
 
 def build_platform(
@@ -96,7 +100,7 @@ def build_platform(
 ) -> Platform:
     """Composition root: assembles orchestrator + registries + runtime + guardrails + connectors + stores.
 
-    `provider`: "local" | "anthropic" | "openai" | "gemini"; if omitted, uses env `AI_PROVIDER` (default "local").
+    `provider`: "local" | "anthropic" | "openai" | "gemini" | "meta"; if omitted, uses env `AI_PROVIDER` (default "local").
     `erp_transport`: in-process ASGI transport (e.g. `httpx.ASGITransport`) for the ERP/scheduling
     RestConnector; if omitted, uses a real `base_url` via env `ERP_BASE_URL` (default `http://127.0.0.1:8123`).
     `audit_path`: path to the audit JSONL; if omitted, uses `JsonlAuditWriter`'s default

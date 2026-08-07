@@ -8,6 +8,11 @@ PRICING_USD_PER_MILLION_TOKENS: dict[str, dict[str, float]] = {
     "gemini-2.5-flash": {"input": 0.30, "output": 2.50},
     "gemini-3.6-flash": {"input": 1.50, "output": 7.50},
     "gemini-3.1-flash-lite": {"input": 0.25, "output": 1.50},
+    # Meta (Llama API) pricing is pay-as-you-go but the exact list rates are behind the account
+    # dashboard and were not available at the time this entry was added: prices are account-gated
+    # and not yet entered; cost figures for this model are recorded as $0 and MUST NOT be
+    # published until real list rates replace these zeros.
+    "muse-spark-1.2": {"input": 0.0, "output": 0.0},
     "local-deterministic": {"input": 0.0, "output": 0.0},
 }
 _CACHE_READ_DISCOUNT = 0.10

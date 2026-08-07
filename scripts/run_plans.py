@@ -758,7 +758,7 @@ _MATRIX_STALL_THRESHOLD_MS = 30_000.0
 _MATRIX_BASELINE_MODEL = "gemini-3.1-flash-lite"
 
 # Mirrors each provider client's own model resolution (env var override, else its module-level
-# default -- see infrastructure/providers/{anthropic,openai,gemini,local}_client.py) so the
+# default -- see infrastructure/providers/{anthropic,openai,gemini,meta,local}_client.py) so the
 # matrix runner can learn "which model is this run actually going to use" up front, before
 # `build_platform` ever instantiates a real client (which would require live API credentials just
 # to answer that question).
@@ -767,6 +767,7 @@ _MATRIX_PROVIDER_MODEL_ENV: dict[str, tuple[str | None, str]] = {
     "anthropic": ("ANTHROPIC_MODEL", "claude-sonnet-5"),
     "openai": ("OPENAI_MODEL", "gpt-4o-mini"),
     "gemini": ("GEMINI_MODEL", _MATRIX_BASELINE_MODEL),
+    "meta": ("META_MODEL", "muse-spark-1.2"),
 }
 
 
@@ -1082,7 +1083,7 @@ def _run_matrix_report_only(model_id: str | None = None) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--provider", choices=["local", "anthropic", "openai", "gemini"], default=None,
+    parser.add_argument("--provider", choices=["local", "anthropic", "openai", "gemini", "meta"], default=None,
                          help="model provider (default: env AI_PROVIDER or 'local')")
     parser.add_argument(
         "--erp", choices=["http", "inprocess"], default="http",
