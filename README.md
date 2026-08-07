@@ -343,14 +343,17 @@ is in [`NOTES.md`](NOTES.md).
 
 Archived at Zenodo — concept DOI
 [`10.5281/zenodo.21831454`](https://doi.org/10.5281/zenodo.21831454)
-(all versions) · this version (v0.4.0):
+(all versions) · last archived version (v0.4.0):
 [`10.5281/zenodo.21831455`](https://doi.org/10.5281/zenodo.21831455).
+Version DOIs for v0.4.1 (erratum release) and v0.5.0 (full-schema
+boundary arm) are pending Zenodo archival; until minted, cite the
+concept DOI for the current version.
 Machine-readable citation in [`CITATION.cff`](CITATION.cff).
 
 > Senhor Ferreira, E. (2026). *Authored-Plan Agents: Reference
 > Implementation and Measurement Study of an Architectural Pattern for
-> LLM Agent Platforms* (v0.4.0). Zenodo.
-> https://doi.org/10.5281/zenodo.21831455
+> LLM Agent Platforms* (v0.5.0). Zenodo.
+> https://doi.org/10.5281/zenodo.21831454
 
 ## License
 
