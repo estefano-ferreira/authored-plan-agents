@@ -68,8 +68,7 @@ table in `src/infrastructure/observability/console_writer.py`
 - **Cached input is billed at 10% of the input rate** in the runner's formula
   (billable input = input − cached). **In the recorded evidence, cached
   tokens are zero**: recomputing all 243 recorded per-execution costs (the
-  six-cell comparison and control, and the genuine-extractor and
-  natural-violation cells G/H/I/J, in `integrity_matrix.jsonl` plus the
+  ten-cell matrix and its control arm in `integrity_matrix.jsonl` plus the
   suffixed arm files, each at its model's recorded list rates) from
   their token counts alone reproduces every recorded figure exactly, and the
   earlier measurement rounds logged 0 cache-read tokens across all calls
