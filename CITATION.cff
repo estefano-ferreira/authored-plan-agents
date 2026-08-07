@@ -8,7 +8,7 @@ authors:
     given-names: "Estefano"
     email: "estefano.senhor@gmail.com"
 date-released: "2026-08-07"
-version: "0.4.0"
+version: "0.4.1"
 doi: "10.5281/zenodo.21831454"
 identifiers:
   - type: doi
