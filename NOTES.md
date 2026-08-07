@@ -1295,3 +1295,131 @@ comparator.
 - The acknowledge-before-register ordering was forced by restriction 6 — is that
   ordering acceptable to the business in general, or does it push real systems
   toward splitting read/reply capabilities after all?
+
+## SPECIFICATION 5.1 enforced; presentation repositioned; K/L interrupted by quota (2026-08-07/08)
+
+**The referee's verdict.** An external review of the v0.6.1 draft returned
+major revision — writing, not measurement. The ten-cell matrix and its
+pre-registered arms stood as measured; the objections landed on the
+paper's own presentation. Named directly: § 5.1 ("repair-before-check
+must be structurally impossible on business writes") was argued in prose
+as a pattern-level restriction with no probe that actually tried to
+build a production platform with a repair decorator wired in and watch
+it get rejected — unlike restrictions 1–7, each of which already carries
+a committed-violation xfail, § 5.1 was, in the review's phrase,
+**not-yet-evaluable**. A second, lighter objection: several passages read
+as though "instance of Proposition 1" or "the extractor column carries
+only injected cells" claimed more completeness or more novelty than the
+underlying construction supports. Neither objection asked for new cells
+or new numbers — both asked the paper to say plainly which outcomes the
+code already decided before the run, and to close the one gap where a
+claimed restriction had no test. The two probes described below are
+that gap closed.
+
+**The `measurement_mode` gate and its probes.** `build_platform`
+(`src/infrastructure/configurations.py`) gained a `measurement_mode`
+flag, default `False`. With it left at the default, wiring a repair or
+fault-injection decorator onto the model client now raises `ValueError`
+before any other collaborator is assembled — production composition
+cannot accidentally, or deliberately, compose a repair-before-check
+pipeline. `measurement_mode=True` is now required to build any of this
+study's own instrumented cells. Three tests carry the restriction: two
+strict-xfail anti-vacuity probes
+(`test_restriction_5_1_production_composition_accepts_repair_decorator`
+— attempts exactly the violation the review asked for, and is rejected;
+`test_restriction_5_1_unvalidated_content_persists_on_write_path` —
+commits the same class of violation end to end, schema stripped, both
+generation attempts corrupted, and asserts no row reaches the ERP) plus
+one companion, non-xfail test proving the flag path itself still works
+(`test_restriction_5_1_measurement_mode_allows_repair_decorator`), so an
+xfail caused by unrelated construction failure cannot masquerade as
+enforcement. Suite: **36 passed, 9 xfailed** (was 35 passed, 7 xfailed
+before this round).
+
+**Cells K and L: pre-registered, quota-interrupted, not falsified.** The
+last unmeasured column of the matrix's factorial grid — the genuine
+extractor under natural, uninjected violations — was pre-registered in
+`docs/preregistration-extractor-natural-cells.md` (committed 2026-08-07,
+before the runner change) as cells K (no schema, no injector, extractor)
+and L (schema, no injector, extractor). The run started the same day and
+hit the daily free-tier cap (500 requests/model) mid-cell. Recorded, per
+`integrity_matrix.jsonl`: **cell K, 6 of 10 repetitions** — reps 1–5
+`completed`, contract counters 0/0/0, one repair each (the extractor
+recovered a naturally single-fenced response every time it fired,
+exactly Branch A/P1's registered mechanics), and rep 6 `failed_clean`
+with a latency of ≈1,077,937 ms (≈18 minutes) — the shape of a
+provider-side rate-limit stall, not a genuine boundary sample, and
+accordingly Branch D of the pre-registration (upstream divergence,
+reported separately, never composited into K's rate). **Cell L: 0 of
+10** — the run never reached it. Nothing here is a finding yet: 5/5
+recovered-with-counters-blind is consistent with P1/P2 but far too small
+a sample to report as K's rate, and the one non-recovering rep is
+exactly the kind of infrastructure noise Branch D anticipated, not a
+K-cell outcome. `scripts/resume_matrix.py` is idempotent on
+`(cell, rep)`, so the remaining 5 K repetitions and all 10 L repetitions
+resume without re-running the recorded 6. The paper does not cite any
+K/L number; this section exists so the interruption itself is tracked
+evidence, the way every other quota stall in this study has been.
+
+**Repositioning applied to the paper.** `docs/paper/integrity-matrix.tex`
+was revised end to end against the referee's verdict, sharpening the
+same problem the measurements already supported rather than adding
+claims:
+
+- Abstract rewritten problem-first, compressed to the four-layer stack
+  (decoding suppresses and breaks silently; position blinds the counters
+  at any validation strength for any repairer; a typed-fail guard is the
+  one loud path measured; audit reads the system of record, unaffected
+  by which repairer sits at the boundary), closing with a discipline
+  sentence naming the determination rule and the replication arms.
+- Table 1 split into "genuinely open outcomes" (C, D, H, I, J) and
+  "construction verifications" (A, B, E, F, G) blocks — applying the
+  paper's own determination rule to its own presentation, every number
+  unchanged.
+- "Proposition 1" renamed "the structural observation" throughout (six
+  occurrences: a figure caption, the paragraph title, two arm
+  paragraphs, the related-work error-hiding paragraph, and the
+  Observed-instance paragraph, which now counts "configurations in which
+  the construction was exercised end to end" rather than "instances") —
+  a sufficient condition proved by construction does not earn discovery
+  credit as a numbered proposition.
+- F3 reworded so idle-cost-zero is stated as the 0/10 observation's
+  arithmetic consequence, not a separate finding.
+- §8's three implications reordered to lead with "audit reads the system
+  of record" (supported by every measured configuration, unaffected by
+  the repairer per cell G), then "repair-before-check structurally
+  impossible" (now *true* of the implementation, not only argued,
+  citing the `measurement_mode` gate and its two probes directly), then
+  the typed-fail guard as backstop (cell H's 8/10, priced by F4, its
+  natural-regime necessity awaiting K/L).
+- A Wilson 95% interval ([0.49, 0.94]) added for cell H's 8/10, so the
+  registered prediction's "held at threshold" is read alongside how wide
+  that threshold actually was at $n=10$; H's 19-repair decomposition
+  flagged as derived from per-attempt audit events
+  (`audit-matrix-H-20260807-115309.jsonl`), not tabulated directly; H's
+  validity reported per-repetition (2/10) with the 2/2
+  conditional-on-completion framing subordinated to it.
+- A pre-registration honesty paragraph added (§6): these are
+  same-author, same-session commits, minutes to about an hour ahead of
+  the runs — not third-party hypothesis locking — with Table 2 gaining a
+  compact commit-time-to-run-window column as the evidence for the
+  claim.
+- Contribution (1) and the related-work "state-grounded evaluation"
+  paragraph both now anchor primarily on GroundEval (cited, as before,
+  at title level only), with the STATE-Bench blog post demoted to an
+  explicitly secondary pointer, consistent with the paper's own
+  Delimitation paragraph.
+- Contribution (2) recast: telemetry blindness named as the measured
+  instantiation, on the agent write path, of gray failure's degenerate
+  case — not claimed as a new phenomenon.
+- A new Limitations paragraph ("Prompt scope") states that both
+  genuinely measured natural rates are properties of (model, prompt,
+  task), not of the model alone, and that no prompt-variation arm has
+  run.
+- The three "the extractor column carries injected-fault cells only"
+  sentences (Contribution 1, the design section, the limitations
+  section) updated to point at the K/L pre-registration and its
+  not-yet-reported status, rather than describing the gap as simply
+  unaddressed.
+- Data availability updated to tag `v0.6.1` and the 36-passed/9-xfailed
+  tally, with the two new § 5.1 probes named.

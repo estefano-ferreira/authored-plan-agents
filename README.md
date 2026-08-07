@@ -88,7 +88,10 @@ amortize. The five-minute version of this scoping is in [`WHY.md`](WHY.md).
 Given the seven restrictions **plus the output-contract guard on the write
 path** (the mechanism integrity-matrix cell B measures — see
 [`SPECIFICATION.md`](SPECIFICATION.md) § 5.1 for why it is named separately
-from the numbered set), each restriction enforced by a test that also
+from the numbered set; the guard is now enforced at **composition time**
+via `build_platform`'s `measurement_mode` gate, which rejects repair and
+fault decorators from production composition outright, carrying its own
+two strict-xfail probes), each restriction enforced by a test that also
 *commits its violation* in a strict-xfail probe, the architecture
 guarantees — each with the evidence that measured it:
 
@@ -98,7 +101,7 @@ guarantees — each with the evidence that measured it:
 | Business validity is decided outside the platform — no business entity exists platform-side | restriction 1 (tests) + persistence tests: the platform container has no path to business storage; `erp_service/` holds the only business tables |
 | No policy composition ever widens permission | restriction 3 (test): intersection-only, widening rejected at load |
 | Business state is never written except through the system that owns and validates the invariant, and its rejection reaches the agent typed | restriction 1 + persistence test (ERP 422 → typed `ConnectorRejection`); every matrix write path went through the ERP API |
-| A generation-contract failure never persists unvalidated content | integrity-matrix cell B: `failed_clean` 10/10, **zero rows**; provider-dialect accident: 10/10 typed failures, zero rows (`results/runs/run-20260727-215429.json`) |
+| A generation-contract failure never persists unvalidated content | integrity-matrix cell B: `failed_clean` 10/10, **zero rows**; provider-dialect accident: 10/10 typed failures, zero rows (`results/runs/run-20260727-215429.json`); `test_restriction_5_1_unvalidated_content_persists_on_write_path` (strict-xfail) commits the same violation end to end under `measurement_mode` and is rejected |
 | Every decision is auditable, unsampled — proposal, guardrail, system-of-record, output-contract, compensation, including compensation's own failure with the orphaned state | five-kind audit vocabulary; persistence test `test_compensation_failure_is_audited_with_orphaned_state`; audit trails in `results/runs/` and `results/integrity-matrix/` |
 
 *Scope, honestly:* these are architectural guarantees under the stated
@@ -204,11 +207,15 @@ default run (a deterministic local model client and stub connectors stand in).
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 
-# Expected: "35 passed, 7 xfailed" — 35 tests (7 restrictions + dependency
+# Expected: "36 passed, 9 xfailed" — 36 tests (7 restrictions + dependency
 # direction + persistence + e2e + the 9 full-schema boundary-validation
-# unit tests + the 8 ExtractorRepairClient unit tests) plus 7 strict-xfail
-# probes that try to
-# violate each restriction on purpose (an XPASS would mean an unenforced rule)
+# unit tests + the 8 ExtractorRepairClient unit tests + 1 companion test
+# proving the measurement_mode gate itself works) plus 9 strict-xfail
+# probes that try to violate each restriction on purpose (an XPASS would
+# mean an unenforced rule) — two of the nine target SPECIFICATION § 5.1's
+# composition-time gate specifically: production composition wiring a
+# repair decorator must be rejected, and unvalidated content must never
+# persist end to end on the write path
 pytest tests/ -q
 
 # Run both reference plans end to end (local provider, in-process ERP, $0)

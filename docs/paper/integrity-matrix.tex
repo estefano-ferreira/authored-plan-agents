@@ -111,48 +111,39 @@ A Controlled Measurement of Output-Contract Enforcement}
 
 \begin{abstract}
 LLM agents that write business state can report success while persisting
-corrupted records. We reproduce this failure as a controlled ten-cell
-matrix (plus a control arm) --- \emph{decoding constraint}
-(provider-enforced response schema vs.\ schema stripped) crossed with
-\emph{fault source} (an injector forcing format violations; the model's
-natural behavior) and three \emph{boundary repair policies} (an
-absorbing fallback, a genuine fence-stripping extractor, and a strict
-retry-once-then-fail output-contract guard) --- accumulated as
-pre-registered cells over an originally non-factorial four-cell
-comparison, on one codebase, with the main comparison on one model; the
-grid is complete for the absorbing and strict policies. Pre-registered
-arms additionally replicate the decisive cells across two further model
-configurations, a second system-of-record engine, and a boundary
-strengthened to full-schema validation --- the blindness signature is
-unchanged throughout --- and the natural-violation cells replicate the
-originating incident under tracked evidence (natural rate 10/10,
-counters at zero). Ground truth is
-read directly from the persisted database of an external system of
-record. Two findings
-carry the paper. First, \emph{telemetry blindness}: with repair
-positioned before the contract check, the tolerant configuration
-reported success 10/10 and persisted ten garbage business records while
-every platform-side instrument --- status, contract counters, repair
-count --- read success or no violation; only the database showed the
-corruption. The signature reproduced unchanged with the schema active
-and the fault injected downstream of it --- a pre-registered follow-up
-reported here as a verification, its registered contrary expectation
-having rested on a misreading of the instrument (the fallback absorbs,
-never strips), corrected by a dated erratum in the pre-registration.
-Second, the guard's
-price sheet: under enforced decoding
-both boundary policies were byte-equivalent and the guard's idle cost
-was zero (natural violations 0/10 --- a bounded observation, not an
-elimination claim); when a violation does arrive, the strict guard's
-price is one extra model call, buying typed, unpersisted failure instead
-of silent corruption --- a trade a naturally occurring provider
-schema-dialect mismatch exercised for us. The implication is
-deliberately narrow: constrained decoding is the suppression mechanism;
-the architectural boundary is what keeps the channel closed when that
-simpler mechanism silently breaks --- and, measured against a competent
-repairer rather than an absorbing one, what it uniquely buys is typed
-visibility, not recovery superiority. All evidence is version-controlled
-and inspectable.
+corrupted records, and every platform-side instrument can read clean
+while it happens. We measure this as a controlled ten-cell matrix (plus
+a control arm) --- \emph{decoding constraint}, \emph{fault source}, and
+three \emph{boundary repair policies} --- ground truth read directly
+from the persisted database of an external system of record, and the
+measurements support a four-layer answer. Constrained decoding
+suppresses the model's natural violations while it works --- zero
+violations at $N{=}10$, replicated at both validation strengths the
+boundary was measured at --- and breaks silently when a provider
+dialect mismatch disables it, an accident this study captured and
+reproduced as a controlled condition. With repair positioned ahead of
+the contract check, position alone decides what the platform's counters
+see, at every validation strength this study reached and for both
+measured repairers: an absorbing fallback corrupts the persisted record,
+a genuine extractor recovers it, and the counters read zero either way.
+Behind any repairer, a typed-fail guard is the only path this study
+measured that stays loud when repair itself fails --- eight of ten
+refusals in the cell built to test it --- and audit has to read the
+system of record rather than platform telemetry, a requirement every
+measured configuration supports, including violations with no injector
+anywhere in the pipeline (natural rate 10/10, counters at zero). Of the
+ten cells plus the control arm, a determination rule fixed in advance
+and declared as such classifies five as construction verifications and
+five as the genuinely open outcomes the findings above rest on;
+pre-registered arms replicate the decisive cells across two further
+model configurations, a second system-of-record engine, and both
+validation strengths. The implication is deliberately narrow:
+constrained decoding is the suppression mechanism; the architectural
+boundary is what keeps the channel closed when that simpler mechanism
+silently breaks --- and, measured against a competent repairer rather
+than an absorbing one, what it uniquely buys is typed visibility, not
+recovery superiority. All evidence is version-controlled and
+inspectable.
 \end{abstract}
 
 \section{Introduction}
@@ -213,12 +204,17 @@ boundary repair policies (absorbing, strict, extracting), plus a shared
 control arm, accumulated as pre-registered cells over an originally
 non-factorial four-cell design --- with ground truth read
 from a persisted external system of record. The grid is complete for
-the absorbing and strict policies; the extractor column carries
-injected-fault cells only (\S\ref{sec:design}). State-grounded scoring itself is
-established practice --- deterministic evaluation against the persisted
-environment is how STATE-Bench scores state-mutating
-tasks~\cite{statebench2026} and what GroundEval provides as an
-LLM-judge replacement~\cite{groundeval2026}; what this comparison adds
+the absorbing and strict policies; the extractor column's
+natural-violation cells are pre-registered
+(\path{docs/preregistration-extractor-natural-cells.md}) but not yet
+run, so results are not reported here (\S\ref{sec:design}).
+State-grounded scoring itself is
+established practice, anchored primarily on GroundEval, which is, by
+its own title, a deterministic replacement for LLM-as-judge in stateful
+agent evaluation~\cite{groundeval2026}; a Microsoft benchmark blog post
+is a secondary pointer for the same deterministic-scorer pattern over
+state-mutating tasks~\cite{statebench2026} (pointer status only,
+\S\ref{sec:related}); what this comparison adds
 is the \emph{question} asked of that ground truth: not whether the
 agent reached the correct final state, but what each boundary policy
 did to the \emph{content} of the records it persisted --- a mechanism
@@ -226,8 +222,11 @@ ablation reading record quality row by row, priced on both sides.
 (2)~The measured finding that \emph{tolerant repair conceals rather than
 repairs}, and specifically that it blinds the platform's own integrity
 counters --- the audit trail records zero violations in the cell that
-persists 100\% garbage: the \emph{telemetry blindness} defined in
-\S\ref{sec:results}.
+persists 100\% garbage: \emph{telemetry blindness} (\S\ref{sec:results}),
+the measured instantiation, on the agent write path, of gray failure's
+degenerate case~\cite{huang2017} --- named for reference against
+established vocabulary, not claimed as a new phenomenon
+(\S\ref{sec:related}).
 (3)~An honest pricing of the boundary guard as insurance: idle cost zero
 when decoding enforcement works, one extra model call per violation when
 it does not, and a naturally occurring configuration failure in which the
@@ -327,8 +326,10 @@ under a genuine extractor rather than the absorbing fallback; I/J then
 measured the no-schema arm's \emph{natural}, uninjected violation rate
 under each boundary policy (all in \S\ref{sec:limits}) --- together
 completing the decoding-constraint $\times$ fault-source grid for the
-absorbing and strict boundary policies. The extractor column remains
-populated only under injected faults; the findings are worded
+absorbing and strict boundary policies. The extractor column's
+natural-violation cells (K, L) are pre-registered
+(\path{docs/preregistration-extractor-natural-cells.md}) but not yet
+run; results are not reported here, and the findings below are worded
 accordingly (F3 claims invisibility of the repair axis and zero idle
 cost, not that decoding ``holds under attack'').
 
@@ -403,46 +404,58 @@ rates as of the stated date, and the token counts --- which do not change
 Cell & Configuration & Status (10 reps) & Viol./Retry/Fail & Repairs &
 Rows & Valid & Cost \\
 \midrule
-\cellA{} & no schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
-& 10 & 10 & \textbf{0} & \$0.00304 \\
-\cellB{} & no schema + fault + strict & \statusfailedclean{} 10/10 &
-10/10/10 & 0 & \textbf{0} & --- & \$0.00509 \\
+\rowcolor{gray!12}
+\multicolumn{8}{@{}l@{}}{\itshape genuinely open outcomes} \\
 \cellC{} & schema + tolerant & \statuscompleted{} 10/10 & 0/0/0 & 0 & 10 &
 10 & \$0.00247 \\
 \cellD{} & schema + strict & \statuscompleted{} 10/10 & 0/0/0 & 0 & 10 &
 10 & \$0.00246 \\
-ctrl & \cellD{} config, no-generation plan & \statuscompleted{} 3/3 &
-0/0/0 & 0 & 3 & n/a & \$0.00017 \\
-\midrule
-E & schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
-& 10 & 10 & \textbf{0} & \$0.00245 \\
-F & schema + fault + strict & \statusfailedclean{} 10/10 &
-10/10/10 & 0 & \textbf{0} & --- & \$0.00384 \\
-\midrule
-G & schema + fault + extractor & \statuscompleted{} 10/10 & 0/0/0 & 10 &
-10 & 10 & \$0.00248 \\
 H & no schema + fault + extractor & \statusfailedclean{} 8/10,
 \statuscompleted{} 2 & 9/9/8 & 19 & 2 & 2 & \$0.00491 \\
 I & no schema, natural, tolerant & \statuscompleted{} 10/10 & 0/0/0 & 10
 & 10 & \textbf{0} & \$0.00295 \\
 J & no schema, natural, strict & \statusfailedclean{} 9/10,
 \statuscompleted{} 1 & 10/10/9 & 0 & 1 & 1 & \$0.00500 \\
+\midrule
+\rowcolor{gray!12}
+\multicolumn{8}{@{}l@{}}{\itshape construction verifications (outcome
+determined by code; G conditional on decoding conformity)} \\
+\cellA{} & no schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
+& 10 & 10 & \textbf{0} & \$0.00304 \\
+\cellB{} & no schema + fault + strict & \statusfailedclean{} 10/10 &
+10/10/10 & 0 & \textbf{0} & --- & \$0.00509 \\
+E & schema + fault + tolerant & \statuscompleted{} 10/10 & 0/0/0
+& 10 & 10 & \textbf{0} & \$0.00245 \\
+F & schema + fault + strict & \statusfailedclean{} 10/10 &
+10/10/10 & 0 & \textbf{0} & --- & \$0.00384 \\
+G & schema + fault + extractor & \statuscompleted{} 10/10 & 0/0/0 & 10 &
+10 & 10 & \$0.00248 \\
+\midrule
+ctrl & \cellD{} config, no-generation plan & \statuscompleted{} 3/3 &
+0/0/0 & 0 & 3 & n/a & \$0.00017 \\
 \bottomrule
 \end{tabular}}
-\caption{The integrity matrix. ``Rows'' are records created in the
+\caption{The integrity matrix, split into the two blocks the paper's own
+determination rule (\S\ref{sec:limits}) prescribes --- applied here to
+presentation, not only to analysis. First block: cells whose outcome was
+genuinely open before the run, and on which the paper's findings rest.
+Second block: cells whose outcome the code determined before the run
+(G conditionally, on decoding conformity), reported as
+verifications. The control row sits outside both, since it targets no
+cell. Every number is unchanged from the matrix as run; only row order
+and this label are new. ``Rows'' are records created in the
 external ERP database; ``Valid'' counts rows whose persisted
 \texttt{summary} is clean one-line text (verified by direct SQL
-inspection). Cell \cellA{}'s ten rows each carry a double-fenced JSON blob
-in the business field while every counter the platform exposes reads
-zero. Below the first rule: the pre-registered follow-up cells E and F
-(\S\ref{sec:limits}), run after the original comparison --- E reproduces
-\cellA{}'s signature with the decoding constraint active upstream. Below
-the second rule: the genuine-extractor pair G/H and the natural-violation
-pair I/J (both \S\ref{sec:limits}) --- G recovers valid content under the
-same injected fence that corrupted E, with the counters just as blind;
-H's eight typed refusals are a double-fenced envelope defeating a
-single-pass extractor; cell I's ten rows carry single-fenced JSON blobs
-produced by purely \emph{natural} violations, no injector anywhere.
+inspection). In the open block: cell H's eight typed refusals are a
+double-fenced envelope defeating a single-pass extractor; cell I's ten
+rows carry single-fenced JSON blobs produced by purely \emph{natural}
+violations, no injector anywhere, with counters at zero; cell J's one
+recovery is a natural retry, not a forced one. In the verification
+block: cell \cellA{}'s ten rows each carry a double-fenced JSON blob in
+the business field while every counter the platform exposes reads zero;
+E reproduces the same signature with the decoding constraint active
+upstream; G recovers valid content under the same injected fence that
+corrupted E, with the counters just as blind.
 Model calls per repetition are structural rather than tabulated: every
 \statuscompleted{} repetition makes the plan's fixed selection calls
 plus one generation call, and the strict cells' \statusfailedclean{}
@@ -522,8 +535,8 @@ succeeded --- status \statuscompleted{}, contract counters at zero, ten
 corrupted records and zero valid ones. Cells \cellA{} and E differ in
 decoding condition (schema stripped vs.\ active, the fault injected
 downstream of it): the same blindness signature in both columns is
-Proposition~1's positional claim (\S\ref{sec:results}), visible at a
-glance.}
+the structural observation's positional claim (\S\ref{sec:results}),
+visible at a glance.}
 \label{fig:observers}
 \end{figure}
 
@@ -575,7 +588,7 @@ is counted before retry or typed failure.}
 success or no violation while the system of record holds corrupted
 state.
 
-\paragraph{Proposition 1 (Sufficient condition).} Given a violation
+\paragraph{Structural observation (sufficient condition).} Given a violation
 that reaches persistence, any absorption step positioned upstream of
 the check that feeds those observers, \emph{and whose own telemetry
 reports its operation as success}, suffices: the check never sees the
@@ -592,29 +605,31 @@ stands).
 
 \paragraph{Observed instance.} Cell \cellA{}: agent report
 \statuscompleted{}, contract counters at zero, repair count reporting
-ten successes, ten corrupted rows in the business database. A second
-instance was measured after this definition was written and
-pre-registered (\S\ref{sec:limits}): the same signature --- counters at
-zero, ten repairs, ten corrupted rows --- with decoding enforcement
-active upstream and the fault injected downstream of it. A third
-instance was measured under a further pre-registered arm
+ten successes, ten corrupted rows in the business database --- the
+first configuration in which the construction above was exercised end
+to end. A second configuration was measured after this definition was
+written and pre-registered (\S\ref{sec:limits}): the same signature ---
+counters at zero, ten repairs, ten corrupted rows --- with decoding
+enforcement active upstream and the fault injected downstream of it. A
+third configuration was measured under a further pre-registered arm
 (\S\ref{sec:limits}): the same signature again, with the boundary
 performing full validation of the declared schema --- the absorbed
 payload is schema-valid by construction, so no boundary-side validation
 strength can reject it; this outcome was determined by the code before
-the run and is reported as a verification. A fourth instance was
+the run and is reported as a verification. A fourth configuration was
 measured under the natural-violation cells (\S\ref{sec:limits}): cell I
 reproduces the same signature --- counters at zero, ten repairs, ten
 corrupted rows --- with \emph{no injector anywhere in the pipeline}; the
-violations are entirely natural, making cell I the first instance this
-study produced without a fault injector. The condition is positional,
-indifferent to what sits upstream of the absorption, to how strong the
-downstream check is, and to whether the violation was forced or occurred
-on its own. Instance counting, fixed here: an \emph{instance} is a
-distinct (decoding condition, boundary strength) configuration
-exhibiting the signature --- four so far; engine replications of these
-instances (\S\ref{sec:limits}) are counted as replications, not further
-instances.
+violations are entirely natural, making cell I the first configuration
+this study produced without a fault injector. The construction is
+positional, indifferent to what sits upstream of the absorption, to how
+strong the downstream check is, and to whether the violation was forced
+or occurred on its own. Counting rule, fixed here: four configurations
+in which the construction was exercised end to end so far, each a
+distinct (decoding condition, boundary strength) pairing with its
+engineering scope stated explicitly (engine, validation strength, fault
+source); engine replications of these configurations (\S\ref{sec:limits})
+are counted as replications, not further configurations.
 
 \paragraph{F3 --- with the schema, no violation occurred and the repair
 axis is invisible.} Cells \cellC{} and \cellD{} are byte-equivalent in
@@ -629,13 +644,18 @@ at $-18\%$ cost per completed task. Cells I and J (\S\ref{sec:limits})
 now measure the same no-schema natural rate under tracked evidence at
 this date --- 10/10 and 10/10 (20/20 first attempts) --- replacing
 reliance on that earlier round's surviving aggregates with a directly
-inspectable record. What \cellC{}/\cellD{} add is the
-guard's price sheet: under the enforced-decoding configuration the guard
-has literally nothing to do, and its idle cost --- extra model calls,
-extra tokens --- is zero. The pre-registered full-schema arm
+inspectable record. What \cellC{}/\cellD{} add is the guard's price
+sheet: under the enforced-decoding configuration the guard has
+literally nothing to do --- the measurement is the 0/10 observation
+itself, and idle cost zero is its arithmetic consequence, not a
+separate finding: a guard makes no call when nothing violates, an
+accounting identity given the 0/10 observation, reported as such. The
+pre-registered full-schema arm
 (\S\ref{sec:limits}) re-measured this idle cost at full validation
 strength --- still zero: cells \cellC{}/\cellD{} remain byte-equivalent
-under the strengthened check, with no additional model calls.
+under the strengthened check, with no additional model calls, the same
+identity holding again given the same 0/10 observation at the stronger
+boundary.
 
 \paragraph{F4 --- the guard's price is one extra call per violation.}
 \cellB{} spent 1.92$\times$ \cellA{}'s output tokens (2636 vs.\ 1376)
@@ -720,8 +740,9 @@ correction. The tolerant cell
 reported \statuscompleted{} 10/10 and persisted ten fenced blobs into
 the business field with contract counters at zero and ten repairs
 reported --- telemetry blindness reproduced under an \emph{active}
-decoding constraint, a second observed instance of Proposition~1 in a
-different decoding condition; cell E is accordingly reported as a
+decoding constraint, a second configuration in which the construction
+was exercised end to end, in a different decoding condition; cell E is
+accordingly reported as a
 \emph{verification} that the historical fallback persists garbage
 independently of the decoding condition, not as a falsified prediction.
 The strict cell reported \statusfailedclean{} 10/10
@@ -736,8 +757,10 @@ no-schema/no-fault arm --- natural violations under each boundary
 policy, the design's longest-standing admitted gap --- has since run as
 cells I and J, reported in their own paragraph below (natural rate
 10/10 in both cells); the one factorial gap that remains is the
-extractor policy under natural, uninjected violations, which has not
-run.
+extractor policy under natural, uninjected violations: cells K and L
+are pre-registered
+(\path{docs/preregistration-extractor-natural-cells.md}) but have not
+yet run, so results are not reported in this draft.
 
 \paragraph{The full-schema boundary arm.} The v0.4.0 review asked the
 strong form of the boundary question: does the positional result survive
@@ -795,14 +818,23 @@ model itself self-fences. Results confirmed the determined branch and
 scored the open one. \textbf{Cell G}: \statuscompleted{} 10/10, contract
 counters 0/0/0, 10 repairs, ten rows, all ten valid. \textbf{Cell H}:
 \statusfailedclean{} 8/10 (2 \statuscompleted{}), contract counters
-9/9/8, 19 repairs, two rows, both valid. The mechanics behind H are
+9/9/8, 19 repairs, two rows, both valid --- valid \emph{conditional on
+completion}; over all 10 repetitions the base rate is 2/10, the number
+the guard's necessity in this cell should be read against, with the
+2/2 conditional framing subordinate to it. The mechanics behind H are
 code-coherent: in 8 of 10 repetitions the model self-fenced its own
 response (implied self-fencing rate 9/10 on first attempts) on top of
 the injector's fence, producing a double-fenced envelope a single-pass
 extractor cannot fully unwrap on either attempt (16 of H's 19 repairs);
 one repetition recovered on retry (2 repairs) and one recovered on the
-first attempt (1 repair). The registered prediction (\statusfailedclean{}
-$\ge$ 8/10) held exactly at the threshold. The committed framing
+first attempt (1 repair) --- 16 + 2 + 1 = 19, a decomposition derived,
+not directly tabulated, from the per-attempt audit events in
+\path{results/integrity-matrix/audit-matrix-H-20260807-115309.jsonl}.
+The registered prediction (\statusfailedclean{}
+$\ge$ 8/10) held exactly at the threshold --- though a Wilson 95\%
+interval on 8/10 at $n{=}10$ is approximately $[0.49, 0.94]$, wide
+enough that, in a frequentist sense, this was not a risky prediction to
+register. The committed framing
 consequence (Branch A) is reported in the terms it was pre-registered
 in: the economics of refusal-versus-repair is \emph{repairer-specific}
 --- the absorbing fallback corrupted cell \cellA{}/E's content, the
@@ -822,8 +854,9 @@ and J (no schema, no injector, strict), 10 repetitions each, no new
 instrument, only configuration. The natural violation rate measured
 10/10 in both cells. \textbf{Cell I}: \statuscompleted{} 10/10, contract
 counters 0/0/0, 10 repairs, ten rows, \textbf{zero} valid --- the fourth
-observed instance of Proposition~1, and the first produced with no
-injector anywhere in the pipeline. \textbf{Cell J}: \statusfailedclean{}
+configuration in which the construction was exercised end to end, and
+the first produced with no injector anywhere in the pipeline.
+\textbf{Cell J}: \statusfailedclean{}
 9/10 (1 \statuscompleted{}), contract counters 10/10/9, zero repairs, one
 row, valid. Nine of J's ten repetitions ended in a typed refusal after
 the retry also violated; the tenth recovered --- the model returned bare
@@ -836,30 +869,51 @@ replicating the originating incident round's 10/10 under tracked,
 inspectable evidence rather than the lost baseline's surviving
 aggregates --- the loss itself (below) stays disclosed, not retracted.
 
+\paragraph{Pre-registration, honestly scoped.} Every pre-registration
+cited in this paper is a same-author, same-session commit, minutes to
+about an hour ahead of the runs it governs --- not third-party
+hypothesis locking, which this study cannot claim and does not.
+What it provides instead is auditable declared intent: a mandatory
+``what the code already determines'' section, written before any
+prediction and committed to version control before the run, so that a
+deterministic outcome cannot later be dressed up as a discovery, and so
+that a reader can check the gap between registration and measurement
+directly rather than take the author's word for it. Table~\ref{tab:arms}
+records that gap per arm, as a commit time and a run window, for exactly
+this inspection.
+
 \begin{table}[t]
 \centering
 \small
+\setlength{\tabcolsep}{4pt}%
 \renewcommand{\arraystretch}{1.2}%
-\begin{tabular}{@{}lp{2.9cm}lp{8.3cm}@{}}
+\begin{tabular}{@{}lp{2.5cm}lp{2.0cm}p{6.1cm}@{}}
 \toprule
-Arm & Varies & Cells & Reading \\
+Arm & Varies & Cells & Prereg$\rightarrow$run & Reading \\
 \midrule
 \texttt{gpt-4o-mini} & model family & \cellA{}/\cellB{} &
+22:59$\rightarrow$08-06/07 &
 transfer on every boundary-reaching rep; 13/20 diverge upstream \\
 \texttt{gpt-oss-120b} & family (open weights) & \cellA{}/\cellB{} &
+22:59$\rightarrow$08-06/07 &
 full transfer, full boundary samples \\
 \texttt{-pg} & SOR engine & \cellA{}/\cellB{} &
+22:59$\rightarrow$08-06/07 &
 full transfer (replication) \\
 \texttt{fullschema} & boundary strength & \cellC{}--F &
+10:30$\rightarrow$10:37--47 &
 P1/P2 confirmed; blindness unchanged (verification) \\
 \texttt{fullschema-pg} & engine, at full strength & \cellC{}--F &
+11:01$\rightarrow$11:02--19 &
 full transfer (replication) \\
 \midrule
-extractor cells & repair mechanism & G/H & G recovers valid content with
+extractor cells & repair mechanism & G/H & 11:40$\rightarrow$11:50--58 &
+G recovers valid content with
 counters blind (verification); H 8/10 refused, double fence defeats
 single pass \\
-natural cells & fault source --- none & I/J & natural rate 10/10;
-blindness instance four; one natural retry recovery \\
+natural cells & fault source --- none & I/J & 11:40$\rightarrow$11:50--58 &
+natural rate 10/10;
+blindness configuration four; one natural retry recovery \\
 \bottomrule
 \end{tabular}
 \caption{The pre-registered arms and follow-up cells at a glance.
@@ -867,8 +921,12 @@ blindness instance four; one natural retry recovery \\
 the arm-suffixed file set in \texttt{results/integrity-matrix/} and its
 pre-registration under \texttt{docs/}; the extractor and natural rows
 are baseline-namespace cells (G/H/I/J, no evidence suffix), each with its
-own pre-registration. Instances vs.\ replications per the counting rule
-fixed in \S\ref{sec:results}.}
+own pre-registration. Configurations vs.\ replications per the counting
+rule fixed in \S\ref{sec:results}. The ``Prereg$\rightarrow$run'' column
+gives each pre-registration's commit time and the run window it
+governed, local time, same date unless noted (first three rows:
+2026-08-06 commit, runs spanning 2026-08-06/07; remaining rows:
+2026-08-07 throughout) --- the evidence for the honesty paragraph above.}
 \label{tab:arms}
 \end{table}
 
@@ -916,6 +974,18 @@ failures, zero rows. The mini arm's sample-of-one caveat is thereby
 resolved by measurement in a different configuration, not withdrawn.
 The frontier-tier arm (\texttt{claude-sonnet-5}, amendment recorded) has
 not run.
+
+\paragraph{Prompt scope.} Both genuinely measured natural rates this
+study reports --- 10/10 without the schema (cells I/J) and the 9/10
+first-attempt self-fencing rate underlying cell H --- are properties of
+a (model, prompt, task) triple, not of the model alone. The prompts are
+fixed strings, unchanged across every cell and every arm; no
+prompt-variation arm has run. First-order sensitivity to one of the
+other two coordinates is already demonstrated: the model-family arm
+above found 13/20 upstream divergence on selection format alone from a
+model swap with the prompt held fixed. Prompt sensitivity is therefore
+not a remote possibility to note in passing; it is the next axis, cheap
+to vary, that this study has left unmeasured.
 
 \paragraph{Self-built system of record.} The ERP is a mock written by the
 same author, with two invariants designed to be checkable. The pattern's
@@ -971,12 +1041,16 @@ gap only: nothing in this paper provides atomicity, isolation, or
 durability.
 
 \paragraph{State-grounded evaluation.} Judging agents against persisted
-state rather than their own reports is established: STATE-Bench's
-deterministic scorer ``compares the final environment state to ground
-truth'' for state-mutating tasks over a pre-populated database of
-business artifacts~\cite{statebench2026}, and GroundEval is, by its own
+state rather than their own reports is established practice, anchored
+primarily on GroundEval, which is, by its own
 title, a deterministic replacement for LLM-as-judge in stateful agent
-evaluation~\cite{groundeval2026}. Both ask whether the agent reached
+evaluation~\cite{groundeval2026}. A secondary pointer, a Microsoft
+benchmark blog post, describes the same deterministic-scorer pattern:
+its scorer ``compares the final environment state to ground
+truth'' for state-mutating tasks over a pre-populated database of
+business artifacts~\cite{statebench2026} --- cited at sentence level
+only, per the Delimitation below, consistent with Contribution~(1)'s use
+of the same reference. Both ask whether the agent reached
 the correct state --- task scoring. This paper asks a different question
 of the same ground truth: what each boundary policy did to the content
 of the records it persisted. The source of truth is shared inheritance;
@@ -1025,9 +1099,9 @@ failure and continuing without recording it~\cite{errorhiding} --- and
 the practitioner literature already states that anti-pattern's
 observational consequence on the availability axis: an API that answers
 200 for failures keeps availability dashboards green. The distinction
-Proposition~1 rests on is one level deeper: in error hiding an error
-occurs and is swallowed; in the measured absorption \emph{no error
-occurs at the absorbing step} --- the repair succeeds by its own
+the structural observation rests on is one level deeper: in error
+hiding an error occurs and is swallowed; in the measured absorption
+\emph{no error occurs at the absorbing step} --- the repair succeeds by its own
 contract and its counter records successes. Telemetry blindness
 requires no swallowed exception anywhere in the pipeline; this is the
 same no-fabrication move drawn against fail-plausible above.
@@ -1104,49 +1178,59 @@ model-call logs, inspectable from a fresh clone.
 \paragraph{Implications for platform design.} Three design consequences
 follow from the measurements, stated as requirements the findings
 support rather than as a new architecture, at three different levels of
-evidential support. First, an output-contract guard on the business
-write path --- measured here at decode-shape strength and, in the
-follow-up arm, at full-schema strength --- is an
-architectural requirement, not an
-optimization: its idle cost was measured at zero in the tested
-configuration (a bounded observation, F3/F4, \S\ref{sec:limits}), and
-was re-measured at zero under the full-schema boundary arm's
-strengthened validation (\S\ref{sec:limits}), and its
-per-violation price is one model call, so omitting it saves nothing
-measurable and forfeits the only loud-failure path this study observed.
-This requirement rests on two supports of different kinds: the measured
-price sheet (F3/F4) prices it, and the naturally occurring dialect
-accident (\S\ref{sec:accident}) --- the one observed event in which the
-guard caught what the decoding constraint had silently stopped catching
---- is what argues it is \emph{necessary}, an existence proof at
-$n{=}1$, stated as such. Second,
-platform-side telemetry
+evidential support. First, platform-side telemetry
 must not be treated as integrity evidence --- audit has to read the
 system of record, because the configuration in which every instrument
-agrees and is wrong is demonstrated, named, and cheap to produce --- this
-requirement rests on the four demonstrated instances: cell \cellA{},
+agrees and is wrong is demonstrated, named, and cheap to produce. This
+requirement rests on the four demonstrated configurations: cell \cellA{},
 cell E, cell E re-run under full-schema boundary validation, and cell I
 under purely natural violations with no injector anywhere
-(\S\ref{sec:limits}). Third, repair-before-check must be made
+(\S\ref{sec:limits}); it is unaffected by which repairer sits at the
+boundary, since cell G's genuine recovery leaves the counters exactly as
+blind as cell E's corruption does --- the requirement holds whether
+repair conceals or repairs. Second, repair-before-check must be made
 structurally impossible on
 business writes --- the mechanism is positional, so no policy applied
-after the absorption can recover the signal --- this requirement rests
-on Proposition~1's structural argument, of which cells \cellA{}, E and
-the full-schema arm's E are observed instances rather than its proof.
-The reference
-implementation's pattern (Authored-Plan Agents) encodes these three as
-registration- and load-time restrictions with their own violation
-probes; its specification and test suite are in the repository for any
-platform that wants to adopt the requirements without adopting the
-implementation.
+after the absorption can recover the signal --- and this is now
+\emph{true} of the reference implementation, not only argued for it: a
+composition-time restriction (\texttt{measurement\_mode}) rejects repair
+and fault decorators from production composition outright, probed by
+two strict-xfail anti-vacuity tests (production composition wiring a
+repair decorator must be rejected; unvalidated content must never
+persist end to end on the write path), closing what an earlier draft of
+this section overclaimed as already encoded. Third, a typed-fail guard
+behind any repairer is the backstop this study can measure: in the one
+cell that tests it against a real repairer rather than an absorbing
+one, it stayed loud on 8 of 10 repetitions where extraction itself
+failed (cell H, \S\ref{sec:limits}), and F4 prices what that costs ---
+one extra model call per violation. Its necessity in the fully natural
+regime --- no injector, a genuine extractor --- awaits the pre-registered
+cells K and L (\S\ref{sec:limits}), not yet run. The naturally occurring
+dialect accident (\S\ref{sec:accident}) --- the one observed event in
+which the guard caught what the decoding constraint had silently
+stopped catching --- remains supporting evidence for the guard's
+necessity, an existence proof at $n{=}1$, stated as such. The reference
+implementation's pattern (Authored-Plan Agents) gives the first
+requirement its audit vocabulary --- a five-kind trail that records what
+the system-of-record target validated, not only what the platform
+reported --- and makes the second a probed restriction: the seven
+numbered restrictions at load or registration time, and \S\,5.1's
+repair-before-check restriction at composition time, each with its own
+violation probe. Its specification and test suite are in the repository
+for any platform that wants to adopt the requirements without adopting
+the implementation.
 
-\paragraph{Data availability.} Repository tag \texttt{v0.6.0} carries
+\paragraph{Data availability.} Repository tag \texttt{v0.6.1} carries
 the complete evidence; the exact source state of this PDF is the commit
 named on the title page (its parent by construction --- a PDF cannot
 embed the hash of the commit that carries it). The tag provides:
-implementation, restriction-enforcing test suite (35 passed, 7
+implementation, restriction-enforcing test suite (36 passed, 9
 strict-xfail anti-vacuity probes --- the extractor unit tests for
-\texttt{ExtractorRepairClient} account for the growth since v0.5.0's 27),
+\texttt{ExtractorRepairClient} account for the growth since v0.5.0's 27
+to 35 passed, 7 xfailed; two further probes, added with \S\,5.1's
+composition-time enforcement, bring the count to 36 passed, 9 xfailed:
+production composition wiring a repair decorator must be rejected, and
+unvalidated content must never persist end to end on the write path),
 and tracked evidence under
 \texttt{results/integrity-matrix/} (checkpointed JSONL, consolidated
 report, per-cell SQLite snapshots \texttt{matrix-\{A,B,C,D,control,E,F\}.sqlite}

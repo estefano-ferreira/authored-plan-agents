@@ -1,5 +1,10 @@
 # Pre-registration — extractor under natural violations, cells K and L
 
+**Amendment (2026-08-07, label correction).** The registered text below
+self-dates "Authored 2026-08-08"; the authoritative timestamp is the
+committing commit's, `c49e1bf`, 2026-08-07 17:32 local. The registered
+text is unchanged, per this document's own rule.
+
 **Status: PRE-REGISTERED, NOT RUN.** Authored 2026-08-08, before the runner
 cells exist and before any number. The runner change (cells K/L) happens
 **only after this document is committed.** Deviations are recorded as dated
